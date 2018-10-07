@@ -8,8 +8,16 @@ import java.util.Objects;
 
 public class Enviroment {
 
+    public static final String DEFAULT_BUILD_PATH = "build";
+    public static final String DEFAULT_ADOC_PATH = DEFAULT_BUILD_PATH + "/adoc";
+    public static final String DEFAULT_RESTDOC_PATH = DEFAULT_BUILD_PATH + "/restdoc";
+
     @Getter
     SourceRoot sourceRoot;
+    @Getter
+    String adocPath = DEFAULT_ADOC_PATH;
+    @Getter
+    String restdocPath = DEFAULT_RESTDOC_PATH;
 
     public static Builder builder(){
         return new Builder();
@@ -24,8 +32,18 @@ public class Enviroment {
             return enviroment;
         }
 
-        public Builder path(String path){
-            enviroment.sourceRoot = new SourceRoot(Paths.get(path));
+        public Builder root(String root){
+            enviroment.sourceRoot = new SourceRoot(Paths.get(root));
+            return this;
+        }
+
+        public Builder adoc(String adocPath){
+            enviroment.adocPath = adocPath;
+            return this;
+        }
+
+        public Builder restdoc(String restdocPath){
+            enviroment.restdocPath = restdocPath;
             return this;
         }
 

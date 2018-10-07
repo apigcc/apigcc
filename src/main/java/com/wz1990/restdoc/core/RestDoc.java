@@ -7,7 +7,9 @@ import com.wz1990.restdoc.helper.EntityVisitor;
 import com.wz1990.restdoc.schema.Tree;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.asciidoctor.*;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -33,12 +35,12 @@ public class RestDoc {
         this.enviroment = enviroment;
     }
 
-    public RestDoc(String path) {
-        this(Enviroment.builder().path(path).build());
+    public RestDoc(String root) {
+        this(Enviroment.builder().root(root).build());
     }
 
     @SneakyThrows
-    public RestDoc parse(){
+    public RestDoc parse() {
         parseResults = enviroment.getSourceRoot().tryToParse();
         parseEntity();
         parseFramework();
@@ -48,15 +50,25 @@ public class RestDoc {
     /**
      * 解析实体类结构
      */
-    private void parseEntity(){
-        parseResults.forEach(result-> result.ifSuccessful(cu-> cu.accept(new EntityVisitor(),entityHolder)));
+    private void parseEntity() {
+        parseResults.forEach(result -> result.ifSuccessful(cu -> cu.accept(new EntityVisitor(), entityHolder)));
         entityHolder.linkParent();
     }
 
     @SneakyThrows
-    private void parseFramework(){
+    private void parseFramework() {
         RestArrayVisitor visitor = Framework.currentFramework().visitor.newInstance();
-        parseResults.forEach(result-> result.ifSuccessful(cu-> cu.accept(visitor,this)));
+        parseResults.forEach(result -> result.ifSuccessful(cu -> cu.accept(visitor, this)));
+    }
+
+    public RestDoc buildAdoc() {
+        new RestDocMarkupBuilder(tree,enviroment.getAdocPath()).build();
+        return this;
+    }
+
+    public RestDoc buildRestdoc() {
+        new RestDocHtmlBuilder(enviroment).build();
+        return this;
     }
 
 }

@@ -54,6 +54,16 @@ public class Item extends Node {
         String port;
         List<Parameter> query = new ArrayList<>();
 
+        @Override
+        public String toString(){
+            if(raw!=null){
+                return raw;
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(protocol).append("://").append(host).append(path);
+            return stringBuilder.toString();
+        }
+
     }
 
     @Data
