@@ -11,9 +11,12 @@ public class Enviroment {
     public static final String DEFAULT_BUILD_PATH = "build";
     public static final String DEFAULT_ADOC_PATH = DEFAULT_BUILD_PATH + "/adoc";
     public static final String DEFAULT_RESTDOC_PATH = DEFAULT_BUILD_PATH + "/restdoc";
+    public static final String DEFAULT_JSON_FILE = DEFAULT_BUILD_PATH + "/json";
 
     @Getter
     SourceRoot sourceRoot;
+    @Getter
+    String jsonFile = DEFAULT_JSON_FILE;
     @Getter
     String adocPath = DEFAULT_ADOC_PATH;
     @Getter
@@ -34,6 +37,11 @@ public class Enviroment {
 
         public Builder root(String root){
             enviroment.sourceRoot = new SourceRoot(Paths.get(root));
+            return this;
+        }
+
+        public Builder jsonFile(String jsonFile){
+            enviroment.jsonFile = jsonFile;
             return this;
         }
 

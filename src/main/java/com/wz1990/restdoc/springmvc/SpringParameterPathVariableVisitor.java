@@ -13,13 +13,17 @@ public class SpringParameterPathVariableVisitor {
             ClassOrInterfaceType type = (ClassOrInterfaceType) p.getType();
             if (AstHelper.isBaseType(type)) {
                 String description = parsedJavadoc.getParams().get(p.getNameAsString());
-                item.getRequest().addDescription(description(p.getTypeAsString(),p.getNameAsString(),description));
+                addPathVariable(item.getRequest(), p.getNameAsString(), p.getTypeAsString(), description);
             }
         }
     }
-
-    public String description(String type, String name, String description) {
-        return String.join(" ", name, type, description);
+    private void addPathVariable(Item.Request request, String key, String type, String description) {
+        Item.Parameter parameter = new Item.Parameter();
+        parameter.setKey(key);
+        parameter.setType(type);
+        parameter.setValue(AstHelper.defaultValue(type));
+        parameter.setDescription(description);
+        request.getUrl().getPathVariable().add(parameter);
     }
 
 }

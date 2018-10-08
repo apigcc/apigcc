@@ -1,15 +1,14 @@
-package com.wz1990.restdoc.core;
+package com.wz1990.restdoc;
 
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
+import com.wz1990.restdoc.core.*;
 import com.wz1990.restdoc.helper.EntityHolder;
 import com.wz1990.restdoc.helper.EntityVisitor;
 import com.wz1990.restdoc.schema.Tree;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.asciidoctor.*;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -61,8 +60,13 @@ public class RestDoc {
         parseResults.forEach(result -> result.ifSuccessful(cu -> cu.accept(visitor, this)));
     }
 
+    public RestDoc buildJson() {
+        new RestDocJsonBuilder(tree, enviroment.getJsonFile()).build();
+        return this;
+    }
+
     public RestDoc buildAdoc() {
-        new RestDocMarkupBuilder(tree,enviroment.getAdocPath()).build();
+        new RestDocMarkupBuilder(tree, enviroment.getAdocPath()).build();
         return this;
     }
 

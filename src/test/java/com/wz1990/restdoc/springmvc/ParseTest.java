@@ -10,14 +10,16 @@ import com.github.javaparser.ast.modules.ModuleDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.utils.SourceRoot;
-import com.wz1990.restdoc.core.RestDoc;
+import com.wz1990.restdoc.RestDoc;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Ignore
 public class ParseTest {
 
     String sourcePath;

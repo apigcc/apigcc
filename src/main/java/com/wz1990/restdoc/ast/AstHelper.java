@@ -58,7 +58,7 @@ public class AstHelper {
         if(baseTypeSet.contains(type)){
             return 0;
         }
-        return null;
+        return "";
     }
 
     /**

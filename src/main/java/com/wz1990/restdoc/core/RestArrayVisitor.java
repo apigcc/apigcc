@@ -4,11 +4,14 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.wz1990.restdoc.RestDoc;
 import com.wz1990.restdoc.ast.AstHelper;
 import com.wz1990.restdoc.helper.JavadocHelper;
 import com.wz1990.restdoc.helper.ParsedJavadoc;
 import com.wz1990.restdoc.schema.Group;
 import com.wz1990.restdoc.schema.Item;
+
+import java.util.Objects;
 
 public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
 
@@ -26,8 +29,10 @@ public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
             Group group = new Group();
             group.setId(AstHelper.getFullName(n));
             ParsedJavadoc parsedJavadoc = JavadocHelper.parse(n.getJavadoc());
-            group.setName(parsedJavadoc.getName());
-            group.setDescription(parsedJavadoc.getDescription());
+            group.setName(Objects.nonNull(parsedJavadoc.getName())?parsedJavadoc.getName():n.getNameAsString());
+            if(Objects.nonNull(parsedJavadoc.getDescription())){
+                group.setDescription(parsedJavadoc.getDescription());
+            }
             restDoc.getTree().getNodes().add(group);
             n.getMembers().forEach(p -> p.accept(restArrayVisitor, group));
         }
@@ -42,8 +47,10 @@ public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
                 Item item = new Item();
                 item.setId(group.getId()+"."+n.getNameAsString());
                 ParsedJavadoc parsedJavadoc = JavadocHelper.parse(n.getJavadoc());
-                item.setName(parsedJavadoc.getName());
-                item.getRequest().addDescription(parsedJavadoc.getDescription());
+                item.setName(Objects.nonNull(parsedJavadoc.getName())?parsedJavadoc.getName():n.getNameAsString());
+                if(Objects.nonNull(parsedJavadoc.getDescription())){
+                    item.getRequest().addDescription(parsedJavadoc.getDescription());
+                }
 
                 RestArrayVisitor.this.visit(n, item, parsedJavadoc);
 

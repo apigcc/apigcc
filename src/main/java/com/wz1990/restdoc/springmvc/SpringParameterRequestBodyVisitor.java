@@ -1,7 +1,7 @@
 package com.wz1990.restdoc.springmvc;
 
 import com.github.javaparser.ast.body.Parameter;
-import com.wz1990.restdoc.core.RestDoc;
+import com.wz1990.restdoc.RestDoc;
 import com.wz1990.restdoc.ast.AstHelper;
 import com.wz1990.restdoc.ast.AstType;
 import com.wz1990.restdoc.helper.Entity;
@@ -33,7 +33,22 @@ public class SpringParameterRequestBodyVisitor {
                 } else {
                     request.getBody().setRaw(entity.getPrettyJson());
                 }
+                addRawParameter(request, entity);
             }
         }
     }
+
+    private void addRawParameter(Item.Request request, Entity entity) {
+        for (int i = 0; i < entity.getFields().size(); i++) {
+            Entity.Field field = entity.getFields().get(i);
+
+            Item.Parameter parameter = new Item.Parameter();
+            parameter.setKey(field.getName());
+            parameter.setType(field.getType());
+            parameter.setValue(AstHelper.defaultValue(field.getType()));
+            parameter.setDescription(field.getDescription());
+            request.getBody().getRawParameter().add(parameter);
+        }
+    }
+
 }

@@ -1,15 +1,19 @@
 package com.wz1990.restdoc.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wz1990.restdoc.helper.Entity;
 import com.wz1990.restdoc.helper.HttpSchema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -53,14 +57,14 @@ public class Item extends Node {
         String path;
         String port;
         List<Parameter> query = new ArrayList<>();
+        List<Parameter> pathVariable = new ArrayList<>();
 
-        @Override
-        public String toString(){
-            if(raw!=null){
-                return raw;
-            }
+        public String getQueryString(){
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(protocol).append("://").append(host).append(path);
+            Parameter.join(query,stringBuilder);
+            if(stringBuilder.length()>0){
+                stringBuilder.insert(0,"?");
+            }
             return stringBuilder.toString();
         }
 
@@ -83,6 +87,11 @@ public class Item extends Node {
             this.key = key;
             this.value = value;
         }
+
+        @Override
+        public String toString(){
+            return key + ": " + value;
+        }
     }
 
     @Data
@@ -91,10 +100,26 @@ public class Item extends Node {
 
         BodyMode mode;
         String raw;
+        List<Parameter> rawParameter = new ArrayList<>();
         Entity entity;
         List<Parameter> urlencoded = new ArrayList<>();
         List<Parameter> formdata = new ArrayList<>();
         FileParameter file;
+
+        @JsonIgnore
+        public boolean isEmpty(){
+            return Objects.isNull(raw) && urlencoded.isEmpty() && formdata.isEmpty();
+        }
+
+        public String toString(){
+            if(raw!=null){
+                return raw;
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            Parameter.join(urlencoded,stringBuilder);
+            Parameter.join(formdata,stringBuilder);
+            return stringBuilder.toString();
+        }
 
     }
 
@@ -104,11 +129,19 @@ public class Item extends Node {
 
         String key;
         String type;
-        String value;
+        Object value;
         String src;
         String description;
         boolean disabled = false;
 
+        public static void join(List<Parameter> parameters, StringBuilder stringBuilder){
+            parameters.forEach(parameter -> {
+                if(stringBuilder.length()!=0){
+                    stringBuilder.append("&");
+                }
+                stringBuilder.append(parameter.getKey()).append("=").append(parameter.getValue());
+            });
+        }
     }
 
     @Data
@@ -127,6 +160,12 @@ public class Item extends Node {
         String name = "example";
         List<Header> header = new ArrayList<>();
         String body;
+        List<Parameter> bodyParameter = new ArrayList<>();
+
+        @JsonIgnore
+        public boolean isEmpty(){
+            return header.isEmpty() && StringUtils.isEmpty(body);
+        }
 
     }
 

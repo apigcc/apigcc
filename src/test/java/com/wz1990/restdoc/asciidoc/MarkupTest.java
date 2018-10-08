@@ -1,8 +1,8 @@
 package com.wz1990.restdoc.asciidoc;
 
-import io.github.swagger2markup.markup.builder.MarkupDocBuilder;
-import io.github.swagger2markup.markup.builder.MarkupDocBuilders;
-import io.github.swagger2markup.markup.builder.MarkupLanguage;
+import com.wz1990.restdoc.helper.AttributeAsciidocBuilder;
+import io.github.swagger2markup.markup.builder.MarkupAdmonition;
+import io.github.swagger2markup.markup.builder.MarkupBlockStyle;
 import io.github.swagger2markup.markup.builder.MarkupTableColumn;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,9 +37,9 @@ public class MarkupTest {
 
     @Test
     public void testAsciiDoc() throws IOException, URISyntaxException {
-        MarkupDocBuilder builder = MarkupDocBuilders.documentBuilder(MarkupLanguage.ASCIIDOC);
+        AttributeAsciidocBuilder builder = AttributeAsciidocBuilder.newInstance();
 
-        builder.documentTitle("Test title")
+        builder.documentTitle("Test title",":doctype: book")
                 .sectionTitleLevel(1, "Section Level 1a")
                 .sectionTitleWithAnchorLevel(1, "Section with anchor Level 1a", "level-1a")
                 .sectionTitleWithAnchorLevel(1, "Section with anchor Level 1a")
@@ -60,13 +60,13 @@ public class MarkupTest {
                 .paragraph("\rLine1\nLine2\r\n", true)
                 .listingBlock("Source code listing")
                 .listingBlock("MarkupDocBuilder builder = MarkupDocBuilders.documentBuilder(MarkupLanguage.MARKDOWN)", "java")
-//                .block("Example", MarkupBlockStyle.EXAMPLE)
-//                .block("Example", MarkupBlockStyle.EXAMPLE, "Example", null)
-//                .block("Example", MarkupBlockStyle.EXAMPLE, null, MarkupAdmonition.IMPORTANT)
-//                .block("Listing", MarkupBlockStyle.LISTING, null, MarkupAdmonition.CAUTION)
-//                .block("Literal", MarkupBlockStyle.LITERAL, null, MarkupAdmonition.NOTE)
-//                .block("Sidebar", MarkupBlockStyle.SIDEBAR, null, MarkupAdmonition.TIP)
-//                .block("Passthrough", MarkupBlockStyle.PASSTHROUGH, null, MarkupAdmonition.WARNING)
+                .block("Example", MarkupBlockStyle.EXAMPLE)
+                .block("Example", MarkupBlockStyle.EXAMPLE, "Example", null)
+                .block("Example", MarkupBlockStyle.EXAMPLE, null, MarkupAdmonition.IMPORTANT)
+                .block("Listing", MarkupBlockStyle.LISTING, null, MarkupAdmonition.CAUTION)
+                .block("Literal", MarkupBlockStyle.LITERAL, null, MarkupAdmonition.NOTE)
+                .block("Sidebar", MarkupBlockStyle.SIDEBAR, null, MarkupAdmonition.TIP)
+                .block("Passthrough", MarkupBlockStyle.PASSTHROUGH, null, MarkupAdmonition.WARNING)
                 .pageBreak()
                 .table(tableCells)
                 .tableWithColumnSpecs(tableColumns, tableCells)
@@ -84,7 +84,8 @@ public class MarkupTest {
                 .crossReferenceRaw("./document.adoc", "anchor", "text").newLine(true)
                 .crossReferenceRaw("  \u0240 µ&|ù This .:/-_  ").newLine(true)
                 .crossReference("./document.adoc", "anchor", "text").newLine(true)
-                .crossReference("  \u0240 µ&|ù This .:/-_  ").newLine(true);
+                .crossReference("  \u0240 µ&|ù This .:/-_  ").newLine(true)
+                .listingBlock("GET http://{host}}/users/{id}");
 
         Path outputFile = Paths.get("out/adoc/test");
 

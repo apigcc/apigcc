@@ -2,7 +2,7 @@ package com.wz1990.restdoc.springmvc;
 
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.wz1990.restdoc.core.RestDoc;
+import com.wz1990.restdoc.RestDoc;
 import com.wz1990.restdoc.ast.AstHelper;
 import com.wz1990.restdoc.helper.Entity;
 import com.wz1990.restdoc.helper.ParsedJavadoc;
@@ -39,6 +39,7 @@ public class SpringParameterUrlEncodedVisitor {
         Item.Parameter parameter = new Item.Parameter();
         parameter.setKey(key);
         parameter.setType(type);
+        parameter.setValue(AstHelper.defaultValue(type));
         parameter.setDescription(description);
         request.getBody().getUrlencoded().add(parameter);
     }

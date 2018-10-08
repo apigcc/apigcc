@@ -1,7 +1,7 @@
 package com.wz1990.restdoc.springmvc;
 
 import com.github.javaparser.ast.body.Parameter;
-import com.wz1990.restdoc.core.RestDoc;
+import com.wz1990.restdoc.RestDoc;
 import com.wz1990.restdoc.helper.ParsedJavadoc;
 import com.wz1990.restdoc.schema.Item;
 import com.wz1990.restdoc.schema.Method;

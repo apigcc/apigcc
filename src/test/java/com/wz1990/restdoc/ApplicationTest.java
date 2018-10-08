@@ -1,10 +1,11 @@
-package com.wz1990.restdoc.springmvc;
+package com.wz1990.restdoc;
 
-import com.wz1990.restdoc.core.RestDoc;
 import com.wz1990.restdoc.helper.JsonHelper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class ApplicationTest {
 
     String root;
@@ -31,14 +32,12 @@ public class ApplicationTest {
         RestDoc restDoc = new RestDoc(root).parse();
         restDoc.getTree().getInfo().setName("Restdoc接口文档");
         restDoc.getTree().getInfo().setDescription("Restdoc接口文档");
-        restDoc.buildAdoc().buildRestdoc();
+        restDoc.buildJson().buildAdoc().buildRestdoc();
     }
 
     @Test
     public void testRestdocOnly(){
-        RestDoc restDoc = new RestDoc(root).parse();
-        restDoc.getTree().getInfo().setName("Restdoc接口文档");
-        restDoc.getTree().getInfo().setDescription("Restdoc接口文档");
+        RestDoc restDoc = new RestDoc(root);
         restDoc.buildRestdoc();
     }
 

@@ -7,7 +7,11 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultData<T> {
 
+    /**
+     * 返回码
+     */
     int code;
+    //返回信息
     String msg;
     T data;
 

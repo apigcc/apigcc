@@ -16,13 +16,8 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    public static final String name = "";
-
-
     /**
-     *
      * 用户详情信息
-     *
      * 主动根据id获取用户的信息
      * 非常方便的方法
      * @param id 用户编号
