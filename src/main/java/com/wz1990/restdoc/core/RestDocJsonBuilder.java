@@ -3,8 +3,10 @@ package com.wz1990.restdoc.core;
 import com.wz1990.restdoc.helper.JsonHelper;
 import com.wz1990.restdoc.schema.Tree;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.nio.file.Files;
 
 public class RestDocJsonBuilder {
 
@@ -18,16 +20,9 @@ public class RestDocJsonBuilder {
 
     @SneakyThrows
     public void build() {
-        File file = targetFile(jsonFile);
-        JsonHelper.getPrettyObjectWriter().writeValue(file, tree);
-    }
-
-    private File targetFile(String jsonFile){
         File file = new File(jsonFile);
-        if(!file.isDirectory()){
-            return new File(file.getParent()+"/index.json");
-        }
-        return new File(jsonFile+"/index.json");
+        String json = JsonHelper.getPrettyObjectWriter().writeValueAsString(tree);
+        FileUtils.writeStringToFile(file,json);
     }
 
 }

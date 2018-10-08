@@ -77,6 +77,12 @@ public class AstHelper {
         return n.getNameAsString();
     }
 
+    /**
+     * 是否包含某个注解
+     * @param n
+     * @param annotations
+     * @return
+     */
     public static boolean isAnyPresent(NodeWithAnnotations n, String ... annotations){
         if(annotations==null){
             return false;
@@ -94,10 +100,20 @@ public class AstHelper {
             List.class.getSimpleName(),
             Set.class.getSimpleName());
 
+    /**
+     * 是否为集合类型
+     * @param name
+     * @return
+     */
     public static boolean isCollection(String name){
         return collectionTypeSet.contains(name);
     }
 
+    /**
+     * 解析语法类型，判断是否为集合，获取结合中存入的类型名称
+     * @param type
+     * @return
+     */
     public static AstType parseType(Type type){
         AstType astType = new AstType();
         astType.setType(type);

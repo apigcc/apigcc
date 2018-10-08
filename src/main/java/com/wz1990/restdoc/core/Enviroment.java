@@ -11,7 +11,7 @@ public class Enviroment {
     public static final String DEFAULT_BUILD_PATH = "build";
     public static final String DEFAULT_ADOC_PATH = DEFAULT_BUILD_PATH + "/adoc";
     public static final String DEFAULT_RESTDOC_PATH = DEFAULT_BUILD_PATH + "/restdoc";
-    public static final String DEFAULT_JSON_FILE = DEFAULT_BUILD_PATH + "/json";
+    public static final String DEFAULT_JSON_FILE = DEFAULT_BUILD_PATH + "/json/index.json";
 
     @Getter
     SourceRoot sourceRoot;

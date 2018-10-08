@@ -46,7 +46,7 @@ public class RestDocMarkupBuilder {
     }
 
     private void buildGroup(Group group, String prefix, int num) {
-        builder.sectionTitleLevel1(prefix + num + group.getName());
+        builder.sectionTitleLevel1(prefix + num + " " + group.getName());
         if(Objects.nonNull(group.getDescription())){
             builder.paragraph(group.getDescription());
         }
@@ -57,7 +57,7 @@ public class RestDocMarkupBuilder {
     }
 
     private void buildItem(Item item, String prefix, int num) {
-        builder.sectionTitleLevel2(prefix + num + item.getName());
+        builder.sectionTitleLevel2(prefix + num + " " + item.getName());
         if (Objects.nonNull(item.getDescription())) {
             builder.paragraph(item.getDescription());
         }
