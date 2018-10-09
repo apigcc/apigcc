@@ -23,7 +23,7 @@ public class UserController {
      * @param id 用户编号
      * @return
      */
-    @GetMapping(value = "/users/{id}")
+    @GetMapping(value = "/{id}")
     public ResultData<User> detail(@PathVariable String id){
         User user = new User();
         return ResultData.ok(user);
@@ -34,7 +34,7 @@ public class UserController {
      * @param user 用户信息
      * @return
      */
-    @PostMapping("/users")
+    @PostMapping
     public ResultData add(@RequestBody UserDTO user){
         return ResultData.ok();
     }
@@ -44,7 +44,7 @@ public class UserController {
      * @param userQuery 查询参数
      * @return
      */
-    @RequestMapping("/users/list")
+    @RequestMapping("/list")
     public ResultData list(UserQuery userQuery){
         return ResultData.ok();
     }
@@ -54,7 +54,7 @@ public class UserController {
      * @param userQuery 查询参数
      * @return
      */
-    @PostMapping("/users/search")
+    @PostMapping("/search")
     public ResultData search(UserQuery userQuery){
         return ResultData.ok();
     }
@@ -64,7 +64,7 @@ public class UserController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/users/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     public ResultData delete(@PathVariable String id){
         return ResultData.ok();
     }
@@ -74,7 +74,7 @@ public class UserController {
      * @param address
      * @return
      */
-    @RequestMapping(value = "/users/{id}/address",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/address",method = RequestMethod.PUT)
     public ResultData address(@RequestBody List<String> address){
         return ResultData.ok();
     }
@@ -84,7 +84,7 @@ public class UserController {
      * @param intersting
      * @return
      */
-    @RequestMapping(value = "/users/{id}/intersting",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/intersting",method = RequestMethod.PUT)
     public User intersting(@RequestBody List<Integer> intersting){
         return new User();
     }
@@ -94,7 +94,7 @@ public class UserController {
      * @param arr
      * @return
      */
-    @RequestMapping(value = "/users/{id}/arr",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/arr",method = RequestMethod.PUT)
     public ResultData arr(@RequestBody String[] arr){
         return ResultData.ok();
     }

@@ -2,9 +2,13 @@ package com.wz1990.restdoc.springmvc;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.wz1990.restdoc.core.RestArrayVisitor;
 import com.wz1990.restdoc.helper.ParsedJavadoc;
+import com.wz1990.restdoc.schema.Group;
 import com.wz1990.restdoc.schema.Item;
+
+import java.util.Optional;
 
 /**
  * Spring Mvc Endpoint解析
@@ -35,12 +39,14 @@ public class SpringMvcVisitor extends RestArrayVisitor {
     }
 
     @Override
+    public void visit(ClassOrInterfaceDeclaration n, Group group) {
+        n.getAnnotations().forEach(annotationExpr -> annotationVisitor.visit(annotationExpr, group));
+    }
+
+    @Override
     public void visit(MethodDeclaration n, Item item, ParsedJavadoc parsedJavadoc) {
-        //解析注解
         n.getAnnotations().forEach(annotationExpr -> annotationVisitor.visit(annotationExpr, item));
-        //解析参数
         n.getParameters().forEach(p -> parameterVisitor.visit(p, item, parsedJavadoc, restDoc));
-        //解析返回值
         resultTypeVisitor.visit(n,item,parsedJavadoc,restDoc);
     }
 }

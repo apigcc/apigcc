@@ -5,6 +5,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.wz1990.restdoc.core.*;
 import com.wz1990.restdoc.helper.EntityHolder;
 import com.wz1990.restdoc.helper.EntityVisitor;
+import com.wz1990.restdoc.postman.RestDocJsonBuilder;
 import com.wz1990.restdoc.schema.Tree;
 import lombok.Getter;
 import lombok.SneakyThrows;

@@ -1,4 +1,4 @@
-package com.wz1990.restdoc.schema;
+package com.wz1990.restdoc.postman.schema;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

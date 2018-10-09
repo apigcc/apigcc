@@ -34,6 +34,9 @@ public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
                 group.setDescription(parsedJavadoc.getDescription());
             }
             restDoc.getTree().getNodes().add(group);
+
+            visit(n,group);
+
             n.getMembers().forEach(p -> p.accept(restArrayVisitor, group));
         }
         super.visit(n, restDoc);
@@ -63,6 +66,8 @@ public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
     public abstract boolean accept(ClassOrInterfaceDeclaration n);
 
     public abstract boolean accept(MethodDeclaration n);
+
+    public abstract void visit(ClassOrInterfaceDeclaration n, Group group);
 
     public abstract void visit(MethodDeclaration n, Item item, ParsedJavadoc parsedJavadoc);
 

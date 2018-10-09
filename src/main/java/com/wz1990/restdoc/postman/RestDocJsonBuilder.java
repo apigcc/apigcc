@@ -1,4 +1,4 @@
-package com.wz1990.restdoc.core;
+package com.wz1990.restdoc.postman;
 
 import com.wz1990.restdoc.helper.JsonHelper;
 import com.wz1990.restdoc.schema.Tree;
