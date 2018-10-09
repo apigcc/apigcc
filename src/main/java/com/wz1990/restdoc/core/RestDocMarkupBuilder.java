@@ -1,7 +1,11 @@
 package com.wz1990.restdoc.core;
 
 import com.wz1990.restdoc.helper.AttributeAsciidocBuilder;
-import com.wz1990.restdoc.schema.*;
+import com.wz1990.restdoc.schema.Group;
+import com.wz1990.restdoc.schema.Item;
+import com.wz1990.restdoc.schema.Node;
+import com.wz1990.restdoc.schema.Tree;
+import io.github.swagger2markup.markup.builder.MarkupBlockStyle;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -47,8 +51,8 @@ public class RestDocMarkupBuilder {
 
     private void buildGroup(Group group, String prefix, int num) {
         builder.sectionTitleLevel1(prefix + num + " " + group.getName());
-        if(Objects.nonNull(group.getDescription())){
-            builder.paragraph(group.getDescription());
+        if (Objects.nonNull(group.getDescription())) {
+            builder.paragraph(group.getDescription(),true);
         }
         for (int i = 0; i < group.getNodes().size(); i++) {
             Node node = group.getNodes().get(i);
@@ -59,32 +63,30 @@ public class RestDocMarkupBuilder {
     private void buildItem(Item item, String prefix, int num) {
         builder.sectionTitleLevel2(prefix + num + " " + item.getName());
         if (Objects.nonNull(item.getDescription())) {
-            builder.paragraph(item.getDescription());
+            builder.paragraph(item.getDescription(),true);
         }
 
         Item.Request request = item.getRequest();
         if (Objects.nonNull(request.getDescription())) {
-            builder.listingBlock(request.getDescription());
+            builder.paragraph(request.getDescription(),true);
         }
-        builder.italicTextLine("request");
-        builder.listingBlock(builder->{
-            builder.textLine(request.getMethod().toString());
-            builder.textLine(request.getUrl().getPath()+request.getUrl().getQueryString());
+        builder.block(builder -> {
+            builder.textLine(request.getMethod().toString()
+                    + " "
+                    + request.getUrl().getPath() + request.getUrl().getQueryString()
+                    + " HTTP/1.1");
             request.getHeader().forEach(header -> builder.textLine(header.toString()));
-        },"HTTP");
+            builder.newLine();
+            builder.textLine(request.getBody().toString());
+        }, "REQUEST");
 
-        if(!request.getBody().isEmpty()){
-            builder.listingBlock(builder-> builder.textLine(request.getBody().toString()),request.getBody().getMode().toString());
-        }
-
-        //构建参数
-        if(request.getUrl().getQuery().size()>0
-                || request.getUrl().getPathVariable().size()>0
-                || request.getBody().getRawParameter().size()>0
-                || request.getBody().getFormdata().size()>0
-                || request.getBody().getUrlencoded().size()>0){
+        if (request.getUrl().getQuery().size() > 0
+                || request.getUrl().getPathVariable().size() > 0
+                || request.getBody().getRawParameter().size() > 0
+                || request.getBody().getFormdata().size() > 0
+                || request.getBody().getUrlencoded().size() > 0) {
             List<List<String>> requestTable = new ArrayList<>();
-            requestTable.add(Arrays.asList("NAME","TYPE","DEFAULT","DESCRIPTION"));
+            requestTable.add(Arrays.asList("NAME", "TYPE", "DEFAULT", "DESCRIPTION"));
             request.getUrl().getPathVariable().forEach(parameter -> requestTable.add(toList(parameter)));
             request.getUrl().getQuery().forEach(parameter -> requestTable.add(toList(parameter)));
             request.getBody().getUrlencoded().forEach(parameter -> requestTable.add(toList(parameter)));
@@ -94,20 +96,18 @@ public class RestDocMarkupBuilder {
         }
 
         Item.Response response = item.getResponse();
-        if(!response.isEmpty()){
-            builder.italicTextLine("response");
-            if(response.getHeader().size()>0){
-                builder.listingBlock(builder->{
+        if (!response.isEmpty()) {
+            if (response.getHeader().size() > 0) {
+                builder.block(builder -> {
+                    builder.textLine("HTTP/1.1 200 OK");
                     response.getHeader().forEach(header -> builder.textLine(header.toString()));
-                },"HTTP");
+                    builder.newLine();
+                    builder.textLine(response.getBody());
+                }, "RESPONSE");
             }
-            if(Objects.nonNull(response.getBody())){
-                builder.listingBlock(builder-> builder.textLine(response.getBody()));
-            }
-            //构建参数
-            if(response.getBodyParameter().size()>0){
+            if (response.getBodyParameter().size() > 0) {
                 List<List<String>> responseTable = new ArrayList<>();
-                responseTable.add(Arrays.asList("NAME","TYPE","DEFAULT","DESCRIPTION"));
+                responseTable.add(Arrays.asList("NAME", "TYPE", "DEFAULT", "DESCRIPTION"));
                 response.getBodyParameter().forEach(parameter -> responseTable.add(toList(parameter)));
                 builder.table(responseTable);
             }
@@ -116,8 +116,8 @@ public class RestDocMarkupBuilder {
 
     }
 
-    private List<String> toList(Item.Parameter parameter){
-        return Arrays.asList(parameter.getKey(),parameter.getType(),String.valueOf(parameter.getValue()),parameter.getDescription());
+    private List<String> toList(Item.Parameter parameter) {
+        return Arrays.asList(parameter.getKey(), parameter.getType(), String.valueOf(parameter.getValue()), parameter.getDescription());
     }
 
 }

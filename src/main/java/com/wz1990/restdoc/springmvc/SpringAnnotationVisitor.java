@@ -7,6 +7,8 @@ import com.wz1990.restdoc.ast.AstHelper;
 import com.wz1990.restdoc.schema.Item;
 import com.wz1990.restdoc.schema.Method;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +25,8 @@ public class SpringAnnotationVisitor {
     public static final String DELETE_MAPPING = "DeleteMapping";
     public static final String REQUEST_MAPPING = "RequestMapping";
 
+    public static final List<String> MAPPINGS = Arrays.asList(GET_MAPPING,POST_MAPPING,PUT_MAPPING,DELETE_MAPPING,REQUEST_MAPPING);
+
     public boolean accept(ClassOrInterfaceDeclaration n) {
         return AstHelper.isAnyPresent(n, CONTROLLER, REST_CONTROLLER);
     }
@@ -36,6 +40,9 @@ public class SpringAnnotationVisitor {
     }
 
     private void parseAnnotation(AnnotationExpr n, Item.Request request) {
+        if(!isMappingAnnotation(n)){
+            return;
+        }
         String annotationName = n.getNameAsString();
         Method method = parseAnnotationName(annotationName);
         if (method == null) {
@@ -70,14 +77,26 @@ public class SpringAnnotationVisitor {
         return null;
     }
 
+    private boolean isMappingAnnotation(AnnotationExpr expr){
+        return MAPPINGS.contains(expr.getNameAsString());
+    }
+
     private Method parseAnnotationName(String name) {
         if (name == null) {
             return null;
         }
-        if ("RequestMapping".equals(name)) {
-            return Method.GET;
+        switch (name){
+            case PUT_MAPPING:
+                return Method.PUT;
+            case DELETE_MAPPING:
+                return Method.DELETE;
+            case POST_MAPPING:
+                return Method.POST;
+            case GET_MAPPING:
+            case REQUEST_MAPPING:
+            default:
+                return Method.GET;
         }
-        return Method.valueOf(name.replace("Mapping", "").toUpperCase());
     }
 
 }

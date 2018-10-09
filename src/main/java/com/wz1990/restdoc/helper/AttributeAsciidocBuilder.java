@@ -44,17 +44,17 @@ public class AttributeAsciidocBuilder extends AsciiDocBuilder {
         return this;
     }
 
-    public MarkupDocBuilder listingBlock(Consumer<AttributeAsciidocBuilder> consumer) {
-        return listingBlock(consumer, null);
+    public MarkupDocBuilder block(Consumer<AttributeAsciidocBuilder> consumer) {
+        return block(consumer, null);
     }
-    public MarkupDocBuilder listingBlock(Consumer<AttributeAsciidocBuilder> consumer, String language) {
+    public MarkupDocBuilder block(Consumer<AttributeAsciidocBuilder> consumer, String language) {
         if (language != null){
             documentBuilder.append(String.format("[source,%s]", language)).append(newLine);
         }
         Validate.notNull(consumer,"listingBlock consumer can not be null");
-        documentBuilder.append(BLOCK_STYLE.get(MarkupBlockStyle.LISTING)).append(newLine);
+        documentBuilder.append(BLOCK_STYLE.get(MarkupBlockStyle.LITERAL)).append(newLine);
         consumer.accept(this);
-        documentBuilder.append(BLOCK_STYLE.get(MarkupBlockStyle.LISTING)).append(newLine);
+        documentBuilder.append(BLOCK_STYLE.get(MarkupBlockStyle.LITERAL)).append(newLine);
         documentBuilder.append(newLine);
         return this;
     }
