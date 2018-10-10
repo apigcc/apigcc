@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public interface AuthController {
 
-    @GetMapping
+    @GetMapping(headers = "content-Type=application/json")
     Auth auth();
 
 }

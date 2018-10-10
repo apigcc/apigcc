@@ -6,7 +6,7 @@ public class URLTest {
 
     @Test
     public void test1(){
-        String p = "/";
+        String p = "/users";
         String s = "/";
         System.out.println(URL.normalize(p,s));
     }

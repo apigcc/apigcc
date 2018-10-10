@@ -3,11 +3,15 @@ package com.wz1990.restdoc.springmvc;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.wz1990.restdoc.RestDoc;
 import com.wz1990.restdoc.ast.AstTypeUtils;
+import com.wz1990.restdoc.http.HttpHeaders;
 import com.wz1990.restdoc.http.HttpMessage;
+import com.wz1990.restdoc.schema.Cell;
 import com.wz1990.restdoc.schema.Group;
 import com.wz1990.restdoc.util.URL;
 
@@ -57,17 +61,43 @@ public class SpringTreeVisitor extends VoidVisitorAdapter<Void> {
             HttpMessage message = new HttpMessage();
             message.setName(n.getNameAsString());
             message.setId(group.getId() + "." + message.getName());
+            group.getNodes().add(message);
 
-            for (int i = 0; i < n.getAnnotations().size(); i++) {
-                AnnotationExpr expr = n.getAnnotation(i);
-                if(RequestMappings.accept(expr)){
-                    RequestMappings requestMappings = RequestMappings.of(expr);
-                    message.getRequest().setMethod(requestMappings.getMethod());
-                    message.getRequest().setUri(URL.normalize(group.getExt().get("path"),requestMappings.getPath()));
-                }
-            }
-
+            n.getAnnotations().forEach(expr -> visitAnnotation(expr, message));
+            n.getParameters().forEach(expr -> visitParameter(expr, message));
+            visitType(n.getType(),message);
         }
         super.visit(n, arg);
     }
+
+    private void visitAnnotation(AnnotationExpr n, HttpMessage message) {
+        if (!RequestMappings.accept(n)) {
+            return;
+        }
+        RequestMappings requestMappings = RequestMappings.of(n);
+        message.getRequest().setMethod(requestMappings.getMethod());
+        //根据method 设置默认content-Type
+        message.getRequest().getHeaders().setContentType(requestMappings.getMethod());
+        message.getRequest().setUri(URL.normalize(group.getExt().get("path"), requestMappings.getPath()));
+        message.getRequest().getHeaders().add(requestMappings.getHeaders());
+    }
+
+    private void visitParameter(Parameter expr, HttpMessage message){
+        //RequestBody 修改请求头为json
+        Parameters parameters = Parameters.of(expr);
+        if(parameters.isFile()){
+            message.getRequest().getHeaders().setContentType(HttpHeaders.ContentType.MULTIPART_FORM_DATA);
+        }
+        if(parameters.isRequestBody()){
+            message.getRequest().getHeaders().setContentType(HttpHeaders.ContentType.APPLICATION_JSON);
+        }
+
+        message.getRequest().getCells().addAll(parameters.getCells());
+
+    }
+
+    private void visitType(Type type, HttpMessage message){
+
+    }
+
 }

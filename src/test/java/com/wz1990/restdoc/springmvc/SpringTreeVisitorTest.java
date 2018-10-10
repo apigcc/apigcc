@@ -3,6 +3,7 @@ package com.wz1990.restdoc.springmvc;
 import com.github.javaparser.utils.SourceRoot;
 import com.wz1990.restdoc.Enviroment;
 import com.wz1990.restdoc.RestDoc;
+import com.wz1990.restdoc.util.JsonHelper;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -20,6 +21,8 @@ public class SpringTreeVisitorTest {
             result.ifSuccessful(compilationUnit -> compilationUnit.accept(
                     new SpringTreeVisitor(restDoc),null));
         });
+
+        System.out.println(JsonHelper.toPretty(restDoc.getTree()));
     }
 
 }

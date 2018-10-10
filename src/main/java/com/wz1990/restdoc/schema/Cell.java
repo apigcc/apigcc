@@ -14,7 +14,7 @@ public class Cell {
     /**
      * 域名称
      */
-    String key;
+    String name;
     /**
      * 域类型
      */

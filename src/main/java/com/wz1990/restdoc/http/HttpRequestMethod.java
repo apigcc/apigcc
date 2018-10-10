@@ -1,5 +1,18 @@
 package com.wz1990.restdoc.http;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -7,6 +20,8 @@ import java.util.Objects;
 /**
  * The request method of HTTP
  */
+@JsonSerialize(using = HttpRequestMethod.Serializer.class)
+@JsonDeserialize(using = HttpRequestMethod.Deserializer.class)
 public class HttpRequestMethod {
 
     public static final HttpRequestMethod OPTIONS = new HttpRequestMethod("OPTIONS");
@@ -93,6 +108,25 @@ public class HttpRequestMethod {
     @Override
     public String toString() {
         return name;
+    }
+
+    /**
+     * 自定义类型序列化
+     */
+    public static class Serializer extends JsonSerializer<HttpRequestMethod>{
+
+        @Override
+        public void serialize(HttpRequestMethod value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+            gen.writeString(value.name());
+        }
+    }
+    
+    public static class Deserializer extends JsonDeserializer<HttpRequestMethod>{
+
+        @Override
+        public HttpRequestMethod deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            return valueOf(p.getText());
+        }
     }
 
 }

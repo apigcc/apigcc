@@ -29,9 +29,9 @@ public class HttpHeaders extends LinkedHashMap<String, String> {
         public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
         public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
-        public static final int APPLICATION_JSON_LEVEL = 3;
-        public static final int APPLICATION_X_WWW_FORM_URLENCODED_LEVEL = 2;
-        public static final int MULTIPART_FORM_DATA_LEVEL = 1;
+        private static final int APPLICATION_JSON_LEVEL = 3;
+        private static final int APPLICATION_X_WWW_FORM_URLENCODED_LEVEL = 2;
+        private static final int MULTIPART_FORM_DATA_LEVEL = 1;
 
         /**
          * HTTP header content-Type value's level.
@@ -39,7 +39,7 @@ public class HttpHeaders extends LinkedHashMap<String, String> {
          * @param value
          * @return
          */
-        public static int level(String value) {
+        private static int level(String value) {
             switch (value) {
                 case APPLICATION_JSON:
                     return APPLICATION_JSON_LEVEL;
@@ -51,11 +51,11 @@ public class HttpHeaders extends LinkedHashMap<String, String> {
             return 0;
         }
 
-        public static int compare(String value, String other) {
+        private static int compare(String value, String other) {
             return level(value) - level(other);
         }
 
-        public static boolean check(String value) {
+        private static boolean check(String value) {
             return level(value) > 0;
         }
     }
@@ -78,6 +78,29 @@ public class HttpHeaders extends LinkedHashMap<String, String> {
 
     public String getContentType(){
         return get(Names.CONTENT_TYPE);
+    }
+
+    /**
+     * 根据请求方法
+     * 设置合理的content-Type
+     * @param method
+     * @return
+     */
+    public void setContentType(HttpRequestMethod method){
+        if(!HttpRequestMethod.GET.equals(method)){
+            setContentType(ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
+        }
+    }
+
+    /**
+     * 加入一个header集合
+     * @param headers
+     */
+    public void add(HttpHeaders headers) {
+        if(headers == null || headers.isEmpty()){
+            return;
+        }
+        headers.forEach(this::put);
     }
 
 }

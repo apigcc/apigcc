@@ -18,12 +18,8 @@ public class HttpRequest {
     String uri;
     HttpHeaders headers = new HttpHeaders();
 
-    String body;
+    Object body;
 
     List<Cell> cells = new ArrayList<>();
-
-    public void setUri(String groupPath, String path){
-
-    }
 
 }
