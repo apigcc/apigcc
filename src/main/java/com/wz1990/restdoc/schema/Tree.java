@@ -1,22 +1,28 @@
 package com.wz1990.restdoc.schema;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Rest api schema from postman schema
- * https://schema.getpostman.com/json/collection/v2.1.0/collection.json
+ * Rest api Tree
+ * example:
+ * {
+ *     id:'restdoc',
+ *     group:'com.wz1990.doc',
+ *     version:'1.0',
+ *     name:'接口文档',
+ *     description:'接口描述'
+ * }
  */
-@Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Tree {
+@Getter
+@Setter
+public class Tree extends Node{
 
-    Info info = new Info();
-
-    @JsonProperty("item")
+    String group;
+    String version;
     List<Node> nodes = new ArrayList<>();
+
 }

@@ -1,4 +1,4 @@
-package com.wz1990.restdoc.helper;
+package com.wz1990.restdoc.ast;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.BodyDeclaration;
@@ -8,19 +8,18 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.wz1990.restdoc.ast.AstGeneric;
-import com.wz1990.restdoc.ast.AstHelper;
+import com.wz1990.restdoc.util.JavadocHelper;
 
 import java.util.EnumSet;
 
-public class EntityVisitor extends VoidVisitorAdapter<EntityHolder> {
+public class AstTypeVisitor extends VoidVisitorAdapter<AstTypeHolder> {
 
     @Override
-    public void visit(ClassOrInterfaceDeclaration n, EntityHolder entityHolder) {
+    public void visit(ClassOrInterfaceDeclaration n, AstTypeHolder entityHolder) {
 
-        Entity entity = new Entity();
+        AstType entity = new AstType();
         entity.setName(n.getNameAsString());
-        entity.setFullName(AstHelper.getFullName(n));
+        entity.setFullName(AstUtils.getFullName(n));
 
         if(n.getExtendedTypes().isNonEmpty()){
             ClassOrInterfaceType parentType = n.getExtendedTypes().get(0);
@@ -43,12 +42,12 @@ public class EntityVisitor extends VoidVisitorAdapter<EntityHolder> {
         }
 
         if (entity.getFields().size() > 0) {
-            entityHolder.put(entity.getName(), entity.getFullName(), entity);
+//            entityHolder.put(entity.getName(), entity.getFullName(), entity);
         }
 
     }
 
-    private void parseField(Entity entity, FieldDeclaration fieldDeclaration) {
+    private void parseField(AstType entity, FieldDeclaration fieldDeclaration) {
         EnumSet<Modifier> modifiers = fieldDeclaration.getModifiers();
         if (modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.FINAL) || modifiers.contains(Modifier.ABSTRACT)) {
             return;
@@ -56,14 +55,14 @@ public class EntityVisitor extends VoidVisitorAdapter<EntityHolder> {
         String content = JavadocHelper.getContent(fieldDeclaration.getComment());
         for (int i = 0; i < fieldDeclaration.getVariables().size(); i++) {
             VariableDeclarator variableDeclarator = fieldDeclaration.getVariables().get(i);
-            Entity.Field field = new Entity.Field();
+            AstType.Field field = new AstType.Field();
 
             field.setType(variableDeclarator.getTypeAsString());
 
             if(entity.isGeneric(variableDeclarator.getTypeAsString())){
                 field.setValue(entity.getGeneric(variableDeclarator.getTypeAsString()));
             }else{
-                field.setValue(AstHelper.defaultValue(field.getType()));
+                field.setValue(AstUtils.defaultValue(field.getType()));
             }
             field.setName(variableDeclarator.getNameAsString());
             field.setDescription(content);

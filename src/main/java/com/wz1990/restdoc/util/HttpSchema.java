@@ -1,4 +1,4 @@
-package com.wz1990.restdoc.helper;
+package com.wz1990.restdoc.util;
 
 public class HttpSchema {
 

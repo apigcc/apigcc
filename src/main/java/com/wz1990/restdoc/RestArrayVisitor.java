@@ -1,15 +1,13 @@
-package com.wz1990.restdoc.core;
+package com.wz1990.restdoc;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.wz1990.restdoc.RestDoc;
-import com.wz1990.restdoc.ast.AstHelper;
-import com.wz1990.restdoc.helper.JavadocHelper;
-import com.wz1990.restdoc.helper.ParsedJavadoc;
 import com.wz1990.restdoc.schema.Group;
-import com.wz1990.restdoc.schema.Item;
+import com.wz1990.restdoc.util.JavadocHelper;
+import com.wz1990.restdoc.util.ParsedJavadoc;
+import com.wz1990.restdoc.ast.AstUtils;
 
 import java.util.Objects;
 
@@ -27,7 +25,7 @@ public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
     public void visit(ClassOrInterfaceDeclaration n, RestDoc restDoc) {
         if (accept(n)) {
             Group group = new Group();
-            group.setId(AstHelper.getFullName(n));
+            group.setId(AstUtils.getFullName(n));
             ParsedJavadoc parsedJavadoc = JavadocHelper.parse(n.getJavadoc());
             group.setName(Objects.nonNull(parsedJavadoc.getName())?parsedJavadoc.getName():n.getNameAsString());
             if(Objects.nonNull(parsedJavadoc.getDescription())){
@@ -37,31 +35,31 @@ public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
 
             visit(n,group);
 
-            n.getMembers().forEach(p -> p.accept(restArrayVisitor, group));
+//            n.getMembers().forEach(p -> p.accept(restArrayVisitor, group));
         }
         super.visit(n, restDoc);
     }
 
-    VoidVisitorAdapter<Group> restArrayVisitor = new VoidVisitorAdapter<Group>() {
-
-        @Override
-        public void visit(MethodDeclaration n, Group group) {
-            if (accept(n)) {
-                Item item = new Item();
-                item.setId(group.getId()+"."+n.getNameAsString());
-                ParsedJavadoc parsedJavadoc = JavadocHelper.parse(n.getJavadoc());
-                item.setName(Objects.nonNull(parsedJavadoc.getName())?parsedJavadoc.getName():n.getNameAsString());
-                if(Objects.nonNull(parsedJavadoc.getDescription())){
-                    item.getRequest().addDescription(parsedJavadoc.getDescription());
-                }
-
-                RestArrayVisitor.this.visit(n, item, parsedJavadoc);
-
-                group.getNodes().add(item);
-            }
-        }
-
-    };
+//    VoidVisitorAdapter<Group> restArrayVisitor = new VoidVisitorAdapter<Group>() {
+//
+//        @Override
+//        public void visit(MethodDeclaration n, Group group) {
+//            if (accept(n)) {
+//                Item item = new Item();
+//                item.setId(group.getId()+"."+n.getNameAsString());
+//                ParsedJavadoc parsedJavadoc = JavadocHelper.parse(n.getJavadoc());
+//                item.setName(Objects.nonNull(parsedJavadoc.getName())?parsedJavadoc.getName():n.getNameAsString());
+//                if(Objects.nonNull(parsedJavadoc.getDescription())){
+//                    item.getRequest().addDescription(parsedJavadoc.getDescription());
+//                }
+//
+//                RestArrayVisitor.this.visit(n, item, parsedJavadoc);
+//
+//                group.getNodes().add(item);
+//            }
+//        }
+//
+//    };
 
     public abstract boolean accept(ClassOrInterfaceDeclaration n);
 
@@ -69,6 +67,6 @@ public abstract class RestArrayVisitor extends VoidVisitorAdapter<RestDoc> {
 
     public abstract void visit(ClassOrInterfaceDeclaration n, Group group);
 
-    public abstract void visit(MethodDeclaration n, Item item, ParsedJavadoc parsedJavadoc);
+//    public abstract void visit(MethodDeclaration n, Item item, ParsedJavadoc parsedJavadoc);
 
 }

@@ -13,10 +13,8 @@ you will get a postman v2.1 json file
 1. 解决自定义的argumentResolve。 配置忽略某种参数类型
 1. 返回类型如ResultData User,ResultData找不到时，列出User
 1. 未找到的参数，也要加入到参数列表中
-1. asciidoc 表头处理
 1. request的头和体合到一起 response的头和体合到一起
 1. 解决代码在二方jar包的问题
-1. urlencoded 与 raw 共存，raw是null么？
 1. 参数是List的情况
 1. 参数是map的情况
 1. 请求参数循环深入

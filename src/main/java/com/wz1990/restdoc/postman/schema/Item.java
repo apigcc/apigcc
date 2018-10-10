@@ -2,8 +2,8 @@ package com.wz1990.restdoc.postman.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.wz1990.restdoc.helper.Entity;
-import com.wz1990.restdoc.helper.HttpSchema;
+import com.wz1990.restdoc.ast.AstType;
+import com.wz1990.restdoc.util.HttpSchema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -100,7 +100,7 @@ public class Item extends Node {
         BodyMode mode;
         String raw;
         List<Parameter> rawParameter = new ArrayList<>();
-        Entity entity;
+        AstType entity;
         List<Parameter> urlencoded = new ArrayList<>();
         List<Parameter> formdata = new ArrayList<>();
         FileParameter file;

@@ -1,5 +1,6 @@
-package com.wz1990.restdoc.core;
+package com.wz1990.restdoc;
 
+import com.wz1990.restdoc.Enviroment;
 import org.asciidoctor.*;
 
 import java.io.File;

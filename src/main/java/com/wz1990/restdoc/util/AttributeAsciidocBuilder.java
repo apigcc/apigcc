@@ -1,8 +1,7 @@
-package com.wz1990.restdoc.helper;
+package com.wz1990.restdoc.util;
 
 import io.github.swagger2markup.markup.builder.MarkupBlockStyle;
 import io.github.swagger2markup.markup.builder.MarkupDocBuilder;
-import io.github.swagger2markup.markup.builder.internal.Markup;
 import io.github.swagger2markup.markup.builder.internal.asciidoc.AsciiDoc;
 import io.github.swagger2markup.markup.builder.internal.asciidoc.AsciiDocBuilder;
 import org.apache.commons.lang3.Validate;

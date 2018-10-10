@@ -2,19 +2,53 @@ package com.wz1990.restdoc.ast;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
-import com.google.common.collect.Sets;
+import com.wz1990.restdoc.util.Collections;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-public class AstHelper {
+public class AstUtils {
 
-    public static final Set<String> baseTypeSet = Sets.newHashSet(
+
+    /**
+     * 获取注解表达式中，各个属性的值
+     * @param n
+     * @return
+     */
+    public static Map<String,Object> parseAtts(AnnotationExpr n){
+        Map<String,Object> attrs = new HashMap<>();
+        if(n instanceof SingleMemberAnnotationExpr){
+            SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) n;
+            if(singleMemberAnnotationExpr.getMemberValue() instanceof StringLiteralExpr){
+                StringLiteralExpr stringLiteralExpr = (StringLiteralExpr) singleMemberAnnotationExpr.getMemberValue();
+                attrs.put("value",stringLiteralExpr.asString());
+            }
+        }else if(n instanceof NormalAnnotationExpr){
+            NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) (n);
+            normalAnnotationExpr.getPairs().forEach(ne -> {
+                if(ne.getValue() instanceof StringLiteralExpr){
+                    attrs.put(ne.getNameAsString(), ((StringLiteralExpr)ne.getValue()).getValue());
+                }else if(ne.getValue() instanceof IntegerLiteralExpr){
+                    attrs.put(ne.getNameAsString(), ((IntegerLiteralExpr)ne.getValue()).getValue());
+                }else if(ne.getValue() instanceof DoubleLiteralExpr){
+                    attrs.put(ne.getNameAsString(), ((DoubleLiteralExpr)ne.getValue()).getValue());
+                }else if(ne.getValue() instanceof LongLiteralExpr){
+                    attrs.put(ne.getNameAsString(), ((LongLiteralExpr)ne.getValue()).getValue());
+                }else if(ne.getValue() instanceof BooleanLiteralExpr){
+                    attrs.put(ne.getNameAsString(), ((BooleanLiteralExpr)ne.getValue()).getValue());
+                }else{
+                    attrs.put(ne.getNameAsString(), ne.getValue().toString());
+                }
+            });
+        }
+        return attrs;
+    }
+
+    public static final Set<String> baseTypeSet = Collections.set(
             Byte.class.getSimpleName(),
             Short.class.getSimpleName(),
             Integer.class.getSimpleName(),
@@ -95,7 +129,7 @@ public class AstHelper {
         return false;
     }
 
-    public static final Set<String> collectionTypeSet = Sets.newHashSet(
+    public static final Set<String> collectionTypeSet = Collections.set(
             Collection.class.getSimpleName(),
             List.class.getSimpleName(),
             Set.class.getSimpleName());
@@ -114,8 +148,8 @@ public class AstHelper {
      * @param type
      * @return
      */
-    public static AstType parseType(Type type){
-        AstType astType = new AstType();
+    public static AstArrayType parseType(Type type){
+        AstArrayType astType = new AstArrayType();
         astType.setType(type);
         if(astType.getType() instanceof ArrayType){
             ArrayType arrayType = (ArrayType) astType.getType();
@@ -126,7 +160,7 @@ public class AstHelper {
         }
         if (astType.getType() instanceof ClassOrInterfaceType) {
             ClassOrInterfaceType classOrInterfaceType = (ClassOrInterfaceType) astType.getType();
-            if(AstHelper.isCollection(classOrInterfaceType.getNameAsString())){
+            if(AstUtils.isCollection(classOrInterfaceType.getNameAsString())){
                 if(classOrInterfaceType.getTypeArguments().isPresent()){
                     Type t = classOrInterfaceType.getTypeArguments().get().get(0);
                     if(t instanceof ClassOrInterfaceType){

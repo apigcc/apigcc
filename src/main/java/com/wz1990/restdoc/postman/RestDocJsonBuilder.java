@@ -1,12 +1,11 @@
 package com.wz1990.restdoc.postman;
 
-import com.wz1990.restdoc.helper.JsonHelper;
+import com.wz1990.restdoc.util.JsonHelper;
 import com.wz1990.restdoc.schema.Tree;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.nio.file.Files;
 
 public class RestDocJsonBuilder {
 

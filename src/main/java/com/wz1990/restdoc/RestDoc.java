@@ -2,27 +2,28 @@ package com.wz1990.restdoc;
 
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
-import com.wz1990.restdoc.core.*;
-import com.wz1990.restdoc.helper.EntityHolder;
-import com.wz1990.restdoc.helper.EntityVisitor;
+import com.github.javaparser.utils.SourceRoot;
+import com.wz1990.restdoc.ast.AstTypeHolder;
 import com.wz1990.restdoc.postman.RestDocJsonBuilder;
 import com.wz1990.restdoc.schema.Tree;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * 工具入口类
+ * 工具入口类、上下文
  */
+@Getter
+@Setter
 public class RestDoc {
 
-    @Getter
     Enviroment enviroment;
-    @Getter
     Tree tree;
-    @Getter
-    EntityHolder entityHolder = new EntityHolder();
+    AstTypeHolder entityHolder = new AstTypeHolder();
 
     private List<ParseResult<CompilationUnit>> parseResults;
 
@@ -36,13 +37,18 @@ public class RestDoc {
     }
 
     public RestDoc(String root) {
-        this(Enviroment.builder().root(root).build());
+        this(Enviroment.builder().source(root).build());
     }
 
     @SneakyThrows
     public RestDoc parse() {
-        parseResults = enviroment.getSourceRoot().tryToParse();
+        //是否使用责任链？
+        Objects.requireNonNull(enviroment.getSource(),"source can not be null");
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(enviroment.getSource()));
+        parseResults = sourceRoot.tryToParse();
+
         parseEntity();
+
         parseFramework();
         return this;
     }
@@ -51,8 +57,8 @@ public class RestDoc {
      * 解析实体类结构
      */
     private void parseEntity() {
-        parseResults.forEach(result -> result.ifSuccessful(cu -> cu.accept(new EntityVisitor(), entityHolder)));
-        entityHolder.linkParent();
+//        parseResults.forEach(result -> result.ifSuccessful(cu -> cu.accept(new EntityVisitor(), entityHolder)));
+//        entityHolder.linkParent();
     }
 
     @SneakyThrows

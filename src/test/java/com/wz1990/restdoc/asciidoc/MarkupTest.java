@@ -1,6 +1,6 @@
 package com.wz1990.restdoc.asciidoc;
 
-import com.wz1990.restdoc.helper.AttributeAsciidocBuilder;
+import com.wz1990.restdoc.util.AttributeAsciidocBuilder;
 import io.github.swagger2markup.markup.builder.MarkupAdmonition;
 import io.github.swagger2markup.markup.builder.MarkupBlockStyle;
 import io.github.swagger2markup.markup.builder.MarkupTableColumn;

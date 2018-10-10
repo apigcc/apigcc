@@ -1,9 +1,10 @@
-package com.wz1990.restdoc.helper;
+package com.wz1990.restdoc.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.wz1990.restdoc.ast.AstType;
 import lombok.SneakyThrows;
 
 import java.util.Objects;
@@ -28,8 +29,8 @@ public class JsonHelper {
     }
 
     public static void add(ArrayNode arrayNode, Object value){
-        if(value instanceof Entity){
-            Entity v = (Entity)value;
+        if(value instanceof AstType){
+            AstType v = (AstType)value;
             arrayNode.add(v.getJsonNode());
         }
         if(value instanceof String){
@@ -46,8 +47,8 @@ public class JsonHelper {
         if(Objects.isNull(value)){
             return;
         }
-        if(value instanceof Entity){
-            Entity v = (Entity)value;
+        if(value instanceof AstType){
+            AstType v = (AstType)value;
             objectNode.set(key,v.getJsonNode());
         }
         if(value instanceof String){

@@ -1,8 +1,7 @@
 package com.wz1990.restdoc;
 
-import com.wz1990.restdoc.helper.JsonHelper;
+import com.wz1990.restdoc.util.JsonHelper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ApplicationTest {
@@ -29,9 +28,9 @@ public class ApplicationTest {
     @Test
     public void testRestdoc(){
         RestDoc restDoc = new RestDoc(root).parse();
-        restDoc.getTree().getInfo().setName("Restdoc接口文档");
-        restDoc.getTree().getInfo().setDescription("Restdoc接口文档");
-        restDoc.buildJson().buildAdoc().buildRestdoc();
+//        restDoc.getTree().getInfo().setName("Restdoc接口文档");
+//        restDoc.getTree().getInfo().setDescription("Restdoc接口文档");
+//        restDoc.buildJson().buildAdoc().buildRestdoc();
     }
 
     @Test
