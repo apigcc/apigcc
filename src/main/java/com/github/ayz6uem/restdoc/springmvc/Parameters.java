@@ -5,7 +5,7 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.ayz6uem.restdoc.ast.ASTResolvedType;
-import com.github.ayz6uem.restdoc.util.Collections;
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class Parameters {
 
     public static final String MVC_MODEL = "MODEL";
 
-    public static final Set<String> MVCS = Collections.set(MVC_MODEL);
+    public static final Set<String> MVCS = Sets.newHashSet(MVC_MODEL);
 
     /**
      * 是否基本类型(包括string)

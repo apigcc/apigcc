@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.expr.*;
 import com.github.ayz6uem.restdoc.ast.AstUtils;
 import com.github.ayz6uem.restdoc.http.HttpHeaders;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +26,7 @@ public class RequestMappings {
     public static final String DELETE_MAPPING = "DeleteMapping";
     public static final String REQUEST_MAPPING = "RequestMapping";
 
-    public static final List<String> ANNOTATIONS = Arrays.asList(GET_MAPPING,
+    public static final List<String> ANNOTATIONS = Lists.newArrayList(GET_MAPPING,
             POST_MAPPING,
             PUT_MAPPING,
             PATCH_MAPPING,

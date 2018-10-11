@@ -46,6 +46,7 @@ public class AttributeAsciidocBuilder extends AsciiDocBuilder {
     public MarkupDocBuilder block(Consumer<AttributeAsciidocBuilder> consumer) {
         return block(consumer, null);
     }
+
     public MarkupDocBuilder block(Consumer<AttributeAsciidocBuilder> consumer, String language) {
         if (language != null){
             documentBuilder.append(String.format("[source,%s]", language)).append(newLine);

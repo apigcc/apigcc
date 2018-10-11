@@ -2,8 +2,6 @@ package com.github.ayz6uem.restdoc.postman.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.ayz6uem.restdoc.ast.AstType;
-import com.github.ayz6uem.restdoc.util.HttpSchema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -74,9 +72,6 @@ public class Item extends Node {
     @NoArgsConstructor
     public static class Header{
 
-        public static final Header APPLICATION_JSON = new Header(HttpSchema.CONTENT_TYPE,HttpSchema.APPLICATION_JSON);
-        public static final Header APPLICATION_URLENCODED = new Header(HttpSchema.CONTENT_TYPE,HttpSchema.APPLICATION_URLENCODED);
-        public static final Header APPLICATION_FORM_DATA = new Header(HttpSchema.CONTENT_TYPE,HttpSchema.FORM_DATA);
 
         String key;
         String value;
@@ -100,7 +95,6 @@ public class Item extends Node {
         BodyMode mode;
         String raw;
         List<Parameter> rawParameter = new ArrayList<>();
-        AstType entity;
         List<Parameter> urlencoded = new ArrayList<>();
         List<Parameter> formdata = new ArrayList<>();
         FileParameter file;

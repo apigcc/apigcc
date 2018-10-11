@@ -7,7 +7,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
-import com.github.ayz6uem.restdoc.util.Collections;
+import com.google.common.collect.Sets;
 
 import java.util.*;
 
@@ -48,7 +48,7 @@ public class AstUtils {
         return attrs;
     }
 
-    public static final Set<String> baseTypeSet = Collections.set(
+    public static final Set<String> baseTypeSet = Sets.newHashSet(
             Byte.class.getSimpleName(),
             Short.class.getSimpleName(),
             Integer.class.getSimpleName(),
@@ -129,7 +129,7 @@ public class AstUtils {
         return false;
     }
 
-    public static final Set<String> collectionTypeSet = Collections.set(
+    public static final Set<String> collectionTypeSet = Sets.newHashSet(
             Collection.class.getSimpleName(),
             List.class.getSimpleName(),
             Set.class.getSimpleName());
@@ -143,37 +143,5 @@ public class AstUtils {
         return collectionTypeSet.contains(name);
     }
 
-    /**
-     * 解析语法类型，判断是否为集合，获取结合中存入的类型名称
-     * @param type
-     * @return
-     */
-    public static AstArrayType parseType(Type type){
-        AstArrayType astType = new AstArrayType();
-        astType.setType(type);
-        if(astType.getType() instanceof ArrayType){
-            ArrayType arrayType = (ArrayType) astType.getType();
-            astType.setArray(true);
-            if(arrayType.getComponentType() instanceof ClassOrInterfaceType){
-                astType.setCompoent(((ClassOrInterfaceType) arrayType.getComponentType()).getNameAsString());
-            }
-        }
-        if (astType.getType() instanceof ClassOrInterfaceType) {
-            ClassOrInterfaceType classOrInterfaceType = (ClassOrInterfaceType) astType.getType();
-            if(AstUtils.isCollection(classOrInterfaceType.getNameAsString())){
-                if(classOrInterfaceType.getTypeArguments().isPresent()){
-                    Type t = classOrInterfaceType.getTypeArguments().get().get(0);
-                    if(t instanceof ClassOrInterfaceType){
-                        String name = ((ClassOrInterfaceType) t).getNameAsString();
-                        astType.setCompoent(name);
-                        astType.setArray(true);
-                    }
-                }
-            }else{
-                astType.setCompoent(classOrInterfaceType.getNameAsString());
-            }
-        }
-        return astType;
-    }
 
 }

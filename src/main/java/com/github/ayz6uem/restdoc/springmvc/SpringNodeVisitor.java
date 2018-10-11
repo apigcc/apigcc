@@ -1,7 +1,6 @@
 package com.github.ayz6uem.restdoc.springmvc;
 
 import com.github.ayz6uem.restdoc.NodeVisitor;
-import com.github.ayz6uem.restdoc.ast.AstTypeUtils;
 import com.github.ayz6uem.restdoc.http.HttpHeaders;
 import com.github.ayz6uem.restdoc.http.HttpMessage;
 import com.github.ayz6uem.restdoc.http.HttpRequest;
@@ -10,7 +9,7 @@ import com.github.ayz6uem.restdoc.schema.Cell;
 import com.github.ayz6uem.restdoc.schema.Group;
 import com.github.ayz6uem.restdoc.schema.Node;
 import com.github.ayz6uem.restdoc.schema.Tree;
-import com.github.ayz6uem.restdoc.util.Comments;
+import com.github.ayz6uem.restdoc.ast.Comments;
 import com.github.ayz6uem.restdoc.util.URL;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -37,8 +36,8 @@ public class SpringNodeVisitor extends NodeVisitor {
         if(arg != null && arg instanceof Tree){
             Tree tree = (Tree) arg;
             if (Controllers.accept(n.getAnnotations())) {
-                String name = AstTypeUtils.getNameInScope(n);
-                String fullName = AstTypeUtils.getFullName(n);
+                String name = ASTResolvedType.getNameInScope(n);
+                String fullName = ASTResolvedType.getFullName(n);
                 Group group = new Group();
                 group.setParent(tree);
                 group.setId(fullName);

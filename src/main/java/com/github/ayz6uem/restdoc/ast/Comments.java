@@ -1,16 +1,14 @@
-package com.github.ayz6uem.restdoc.util;
+package com.github.ayz6uem.restdoc.ast;
 
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Setter
 @Getter
@@ -73,6 +71,5 @@ public class Comments {
         });
         return sb.toString();
     }
-
 
 }

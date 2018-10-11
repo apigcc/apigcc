@@ -1,18 +1,15 @@
 package com.github.ayz6uem.restdoc;
 
-import com.github.ayz6uem.restdoc.ast.AstTypeHolder;
-import com.github.ayz6uem.restdoc.postman.RestDocJsonBuilder;
 import com.github.ayz6uem.restdoc.schema.Tree;
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.utils.SourceRoot;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * 工具入口类、上下文
@@ -21,65 +18,48 @@ import java.util.Objects;
 @Setter
 public class RestDoc {
 
-    Enviroment enviroment;
+    Enviroment env;
     Tree tree;
-    AstTypeHolder entityHolder = new AstTypeHolder();
 
-    private List<ParseResult<CompilationUnit>> parseResults;
-
-    private RestDoc() {
-        tree = new Tree();
+    public RestDoc() {
+        this(new Enviroment());
     }
 
-    public RestDoc(Enviroment enviroment) {
-        this();
-        this.enviroment = enviroment;
+    public RestDoc(Enviroment env) {
+        this.env = env;
+        this.tree = new Tree();
+        this.tree.setContext(this);
     }
 
     public RestDoc(String root) {
-        this(Enviroment.builder().source(root).build());
+        this(new Enviroment().source(root).dependency(root));
     }
 
     @SneakyThrows
     public RestDoc parse() {
         //是否使用责任链？
-        Objects.requireNonNull(enviroment.getSource(),"source can not be null");
-        SourceRoot sourceRoot = new SourceRoot(Paths.get(enviroment.getSource()));
-        parseResults = sourceRoot.tryToParse();
-
-        parseEntity();
-
-        parseFramework();
+        ParserConfiguration configuration = env.buildParserConfiguration();
+        NodeVisitor visitor = env.nodeVisitor();
+        Iterator<String> iterator = env.sources.iterator();
+        while (iterator.hasNext()){
+            String source = iterator.next();
+            SourceRoot root = new SourceRoot(Paths.get(source),configuration);
+            root.tryToParse().forEach(result -> result.ifSuccessful(cu -> cu.accept(visitor, this.getTree())));
+        }
         return this;
     }
 
-    /**
-     * 解析实体类结构
-     */
-    private void parseEntity() {
-//        parseResults.forEach(result -> result.ifSuccessful(cu -> cu.accept(new EntityVisitor(), entityHolder)));
-//        entityHolder.linkParent();
+    public void build() {
+        env.pipeline().forEach(this::build);
     }
 
-    @SneakyThrows
-    private void parseFramework() {
-        RestArrayVisitor visitor = Framework.currentFramework().visitor.newInstance();
-        parseResults.forEach(result -> result.ifSuccessful(cu -> cu.accept(visitor, this)));
+    public void build(RestDocVisitor ... visitors){
+        Arrays.stream(visitors).forEach(this::build);
     }
 
-    public RestDoc buildJson() {
-        new RestDocJsonBuilder(tree, enviroment.getJsonFile()).build();
-        return this;
+    public void build(RestDocVisitor visitor){
+        visitor.visit(this);
     }
 
-    public RestDoc buildAdoc() {
-        new RestDocMarkupBuilder(tree, enviroment.getAdocPath()).build();
-        return this;
-    }
-
-    public RestDoc buildRestdoc() {
-        new RestDocHtmlBuilder(enviroment).build();
-        return this;
-    }
 
 }

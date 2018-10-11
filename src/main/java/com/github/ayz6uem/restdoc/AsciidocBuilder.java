@@ -1,19 +1,17 @@
 package com.github.ayz6uem.restdoc;
 
-import com.github.ayz6uem.restdoc.schema.Tree;
 import com.github.ayz6uem.restdoc.util.AttributeAsciidocBuilder;
 
-public class RestDocMarkupBuilder {
+public class AsciidocBuilder implements RestDocVisitor {
 
-    Tree tree;
-    String path;
     AttributeAsciidocBuilder builder;
 
-    public RestDocMarkupBuilder(Tree tree, String path) {
-        this.tree = tree;
-        this.path = path;
-        builder = AttributeAsciidocBuilder.newInstance();
-    }
+
+    //    public AsciidocBuilder(Tree tree, String path) {
+//        this.tree = tree;
+//        this.path = path;
+//        builder = AttributeAsciidocBuilder.newInstance();
+//    }
 
 
     public void build() {
@@ -28,6 +26,12 @@ public class RestDocMarkupBuilder {
 //        Path indexFile = Paths.get(path + "/index");
 //        builder.writeToFile(indexFile, StandardCharsets.UTF_8);
     }
+
+    @Override
+    public void visit(RestDoc restDoc) {
+
+    }
+
 
 //    private void buildNode(Node node, String prefix, int num) {
 //        if (node instanceof Group) {

@@ -2,6 +2,12 @@ package com.github.ayz6uem.restdoc.util;
 
 public class URL {
 
+    /**
+     * 格式化链接地址
+     * @param parent
+     * @param sub
+     * @return
+     */
     public static String normalize(Object parent, String sub) {
         if(parent!=null && parent instanceof String){
             return normalize((String)parent,sub);

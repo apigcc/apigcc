@@ -1,8 +1,10 @@
 package com.github.ayz6uem.restdoc.common;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 public class UserDTO extends Query {
 
     String name;
