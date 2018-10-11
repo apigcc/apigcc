@@ -1,12 +1,26 @@
 # Restdoc
-A rest document generator with parse java code
+A rest document generator with parse java source code
 
-example:
-```$xslt
+### usage
+you will get a postman v2.1 json file like this:
+```java
 RestDoc restDoc = new RestDoc("source").parse();
 System.out.println(JsonHelper.toPretty(restDoc.getTree()));
 ```
-you will get a postman v2.1 json file
+you will get an Asciidoc file like this:
+```java
+RestDoc restDoc = new RestDoc(root).parse();
+restDoc.buildAdoc();
+```
+you will get a html docbook like this:
+```java
+RestDoc restDoc = new RestDoc(root).parse();
+restDoc.getTree().getInfo().setName("Restdoc接口文档");
+restDoc.getTree().getInfo().setDescription("Restdoc接口文档描述");
+restDoc.buildJson().buildAdoc().buildRestdoc();
+```
+
+### problems
 
 1. url继承父类
 1. content-Type 优先级，有 requestBody参数的，一定是 json
@@ -35,11 +49,11 @@ public class DTO{
 }
 ```
 
-```
+```java
 {@link com.ybyc.car.insurance.model.slip.RenewSlipStatus}
 ```
 
-```
+```java
 NoSuchMethodError: org.apache.commons.lang3.Validate.inclusiveBetween
 ```
  
