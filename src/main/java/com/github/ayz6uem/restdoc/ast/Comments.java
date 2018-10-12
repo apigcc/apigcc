@@ -1,10 +1,16 @@
 package com.github.ayz6uem.restdoc.ast;
 
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
+import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserParameterDeclaration;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,19 +26,12 @@ public class Comments {
 
     public static Comments of(Comment n){
         Comments comments = new Comments();
+        String content = getContent(n);
+        comments.setContent(content);
         n.ifJavadocComment(javadocComment->{
             Javadoc javadoc = javadocComment.parse();
-            String content = getContent(javadoc.getDescription());
-            comments.setContent(content);
             comments.parseBlockTags(javadoc.getBlockTags());
         });
-        n.ifBlockComment(blockComment -> {
-            comments.setContent(blockComment.getContent());
-        });
-        n.ifLineComment(lineComment -> {
-            comments.setContent(lineComment.getContent());
-        });
-
         return comments;
     }
 
@@ -61,6 +60,14 @@ public class Comments {
         }
     }
 
+    public static String getContent(Comment comment){
+        if(comment instanceof JavadocComment){
+            return getContent(((JavadocComment)comment).parse().getDescription());
+        }else{
+            return comment.getContent();
+        }
+
+    }
     private static String getContent(JavadocDescription javadocDescription){
         StringBuilder sb = new StringBuilder();
         javadocDescription.getElements().forEach(element->{
@@ -72,4 +79,24 @@ public class Comments {
         return sb.toString();
     }
 
+    public static String getCommentAsString(ResolvedFieldDeclaration declaration){
+        Optional<Comment> optional = ((JavaParserFieldDeclaration) declaration).getWrappedNode().getComment();
+        return optional.isPresent()?getContent(optional.get()):null;
+    }
+
+    public static String getCommentAsString(ResolvedParameterDeclaration declaration) {
+        Optional<Comment> optional = ((JavaParserParameterDeclaration)declaration).getWrappedNode().getComment();
+        return optional.isPresent()?getContent(optional.get()):null;
+    }
+
+    public static String getCommentFromMethod(Parameter expr) {
+        if(expr.getParentNode().isPresent()){
+            MethodDeclaration method = (MethodDeclaration)expr.getParentNode().get();
+            if(method.getComment().isPresent()){
+                Comments comments = Comments.of(method.getComment().get());
+                return comments.getParams().get(expr.getNameAsString());
+            }
+        }
+        return null;
+    }
 }

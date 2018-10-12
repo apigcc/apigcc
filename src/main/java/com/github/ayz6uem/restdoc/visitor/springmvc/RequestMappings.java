@@ -1,10 +1,10 @@
-package com.github.ayz6uem.restdoc.springmvc;
+package com.github.ayz6uem.restdoc.visitor.springmvc;
 
 import com.github.ayz6uem.restdoc.http.HttpRequestMethod;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.expr.*;
-import com.github.ayz6uem.restdoc.ast.AstUtils;
+import com.github.ayz6uem.restdoc.ast.Annotations;
 import com.github.ayz6uem.restdoc.http.HttpHeaders;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -84,7 +84,7 @@ public class RequestMappings {
             throw new IllegalArgumentException("annotationExpr not accept:"+n.getNameAsString());
         }
         //解析注解各个属性
-        Map<String,Object> annotationAttrs = AstUtils.parseAtts(n);
+        Map<String,Object> annotationAttrs = Annotations.parseAtts(n);
 
         RequestMappings requestMappings = new RequestMappings();
         //解析并设置http请求方法

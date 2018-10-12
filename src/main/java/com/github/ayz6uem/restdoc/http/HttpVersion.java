@@ -40,6 +40,11 @@ public enum HttpVersion {
         this.text = text;
     }
 
+    @Override
+    public String toString() {
+        return text;
+    }
+
     public static class Serializer extends JsonSerializer<HttpVersion>{
 
         @Override

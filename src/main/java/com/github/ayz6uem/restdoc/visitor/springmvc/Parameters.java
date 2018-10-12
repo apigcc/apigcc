@@ -1,10 +1,12 @@
-package com.github.ayz6uem.restdoc.springmvc;
+package com.github.ayz6uem.restdoc.visitor.springmvc;
 
+import com.github.ayz6uem.restdoc.ast.Annotations;
+import com.github.ayz6uem.restdoc.ast.Comments;
 import com.github.ayz6uem.restdoc.schema.Cell;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.ayz6uem.restdoc.ast.ASTResolvedType;
+import com.github.ayz6uem.restdoc.ast.ResolvedTypes;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +25,7 @@ import java.util.Set;
 public class Parameters {
 
     public static final String REQUEST_BODY = "RequestBody";
+    public static final String REQUEST_Param = "RequestParam";
     public static final String PATH_VARIABLE = "PathVariable";
 
     public static final String MVC_MODEL = "MODEL";
@@ -61,10 +64,11 @@ public class Parameters {
 
         //TODO ignore file mvc ?
 
-        //TODO 解析@RequestParam
         if (expr.isAnnotationPresent(PATH_VARIABLE)) {
             parameters.setPathVariable(true);
-            parameters.cells.add(new Cell(expr.getNameAsString(), expr.getTypeAsString(), true));
+            Cell cell = new Cell(expr.getNameAsString(), expr.getTypeAsString(), true);
+            cell.setDescription(Comments.getCommentFromMethod(expr));
+            parameters.cells.add(cell);
         } else {
             if (expr.isAnnotationPresent(REQUEST_BODY)) {
                 parameters.setRequestBody(true);
@@ -80,12 +84,26 @@ public class Parameters {
         try {
             ResolvedParameterDeclaration parameterDeclaration = expr.resolve();
             ResolvedType resolvedType = parameterDeclaration.getType();
-            ASTResolvedType astResolvedType = ASTResolvedType.of(resolvedType);
+            ResolvedTypes astResolvedType = ResolvedTypes.of(resolvedType);
             setPrimitive(astResolvedType.isPrimitive());
-            //TODO expr 的 value
             setValue(astResolvedType.getValue());
+
             if(astResolvedType.isPrimitive()){
-                cells.add(new Cell(expr.getNameAsString(), astResolvedType.getName(), astResolvedType.getValue()));
+
+                Cell cell = new Cell(expr.getNameAsString(), astResolvedType.getName(), astResolvedType.getValue());
+
+                //解析RequestParam 获取字段名和默认值
+                Object valueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_Param), "value");
+                Object defaultValueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_Param), "defaultValue");
+                if(valueAttr!=null){
+                    cell.setName(String.valueOf(valueAttr));
+                }
+                if(defaultValueAttr!=null){
+                    cell.setValue(defaultValueAttr);
+                }
+
+                cell.setDescription(Comments.getCommentFromMethod(expr));
+                cells.add(cell);
             }
             cells.addAll(astResolvedType.getCells());
 

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -16,5 +17,9 @@ public class HttpResponse {
     Object body;
 
     List<Cell> cells = new ArrayList<>();
+
+    public boolean isEmpty(){
+        return cells.isEmpty() && Objects.isNull(body)  && headers.isEmpty();
+    }
 
 }

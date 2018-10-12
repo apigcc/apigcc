@@ -1,13 +1,16 @@
 package com.github.ayz6uem.restdoc;
 
-import com.github.ayz6uem.restdoc.springmvc.SpringNodeVisitor;
+import com.github.ayz6uem.restdoc.visitor.NodeVisitor;
+import com.github.ayz6uem.restdoc.visitor.springmvc.SpringVisitor;
+import com.github.ayz6uem.restdoc.handler.AsciidocHandler;
+import com.github.ayz6uem.restdoc.handler.HtmlHandler;
+import com.github.ayz6uem.restdoc.handler.RestDocHandler;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import com.github.javaparser.utils.ProjectRoot;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
@@ -16,8 +19,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class Enviroment {
     /**
      * 默认的文档树访问器
      */
-    public static Iterable<RestDocVisitor> DEFAULT_PIPELINE = Lists.newArrayList(new AsciidocBuilder(), new HtmlBuilder());
+    public static Iterable<RestDocHandler> DEFAULT_PIPELINE = Lists.newArrayList(new AsciidocHandler(), new HtmlHandler());
 
     public static final String DEFAULT_OUT_PATH = "build/restdoc/";
     public static final String DEFAULT_PROJECT_PATH = System.getProperty("user.dir");
@@ -37,7 +38,7 @@ public class Enviroment {
 
     private enum Framework {
 
-        SPRINGMVC(new SpringNodeVisitor());
+        SPRINGMVC(new SpringVisitor());
 
         private NodeVisitor visitor;
 
@@ -75,9 +76,9 @@ public class Enviroment {
     String out = DEFAULT_OUT_PATH;
 
     /**
-     * 项目名称 生成 projectName.json projectName.adoc projectName.html
+     * 项目名称 生成 project.json project.adoc project.html
      */
-    String projectName;
+    String project;
 
     /**
      * 文档标题
@@ -98,9 +99,9 @@ public class Enviroment {
      */
     Framework currentFramework = Framework.SPRINGMVC;
 
-
     public Enviroment source(String ... values){
         this.sources.addAll(Sets.newHashSet(values));
+        dependency(values);
         return this;
     }
 
@@ -114,8 +115,8 @@ public class Enviroment {
         return this;
     }
 
-    public Enviroment projectName(String value){
-        this.projectName = value;
+    public Enviroment project(String value){
+        this.project = value;
         return this;
     }
 
@@ -139,7 +140,7 @@ public class Enviroment {
         return this;
     }
 
-    public Iterable<RestDocVisitor> pipeline(){
+    public Iterable<RestDocHandler> pipeline(){
         return DEFAULT_PIPELINE;
     }
 
@@ -170,7 +171,7 @@ public class Enviroment {
         return parserConfiguration;
     }
 
-    public NodeVisitor nodeVisitor(){
+    public NodeVisitor visitor(){
         return currentFramework().visitor();
     }
 

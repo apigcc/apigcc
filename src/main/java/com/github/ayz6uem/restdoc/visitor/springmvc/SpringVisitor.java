@@ -1,11 +1,10 @@
-package com.github.ayz6uem.restdoc.springmvc;
+package com.github.ayz6uem.restdoc.visitor.springmvc;
 
-import com.github.ayz6uem.restdoc.NodeVisitor;
+import com.github.ayz6uem.restdoc.visitor.NodeVisitor;
 import com.github.ayz6uem.restdoc.http.HttpHeaders;
 import com.github.ayz6uem.restdoc.http.HttpMessage;
 import com.github.ayz6uem.restdoc.http.HttpRequest;
 import com.github.ayz6uem.restdoc.http.HttpRequestMethod;
-import com.github.ayz6uem.restdoc.schema.Cell;
 import com.github.ayz6uem.restdoc.schema.Group;
 import com.github.ayz6uem.restdoc.schema.Node;
 import com.github.ayz6uem.restdoc.schema.Tree;
@@ -17,14 +16,15 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.type.Type;
-import com.github.ayz6uem.restdoc.ast.ASTResolvedType;
+import com.github.ayz6uem.restdoc.ast.ResolvedTypes;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 
 /**
  * Spring endpoints解析
  */
-public class SpringNodeVisitor extends NodeVisitor {
+public class SpringVisitor extends NodeVisitor {
 
     /**
      * 查找Endpoints接入类
@@ -36,8 +36,8 @@ public class SpringNodeVisitor extends NodeVisitor {
         if(arg != null && arg instanceof Tree){
             Tree tree = (Tree) arg;
             if (Controllers.accept(n.getAnnotations())) {
-                String name = ASTResolvedType.getNameInScope(n);
-                String fullName = ASTResolvedType.getFullName(n);
+                String name = ResolvedTypes.getNameInScope(n);
+                String fullName = ResolvedTypes.getFullName(n);
                 Group group = new Group();
                 group.setParent(tree);
                 group.setId(fullName);
@@ -74,9 +74,10 @@ public class SpringNodeVisitor extends NodeVisitor {
 
             visit(n.getType(), message);
             n.getParameters().forEach(p -> visit(p, message));
-            //TODO 没有body，有cells时，生成queryString。
             n.getAnnotations().forEach(p -> visit(p, message));
             n.getComment().ifPresent(l -> visit(l, message));
+
+            //TODO 没有body，有cells时，生成queryString。
 
         }
         super.visit(n, arg);
@@ -88,8 +89,8 @@ public class SpringNodeVisitor extends NodeVisitor {
      * @param message
      */
     private void visit(Type type, HttpMessage message){
-        ASTResolvedType astResolvedType = ASTResolvedType.of(type);
-        if(astResolvedType!=null){
+        ResolvedTypes astResolvedType = ResolvedTypes.of(type);
+        if(astResolvedType.isResolved()){
             message.getResponse().setBody(astResolvedType.getValue());
             message.getResponse().getCells().addAll(astResolvedType.getCells());
         }
@@ -148,14 +149,12 @@ public class SpringNodeVisitor extends NodeVisitor {
      */
     private void visit(Comment n, HttpMessage message) {
         Comments comments = Comments.of(n);
-        message.setName(comments.getName());
-        message.setDescription(comments.getDescription());
-        for (int i = 0; i < message.getRequest().getCells().size(); i++) {
-            Cell cell = message.getRequest().getCells().get(i);
-            String description = comments.getParams().get(cell.getName());
-            cell.setDescription(description);
+        if(StringUtils.isNotEmpty(comments.getName())){
+            message.setName(comments.getName());
         }
-
+        if(StringUtils.isNotEmpty(comments.getDescription())){
+            message.setDescription(comments.getDescription());
+        }
     }
 
 }

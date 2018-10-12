@@ -1,4 +1,4 @@
-package com.github.ayz6uem.restdoc.postman.schema;
+package com.github.ayz6uem.restdoc.handler.postman.schema;
 
 /**
  * 支持的http method

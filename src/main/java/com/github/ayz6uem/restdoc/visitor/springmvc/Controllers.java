@@ -1,4 +1,4 @@
-package com.github.ayz6uem.restdoc.springmvc;
+package com.github.ayz6uem.restdoc.visitor.springmvc;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.AnnotationExpr;

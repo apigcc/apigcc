@@ -1,6 +1,7 @@
 package com.github.ayz6uem.restdoc.springmvc;
 
 import com.github.ayz6uem.restdoc.Enviroment;
+import com.github.ayz6uem.restdoc.visitor.springmvc.SpringVisitor;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -32,7 +33,7 @@ public class SpringRestDocVisitorTest {
         parserConfiguration.setSymbolResolver(new JavaSymbolSolver(combinedTypeSolver));
 
         SourceRoot root = new SourceRoot(Paths.get(sourceFolder),parserConfiguration);
-        root.tryToParse().forEach(result-> result.ifSuccessful(compilationUnit -> compilationUnit.accept(new SpringNodeVisitor(),restDoc.getTree())));
+        root.tryToParse().forEach(result-> result.ifSuccessful(compilationUnit -> compilationUnit.accept(new SpringVisitor(),restDoc.getTree())));
 
         System.out.println(ObjectMappers.toPretty(restDoc.getTree()));
     }

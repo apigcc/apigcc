@@ -1,9 +1,11 @@
 package com.github.ayz6uem.restdoc.schema;
 
-import com.github.ayz6uem.restdoc.ast.AstUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 域
@@ -36,12 +38,15 @@ public class Cell {
     }
 
     public Cell(String name, String type){
-        this(name, type, AstUtils.defaultValue(type));
+        this(name, type, null);
     }
 
     public Cell(String name, String type, boolean disabled){
-        this(name, type, AstUtils.defaultValue(type));
+        this(name, type);
         this.disabled = disabled;
     }
 
+    public List<String> toList() {
+        return Arrays.asList(name, type, value==null?"":String.valueOf(value), description);
+    }
 }

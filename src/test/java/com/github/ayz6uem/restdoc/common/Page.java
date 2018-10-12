@@ -10,9 +10,9 @@ public class Page extends Query {
     /**
      * 第几页
      */
-    int page;
+    int page = 1;
     /* 每页条数 */
-    int sizs;
+    int sizs = 20;
     //关键字
     String key;
 

@@ -1,4 +1,4 @@
-package com.github.ayz6uem.restdoc.postman;
+package com.github.ayz6uem.restdoc.handler.postman;
 
 import com.github.ayz6uem.restdoc.schema.Tree;
 import lombok.SneakyThrows;
