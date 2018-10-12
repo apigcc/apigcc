@@ -15,7 +15,7 @@ restDoc.parse();
 restDoc.build();
 ```
 
-![example](https://github.com/ayz6uem/restdoc/master/example/example.jpg)
+![example](https://github.com/ayz6uem/restdoc/blob/master/example/example.jpg)
 
 ### Plans
 
