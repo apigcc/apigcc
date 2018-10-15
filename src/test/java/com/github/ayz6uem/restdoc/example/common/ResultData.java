@@ -1,4 +1,4 @@
-package com.github.ayz6uem.restdoc.common;
+package com.github.ayz6uem.restdoc.example.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

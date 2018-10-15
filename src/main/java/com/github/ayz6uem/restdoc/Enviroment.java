@@ -92,7 +92,7 @@ public class Enviroment {
     /**
      * 忽略哪些类型的参数、类解析
      */
-    Set<String> ignoreTypes = Sets.newHashSet();
+    public static Set<String> ignoreTypes = Sets.newHashSet();
 
     /**
      * 当前项目使用了什么框架

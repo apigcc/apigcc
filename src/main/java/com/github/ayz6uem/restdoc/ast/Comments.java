@@ -80,11 +80,18 @@ public class Comments {
     }
 
     public static String getCommentAsString(ResolvedFieldDeclaration declaration){
+        if(!(declaration instanceof JavaParserFieldDeclaration)){
+            return null;
+        }
         Optional<Comment> optional = ((JavaParserFieldDeclaration) declaration).getWrappedNode().getComment();
         return optional.isPresent()?getContent(optional.get()):null;
     }
 
     public static String getCommentAsString(ResolvedParameterDeclaration declaration) {
+
+        if(!(declaration instanceof JavaParserParameterDeclaration)){
+            return null;
+        }
         Optional<Comment> optional = ((JavaParserParameterDeclaration)declaration).getWrappedNode().getComment();
         return optional.isPresent()?getContent(optional.get()):null;
     }

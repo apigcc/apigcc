@@ -2,6 +2,7 @@ package com.github.ayz6uem.restdoc.ast;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.ayz6uem.restdoc.Enviroment;
 import com.github.ayz6uem.restdoc.schema.Cell;
 import com.github.ayz6uem.restdoc.util.ObjectMappers;
 import com.github.javaparser.ast.CompilationUnit;
@@ -13,13 +14,14 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
-import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedTypeVariable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.Pair;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,10 +49,17 @@ public class ResolvedTypes {
     boolean primitive;
     String name;
     Object value;
+    ObjectNode objectNode;
     List<Cell> cells = new ArrayList<>();
+
+
+    public Object getValue(){
+        return value==null?objectNode:value;
+    }
 
     /**
      * 解析普通类型
+     *
      * @param type
      * @return
      */
@@ -60,11 +69,11 @@ public class ResolvedTypes {
             resolvedTypes.resolve(type.resolve());
             resolvedTypes.resolved = true;
         } catch (UnsolvedSymbolException e) {
-            log.warn("try to resolve fail:" + type.toString());
+            log.debug("try to resolve fail:" + type.toString());
             //解析失败 查找泛型参数
-            if(type instanceof ClassOrInterfaceType){
+            if (type instanceof ClassOrInterfaceType) {
                 ClassOrInterfaceType classType = (ClassOrInterfaceType) type;
-                if(classType.getTypeArguments().isPresent()){
+                if (classType.getTypeArguments().isPresent()) {
                     resolvedTypes.tryResolveTypeArguments(classType.getTypeArguments().get());
                     resolvedTypes.resolved = true;
                 }
@@ -75,36 +84,52 @@ public class ResolvedTypes {
 
     /**
      * 包装解析类型
+     *
      * @param resolvedType
      * @return
      */
     public static ResolvedTypes of(ResolvedType resolvedType) {
         ResolvedTypes resolvedTypes = new ResolvedTypes();
-        resolvedTypes.resolve(resolvedType);
-        resolvedTypes.resolved = true;
+        if(!resolvedType.isTypeVariable()){
+            resolvedTypes.resolve(resolvedType);
+            resolvedTypes.resolved = true;
+        }
         return resolvedTypes;
     }
 
     /**
      * 解析泛型的参数类型，需结合外部环境
-     * @param resolvedType
+     *
+     * @param type
      * @param typeParametersMap
      * @return
      */
-    public static ResolvedTypes ofTypeVariable(ResolvedTypeVariable resolvedType, List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
+    public static ResolvedTypes ofTypeVariable(ResolvedType type, List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
+
+        if (!type.isTypeVariable()) {
+            return ResolvedTypes.of(type);
+        }
+        //泛型解析
+        ResolvedTypeVariable resolvedType = type.asTypeVariable();
+
         for (int i = 0; i < typeParametersMap.size(); i++) {
             Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair = typeParametersMap.get(i);
-            if(Objects.equals(resolvedType.asTypeParameter(), pair.a)){
+            if (Objects.equals(resolvedType.asTypeParameter(), pair.a)) {
                 return ResolvedTypes.of(pair.b);
             }
         }
+        // 未成功解析
         return new ResolvedTypes();
     }
 
-    private void tryResolveTypeArguments(NodeList<Type> nodes){
-        nodes.forEach(type->{
+    /**
+     * 解析泛型参数
+     * @param nodes
+     */
+    private void tryResolveTypeArguments(NodeList<Type> nodes) {
+        nodes.forEach(type -> {
             ResolvedTypes argumentResolved = ResolvedTypes.of(type);
-            if(argumentResolved.isResolved()){
+            if (argumentResolved.isResolved()) {
                 setValue(argumentResolved.getValue());
                 getCells().addAll(argumentResolved.getCells());
             }
@@ -113,23 +138,45 @@ public class ResolvedTypes {
 
     /**
      * 基本解析流程
+     *
      * @param resolvedType
      */
     private void resolve(ResolvedType resolvedType) {
-        resolveName(resolvedType);
-        resolvePrimitive(resolvedType);
-        resolveArray(resolvedType);
 
-        if (resolvedType.isReferenceType()) {
+        resolveName(resolvedType);
+
+        //忽略的类型
+        if(Enviroment.ignoreTypes.contains(this.getName())){
+            return;
+        }
+
+        if (resolvedType.isPrimitive() || Numbers.isAssignableBy(resolvedType)) {
+            setPrimitive(true);
+            setValue(0);
+        } else if (Strings.isAssignableBy(resolvedType)) {
+            setPrimitive(true);
+            setValue("");
+        } else if (resolvedType.isArray()) {
+            resolveArray(resolvedType);
+        } else if (resolvedType.isReferenceType()) {
             ResolvedReferenceType referenceType = resolvedType.asReferenceType();
-            if (referenceType.getId().equals(String.class.getName())) {
+            if(referenceType.getTypeDeclaration().isEnum()){
+                //枚举类型
                 setPrimitive(true);
                 setValue("");
-//            resolveCollection(referenceType);
-            }else{
+            }else if (Collections.isAssignableBy(resolvedType)) {
+                resolveCollection(referenceType);
+            } else if(Maps.isAssignableBy(resolvedType)){
+                //Map类型，解析为一个object
+            } else if(Dates.isAssignableBy(resolvedType)){
+                //日期类型
+            } else if(Langs.isAssignableBy(resolvedType)){
+                //java类型，不处理
+            } else {
                 resolvePojo(referenceType);
             }
         }
+
     }
 
     /**
@@ -137,36 +184,27 @@ public class ResolvedTypes {
      * 基本类型如：int double
      * java类型如：String List
      * 自定义类型如: com.example.User
+     *
      * @param resolvedType
      * @return
      */
-    private void resolveName(ResolvedType resolvedType){
+    private void resolveName(ResolvedType resolvedType) {
         name = resolvedType.describe();
-        if(resolvedType instanceof ReferenceTypeImpl){
+        if (resolvedType instanceof ReferenceTypeImpl) {
             name = ((ReferenceTypeImpl) resolvedType).getTypeDeclaration().getName();
         }
     }
 
     /**
-     * 解析基本类型
-     * @param resolvedType
-     */
-    private void resolvePrimitive(ResolvedType resolvedType){
-        if (resolvedType.isPrimitive()) {
-            setPrimitive(true);
-            setValue(0);
-        }
-    }
-
-    /**
      * 解析数组
+     *
      * @param resolvedType
      */
-    private void resolveArray(ResolvedType resolvedType){
+    private void resolveArray(ResolvedType resolvedType) {
         if (resolvedType.isArray()) {
             ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
             ResolvedTypes componentType = ResolvedTypes.of(resolvedType.asArrayType().getComponentType());
-            if(componentType.isResolved()){
+            if (componentType.isResolved()) {
                 arrayNode.addPOJO(componentType.getValue());
                 setValue(arrayNode);
                 getCells().addAll(componentType.getCells());
@@ -176,9 +214,10 @@ public class ResolvedTypes {
 
     /**
      * 解析集合
+     *
      * @param referenceType
      */
-    private void resolveCollection(ResolvedReferenceType referenceType){
+    private void resolveCollection(ResolvedReferenceType referenceType) {
 
     }
 
@@ -189,62 +228,80 @@ public class ResolvedTypes {
      * @param resolvedReferenceType
      */
     private void resolvePojo(ResolvedReferenceType resolvedReferenceType) {
-        if (Object.class.getName().equals(resolvedReferenceType.getId())) {
-            return;
-        }
-        ObjectNode objectNode = ObjectMappers.instance().createObjectNode();
-        resolveFields(resolvedReferenceType, objectNode);
-        setValue(objectNode);
+        objectNode = ObjectMappers.instance().createObjectNode();
+        resolveFields(resolvedReferenceType);
     }
 
     /**
      * 解析类型各字段
+     *
      * @param referenceType
-     * @param objectNode
      */
-    private void resolveFields(ResolvedReferenceType referenceType, ObjectNode objectNode) {
-        if (Object.class.getName().equals(referenceType.getId())) {
-            return;
-        }
+    private void resolveFields(ResolvedReferenceType referenceType) {
         //先解析父类的字段
-        List<ResolvedReferenceType> directAncestors = referenceType.getDirectAncestors();
-        for (int i = 0; i < directAncestors.size(); i++) {
-            ResolvedReferenceType directAncestor = directAncestors.get(i);
-            resolveFields(directAncestor, objectNode);
+        try{
+            referenceType.getDirectAncestors().forEach(direct -> merge(ResolvedTypes.of(direct)));
+        }catch (Exception e){
+            log.warn("parse parent fail:"+referenceType);
         }
 
         //解析各字段
         Iterator<ResolvedFieldDeclaration> iterator = referenceType.getTypeDeclaration().getDeclaredFields().iterator();
         while (iterator.hasNext()) {
             ResolvedFieldDeclaration next = iterator.next();
-            String name = next.getName();
-            ResolvedTypes resolvedTypes;
+            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(),referenceType.getTypeParametersMap());
+            //处理类字段的默认值
+            if (next instanceof JavaParserFieldDeclaration) {
+                JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
+                if(field.isStatic()){
+                    //忽略静态属性
+                    continue;
+                }
 
-            ResolvedType type = next.getType();
-            if(type.isTypeVariable()){
-                //泛型解析
-                ResolvedTypeVariable resolvedTypeVariable = type.asTypeVariable();
-                List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap = referenceType.getTypeParametersMap();
-                resolvedTypes = ResolvedTypes.ofTypeVariable(resolvedTypeVariable, typeParametersMap);
-            }else{
-                resolvedTypes = ResolvedTypes.of(type);
+                Optional<Expression> initializer = field.getVariableDeclarator().getInitializer();
+                initializer.ifPresent(expr->resolvedTypes.setValue(expr.toString()));
             }
 
-            if(resolvedTypes.isResolved()){
-                if (Objects.nonNull(resolvedTypes.getValue())) {
-                    objectNode.putPOJO(name, resolvedTypes.getValue());
-                }
-                Cell cell = new Cell(name, resolvedTypes.getName());
-                if (resolvedTypes.isPrimitive()) {
-                    cell.setValue(String.valueOf(resolvedTypes.getValue()));
-                    //处理类字段的默认值
-                    Optional<Expression> initializer = ((JavaParserFieldDeclaration) next).getVariableDeclarator().getInitializer();
-                    initializer.ifPresent(expression -> cell.setValue(expression.toString()));
-                }
-                cell.setDescription(Comments.getCommentAsString(next));
-                cells.add(cell);
-                cells.addAll(resolvedTypes.getCells());
+            String comment = Comments.getCommentAsString(next);
+
+            put(next.getName(), resolvedTypes, comment);
+        }
+    }
+
+    /**
+     * 合并另一个Type的属性到当前对象
+     *
+     * @param other
+     */
+    private void merge(ResolvedTypes other) {
+        if (other.isResolved() && !other.isPrimitive()) {
+            if (other.getValue() instanceof ObjectNode) {
+                ObjectNode directValue = (ObjectNode) other.getValue();
+                objectNode.setAll(directValue);
             }
+            cells.addAll(other.getCells());
+        }
+    }
+
+    /**
+     * 设置某字段
+     *
+     * @param key
+     * @param other
+     * @param description
+     */
+    private void put(String key, ResolvedTypes other, String description) {
+        if (other.isResolved()) {
+            if (Objects.nonNull(other.getValue())) {
+                objectNode.putPOJO(key, other.getValue());
+            }
+            Cell cell = new Cell(key, other.getName());
+            if (other.isPrimitive()) {
+                cell.setValue(String.valueOf(other.getValue()));
+            }
+            cell.setDescription(description);
+            cells.add(cell);
+            cells.addAll(other.getCells());
         }
     }
 

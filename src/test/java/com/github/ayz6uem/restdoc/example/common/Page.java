@@ -1,4 +1,4 @@
-package com.github.ayz6uem.restdoc.common;
+package com.github.ayz6uem.restdoc.example.common;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,5 @@ public class Page extends Query {
     int page = 1;
     /* 每页条数 */
     int sizs = 20;
-    //关键字
-    String key;
 
 }

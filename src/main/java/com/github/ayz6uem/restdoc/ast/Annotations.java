@@ -55,18 +55,4 @@ public class Annotations {
         return null;
     }
 
-    public static final Set<String> collectionTypeSet = Sets.newHashSet(
-            Collection.class.getSimpleName(),
-            List.class.getSimpleName(),
-            Set.class.getSimpleName());
-
-    /**
-     * 是否为集合类型
-     * @param name
-     * @return
-     */
-    public static boolean isCollection(String name){
-        return collectionTypeSet.contains(name);
-    }
-
 }

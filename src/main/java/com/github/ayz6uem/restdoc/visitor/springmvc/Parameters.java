@@ -108,7 +108,7 @@ public class Parameters {
             cells.addAll(astResolvedType.getCells());
 
         } catch (Exception e) {
-            log.warn("try to resolve fail:" + expr.toString());
+            log.debug("try to resolve fail:" + expr.toString());
         }
     }
 
