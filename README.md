@@ -15,7 +15,7 @@ restDoc.parse();
 restDoc.build();
 ```
 
-![example](https://github.com/ayz6uem/restdoc/master/example/example.jpg)
+![example](https://github.com/ayz6uem/restdoc/blob/master/example/example.jpg)
 
 ### Plans
 
@@ -70,4 +70,3 @@ it possible throw this error
 java.lang.NoSuchMethodError: org.apache.commons.lang3.Validate.inclusiveBetween(JJJ)V
 ```
 
- 
