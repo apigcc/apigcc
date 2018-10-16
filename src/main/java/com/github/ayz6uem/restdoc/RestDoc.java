@@ -4,9 +4,6 @@ import com.github.ayz6uem.restdoc.handler.RestDocHandler;
 import com.github.ayz6uem.restdoc.schema.Tree;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.utils.SourceRoot;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -15,8 +12,6 @@ import java.util.Iterator;
 /**
  * 工具入口类、上下文
  */
-@Getter
-@Setter
 public class RestDoc {
 
     Enviroment env;
@@ -39,7 +34,6 @@ public class RestDoc {
         this(new Enviroment().source(root));
     }
 
-    @SneakyThrows
     public RestDoc parse() {
         //是否使用责任链？
         ParserConfiguration configuration = env.buildParserConfiguration();
@@ -65,4 +59,11 @@ public class RestDoc {
     }
 
 
+    public Tree getTree() {
+        return tree;
+    }
+
+    public Enviroment getEnv() {
+        return env;
+    }
 }

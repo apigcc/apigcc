@@ -1,5 +1,6 @@
 package com.github.ayz6uem.restdoc;
 
+import com.github.ayz6uem.restdoc.handler.postman.PostmanBuilder;
 import com.github.ayz6uem.restdoc.visitor.NodeVisitor;
 import com.github.ayz6uem.restdoc.visitor.springmvc.SpringVisitor;
 import com.github.ayz6uem.restdoc.handler.AsciidocHandler;
@@ -13,24 +14,21 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeS
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
-@Slf4j
-@Getter
-@Setter
 public class Enviroment {
+
+    Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 默认的文档树访问器
      */
-    public static Iterable<RestDocHandler> DEFAULT_PIPELINE = Lists.newArrayList(new AsciidocHandler(), new HtmlHandler());
+    public static Iterable<RestDocHandler> DEFAULT_PIPELINE = Lists.newArrayList(new PostmanBuilder(), new AsciidocHandler(), new HtmlHandler());
 
     public static final String DEFAULT_OUT_PATH = "build/restdoc/";
     public static final String DEFAULT_PROJECT_PATH = System.getProperty("user.dir");
@@ -46,7 +44,6 @@ public class Enviroment {
             this.visitor = visitor;
         }
 
-        @SneakyThrows
         public NodeVisitor visitor(){
             return visitor;
         }
@@ -175,4 +172,35 @@ public class Enviroment {
         return currentFramework().visitor();
     }
 
+    public Set<String> getSources() {
+        return sources;
+    }
+
+    public Set<String> getDependencies() {
+        return dependencies;
+    }
+
+    public Set<String> getJars() {
+        return jars;
+    }
+
+    public String getOut() {
+        return out;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public static Set<String> getIgnoreTypes() {
+        return ignoreTypes;
+    }
 }

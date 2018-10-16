@@ -2,8 +2,6 @@ package com.github.ayz6uem.restdoc.visitor.springmvc;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.AnnotationExpr;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,8 +9,6 @@ import java.util.List;
 /**
  * Spring @Controller 解析工具
  */
-@Setter
-@Getter
 public class Controllers {
 
     public static final String CONTROLLER = "Controller";

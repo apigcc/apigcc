@@ -11,18 +11,14 @@ import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserParameterDeclaration;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.*;
 
-@Setter
-@Getter
 public class Comments {
 
-    String name;
-    String description;
-    Map<String,String> params = new HashMap<>();
+    public String name;
+    public String description;
+    public Map<String,String> params = new HashMap<>();
 
     public static Comments of(Comment n){
         Comments comments = new Comments();
@@ -41,10 +37,10 @@ public class Comments {
         }
         String[] arr = content.split("(\\r\\n)+",2);
         if(arr.length>=1){
-            setName(arr[0]);
+            name = arr[0];
         }
         if(arr.length>=2){
-            setDescription(arr[1]);
+            description = arr[1];
         }
     }
 
@@ -101,9 +97,10 @@ public class Comments {
             MethodDeclaration method = (MethodDeclaration)expr.getParentNode().get();
             if(method.getComment().isPresent()){
                 Comments comments = Comments.of(method.getComment().get());
-                return comments.getParams().get(expr.getNameAsString());
+                return comments.params.get(expr.getNameAsString());
             }
         }
         return null;
     }
+
 }

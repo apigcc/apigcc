@@ -7,7 +7,6 @@ import java.util.*;
 
 public class Annotations {
 
-
     /**
      * 获取注解表达式中，各个属性的值
      * @param n

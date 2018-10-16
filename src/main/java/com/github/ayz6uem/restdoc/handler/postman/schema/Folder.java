@@ -1,18 +1,13 @@
-package com.github.ayz6uem.restdoc.schema;
+package com.github.ayz6uem.restdoc.handler.postman.schema;
 
-public class Node {
+import java.util.ArrayList;
+import java.util.List;
 
-    String id;
+public class Folder {
+
     String name;
     String description;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    List<Item> item = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -30,4 +25,11 @@ public class Node {
         this.description = description;
     }
 
+    public List<Item> getItem() {
+        return item;
+    }
+
+    public void setItem(List<Item> item) {
+        this.item = item;
+    }
 }

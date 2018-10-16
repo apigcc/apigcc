@@ -1,14 +1,8 @@
 package com.github.ayz6uem.restdoc.example.common;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
-@Setter
-@Getter
 public class UserDTO {
 
     /**
@@ -34,4 +28,51 @@ public class UserDTO {
      */
     String[] icons;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public String[] getIcons() {
+        return icons;
+    }
+
+    public void setIcons(String[] icons) {
+        this.icons = icons;
+    }
 }

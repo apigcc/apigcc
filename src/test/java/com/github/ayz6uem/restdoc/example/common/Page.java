@@ -1,10 +1,5 @@
 package com.github.ayz6uem.restdoc.example.common;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Setter
-@Getter
 public class Page extends Query {
 
     /**
@@ -14,4 +9,19 @@ public class Page extends Query {
     /* 每页条数 */
     int sizs = 20;
 
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getSizs() {
+        return sizs;
+    }
+
+    public void setSizs(int sizs) {
+        this.sizs = sizs;
+    }
 }

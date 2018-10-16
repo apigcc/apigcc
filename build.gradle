@@ -26,7 +26,6 @@ repositories {
 }
 
 dependencies {
-    compile 'org.projectlombok:lombok:1.18.2'
     compile 'com.github.javaparser:javaparser-symbol-solver-core:3.6.25'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5.2'
     compile 'org.asciidoctor:asciidoctorj:1.5.6'

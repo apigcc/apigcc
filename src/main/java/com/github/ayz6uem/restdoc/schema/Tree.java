@@ -2,8 +2,6 @@ package com.github.ayz6uem.restdoc.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.ayz6uem.restdoc.RestDoc;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,22 +10,52 @@ import java.util.List;
  * Rest api Tree
  * example:
  * {
- *     id:'restdoc',
- *     group:'com.github.ayz6uem',
- *     version:'1.0',
- *     name:'接口文档',
- *     description:'接口描述'
+ * id:'restdoc',
+ * group:'com.github.ayz6uem',
+ * version:'1.0',
+ * name:'接口文档',
+ * description:'接口描述'
  * }
  */
-@Getter
-@Setter
-public class Tree extends Node{
+public class Tree extends Node {
 
-    String group;
+    String realm;
     String version;
-    List<Node> nodes = new ArrayList<>();
+    List<Group> groups = new ArrayList<>();
 
     @JsonIgnore
     RestDoc context;
+
+    public String getRealm() {
+        return realm;
+    }
+
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    public RestDoc getContext() {
+        return context;
+    }
+
+    public void setContext(RestDoc context) {
+        this.context = context;
+    }
 
 }

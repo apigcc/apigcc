@@ -1,4 +1,8 @@
 # Restdoc
+
+![](https://img.shields.io/badge/language-java-yellow.svg)
+![](https://img.shields.io/badge/build-processing-green.svg)
+
 A rest document generator with parse the source code
 
 ### Usage
@@ -20,7 +24,7 @@ restDoc.build();
 ### Plans
 
 #### v1.0 Parse code and generate files
-1. postman.json 
+1. postman.json
 2. index.adoc
 3. render adoc to html
 4. find some target test
@@ -65,8 +69,7 @@ if your project have import
 ```
 compile('org.apache.commons:commons-lang3:3.0')
 ```
-it possible throw this error 
+it possible throw this error
 ```java
 java.lang.NoSuchMethodError: org.apache.commons.lang3.Validate.inclusiveBetween(JJJ)V
 ```
-

@@ -1,10 +1,5 @@
 package com.github.ayz6uem.restdoc.example.common;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class Query {
 
     /**
@@ -17,4 +12,11 @@ public class Query {
      */
     String q = "";
 
+    public String getQ() {
+        return q;
+    }
+
+    public void setQ(String q) {
+        this.q = q;
+    }
 }

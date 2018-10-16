@@ -1,22 +1,21 @@
 package com.github.ayz6uem.restdoc.visitor.springmvc;
 
+import com.github.ayz6uem.restdoc.ast.Annotations;
+import com.github.ayz6uem.restdoc.http.HttpHeaders;
 import com.github.ayz6uem.restdoc.http.HttpRequestMethod;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.expr.*;
-import com.github.ayz6uem.restdoc.ast.Annotations;
-import com.github.ayz6uem.restdoc.http.HttpHeaders;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Spring @RequestMapping 解析工具
  */
-@Setter
-@Getter
 public class RequestMappings {
 
     public static final String GET_MAPPING = "GetMapping";
@@ -33,15 +32,15 @@ public class RequestMappings {
             DELETE_MAPPING,
             REQUEST_MAPPING);
 
-    public static final Map<String,HttpRequestMethod> ANNOTATION_METHOD = new HashMap<>(ANNOTATIONS.size());
+    public static final Map<String, HttpRequestMethod> ANNOTATION_METHOD = new HashMap<>(ANNOTATIONS.size());
 
     static {
-        ANNOTATION_METHOD.put(GET_MAPPING,HttpRequestMethod.GET);
-        ANNOTATION_METHOD.put(POST_MAPPING,HttpRequestMethod.POST);
-        ANNOTATION_METHOD.put(PUT_MAPPING,HttpRequestMethod.PUT);
-        ANNOTATION_METHOD.put(PATCH_MAPPING,HttpRequestMethod.PATCH);
-        ANNOTATION_METHOD.put(DELETE_MAPPING,HttpRequestMethod.DELETE);
-        ANNOTATION_METHOD.put(REQUEST_MAPPING,HttpRequestMethod.GET);
+        ANNOTATION_METHOD.put(GET_MAPPING, HttpRequestMethod.GET);
+        ANNOTATION_METHOD.put(POST_MAPPING, HttpRequestMethod.POST);
+        ANNOTATION_METHOD.put(PUT_MAPPING, HttpRequestMethod.PUT);
+        ANNOTATION_METHOD.put(PATCH_MAPPING, HttpRequestMethod.PATCH);
+        ANNOTATION_METHOD.put(DELETE_MAPPING, HttpRequestMethod.DELETE);
+        ANNOTATION_METHOD.put(REQUEST_MAPPING, HttpRequestMethod.GET);
     }
 
     public static final String REQUEST_METHOD_GET = "RequestMethod.GET";
@@ -50,26 +49,27 @@ public class RequestMappings {
     public static final String REQUEST_METHOD_PATCH = "RequestMethod.PATCH";
     public static final String REQUEST_METHOD_DELETE = "RequestMethod.DELETE";
 
-    public static final Map<String,HttpRequestMethod> ATTRS_METHOD = new HashMap<>();
+    public static final Map<String, HttpRequestMethod> ATTRS_METHOD = new HashMap<>();
 
     static {
-        ATTRS_METHOD.put(REQUEST_METHOD_GET,HttpRequestMethod.GET);
-        ATTRS_METHOD.put(REQUEST_METHOD_POST,HttpRequestMethod.POST);
-        ATTRS_METHOD.put(REQUEST_METHOD_PUT,HttpRequestMethod.PUT);
-        ATTRS_METHOD.put(REQUEST_METHOD_PATCH,HttpRequestMethod.PATCH);
-        ATTRS_METHOD.put(REQUEST_METHOD_DELETE,HttpRequestMethod.DELETE);
+        ATTRS_METHOD.put(REQUEST_METHOD_GET, HttpRequestMethod.GET);
+        ATTRS_METHOD.put(REQUEST_METHOD_POST, HttpRequestMethod.POST);
+        ATTRS_METHOD.put(REQUEST_METHOD_PUT, HttpRequestMethod.PUT);
+        ATTRS_METHOD.put(REQUEST_METHOD_PATCH, HttpRequestMethod.PATCH);
+        ATTRS_METHOD.put(REQUEST_METHOD_DELETE, HttpRequestMethod.DELETE);
     }
 
-    public static boolean accept(NodeList<AnnotationExpr> nodes){
+    public static boolean accept(NodeList<AnnotationExpr> nodes) {
         for (int i = 0; i < nodes.size(); i++) {
-            if(accept(nodes.get(i))){
+            if (accept(nodes.get(i))) {
                 return true;
             }
         }
         return false;
     }
-    public static boolean accept(AnnotationExpr n){
-        if(!ANNOTATIONS.contains(n.getNameAsString())){
+
+    public static boolean accept(AnnotationExpr n) {
+        if (!ANNOTATIONS.contains(n.getNameAsString())) {
             return false;
         }
         return true;
@@ -79,27 +79,27 @@ public class RequestMappings {
     String path;
     HttpHeaders headers = new HttpHeaders();
 
-    public static RequestMappings of(AnnotationExpr n){
-        if(!accept(n)){
-            throw new IllegalArgumentException("annotationExpr not accept:"+n.getNameAsString());
+    public static RequestMappings of(AnnotationExpr n) {
+        if (!accept(n)) {
+            throw new IllegalArgumentException("annotationExpr not accept:" + n.getNameAsString());
         }
         //解析注解各个属性
-        Map<String,Object> annotationAttrs = Annotations.parseAtts(n);
+        Map<String, Object> annotationAttrs = Annotations.parseAtts(n);
 
         RequestMappings requestMappings = new RequestMappings();
         //解析并设置http请求方法
-        if(annotationAttrs.containsKey("method")){
+        if (annotationAttrs.containsKey("method")) {
             HttpRequestMethod m = ATTRS_METHOD.get(String.valueOf(annotationAttrs.get("method")));
-            if(m!=null){
+            if (m != null) {
                 requestMappings.setMethod(m);
             }
-        }else{
+        } else {
             requestMappings.setMethod(ANNOTATION_METHOD.get(n.getNameAsString()));
         }
         //解析并设置http请求路径
-        if(annotationAttrs.containsKey("value")){
+        if (annotationAttrs.containsKey("value")) {
             requestMappings.setPath(String.valueOf(annotationAttrs.get("value")));
-        }else{
+        } else {
             requestMappings.setPath("");
         }
         //TODO 解析headers
@@ -111,10 +111,11 @@ public class RequestMappings {
     /**
      * 解析Class的@RequestMapping注解
      * Class上只能使用@RequestMapping
+     *
      * @param n
      * @return
      */
-    public static Optional<RequestMappings> of(ClassOrInterfaceDeclaration n){
+    public static Optional<RequestMappings> of(ClassOrInterfaceDeclaration n) {
         RequestMappings requestMappings = null;
         Optional<AnnotationExpr> requestMapping = n.getAnnotationByName(RequestMappings.REQUEST_MAPPING);
         if (requestMapping.isPresent()) {
@@ -123,5 +124,30 @@ public class RequestMappings {
         return Optional.ofNullable(requestMappings);
     }
 
-    private RequestMappings(){}
+    private RequestMappings() {
+    }
+
+    public HttpRequestMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(HttpRequestMethod method) {
+        this.method = method;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public HttpHeaders getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(HttpHeaders headers) {
+        this.headers = headers;
+    }
 }

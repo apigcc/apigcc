@@ -14,18 +14,15 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedTypeVariable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.Pair;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -33,28 +30,27 @@ import java.util.*;
  * 语法树中Symbol处理
  * 解析已知类的结构
  */
-@Slf4j
-@Getter
-@Setter
 public class ResolvedTypes {
+
+    static Logger log = LoggerFactory.getLogger(ResolvedTypes.class);
 
     /**
      * 获取解析结果前，应判断是否已解析
      */
-    boolean resolved;
+    public boolean resolved;
 
     /**
      * 是否基本类型
      */
-    boolean primitive;
-    String name;
-    Object value;
-    ObjectNode objectNode;
-    List<Cell> cells = new ArrayList<>();
+    public boolean primitive;
+    public String name;
+    public Object value;
+    public ObjectNode objectNode;
+    public List<Cell> cells = new ArrayList<>();
 
 
-    public Object getValue(){
-        return value==null?objectNode:value;
+    public Object getValue() {
+        return value == null ? objectNode : value;
     }
 
     /**
@@ -90,7 +86,7 @@ public class ResolvedTypes {
      */
     public static ResolvedTypes of(ResolvedType resolvedType) {
         ResolvedTypes resolvedTypes = new ResolvedTypes();
-        if(!resolvedType.isTypeVariable()){
+        if (!resolvedType.isTypeVariable()) {
             resolvedTypes.resolve(resolvedType);
             resolvedTypes.resolved = true;
         }
@@ -124,14 +120,15 @@ public class ResolvedTypes {
 
     /**
      * 解析泛型参数
+     *
      * @param nodes
      */
     private void tryResolveTypeArguments(NodeList<Type> nodes) {
         nodes.forEach(type -> {
             ResolvedTypes argumentResolved = ResolvedTypes.of(type);
-            if (argumentResolved.isResolved()) {
-                setValue(argumentResolved.getValue());
-                getCells().addAll(argumentResolved.getCells());
+            if (argumentResolved.resolved) {
+                value = argumentResolved.getValue();
+                cells.addAll(argumentResolved.cells);
             }
         });
     }
@@ -146,31 +143,31 @@ public class ResolvedTypes {
         resolveName(resolvedType);
 
         //忽略的类型
-        if(Enviroment.ignoreTypes.contains(this.getName())){
+        if (Enviroment.ignoreTypes.contains(this.name)) {
             return;
         }
 
         if (resolvedType.isPrimitive() || Numbers.isAssignableBy(resolvedType)) {
-            setPrimitive(true);
-            setValue(0);
+            primitive = true;
+            value = 0;
         } else if (Strings.isAssignableBy(resolvedType)) {
-            setPrimitive(true);
-            setValue("");
+            primitive = true;
+            value = "";
         } else if (resolvedType.isArray()) {
             resolveArray(resolvedType);
         } else if (resolvedType.isReferenceType()) {
             ResolvedReferenceType referenceType = resolvedType.asReferenceType();
-            if(referenceType.getTypeDeclaration().isEnum()){
+            if (referenceType.getTypeDeclaration().isEnum()) {
                 //枚举类型
-                setPrimitive(true);
-                setValue("");
-            }else if (Collections.isAssignableBy(resolvedType)) {
+                primitive = true;
+                value = "";
+            } else if (Collections.isAssignableBy(resolvedType)) {
                 resolveCollection(referenceType);
-            } else if(Maps.isAssignableBy(resolvedType)){
+            } else if (Maps.isAssignableBy(resolvedType)) {
                 //Map类型，解析为一个object
-            } else if(Dates.isAssignableBy(resolvedType)){
+            } else if (Dates.isAssignableBy(resolvedType)) {
                 //日期类型
-            } else if(Langs.isAssignableBy(resolvedType)){
+            } else if (Langs.isAssignableBy(resolvedType)) {
                 //java类型，不处理
             } else {
                 resolvePojo(referenceType);
@@ -204,10 +201,10 @@ public class ResolvedTypes {
         if (resolvedType.isArray()) {
             ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
             ResolvedTypes componentType = ResolvedTypes.of(resolvedType.asArrayType().getComponentType());
-            if (componentType.isResolved()) {
+            if (componentType.resolved) {
                 arrayNode.addPOJO(componentType.getValue());
-                setValue(arrayNode);
-                getCells().addAll(componentType.getCells());
+                value = arrayNode;
+                cells.addAll(componentType.cells);
             }
         }
     }
@@ -239,27 +236,27 @@ public class ResolvedTypes {
      */
     private void resolveFields(ResolvedReferenceType referenceType) {
         //先解析父类的字段
-        try{
+        try {
             referenceType.getDirectAncestors().forEach(direct -> merge(ResolvedTypes.of(direct)));
-        }catch (Exception e){
-            log.warn("parse parent fail:"+referenceType);
+        } catch (Exception e) {
+            log.warn("parse parent fail:" + referenceType);
         }
 
         //解析各字段
         Iterator<ResolvedFieldDeclaration> iterator = referenceType.getTypeDeclaration().getDeclaredFields().iterator();
         while (iterator.hasNext()) {
             ResolvedFieldDeclaration next = iterator.next();
-            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(),referenceType.getTypeParametersMap());
+            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), referenceType.getTypeParametersMap());
             //处理类字段的默认值
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
-                if(field.isStatic()){
+                if (field.isStatic()) {
                     //忽略静态属性
                     continue;
                 }
 
                 Optional<Expression> initializer = field.getVariableDeclarator().getInitializer();
-                initializer.ifPresent(expr->resolvedTypes.setValue(expr.toString()));
+                initializer.ifPresent(expr -> resolvedTypes.value = expr.toString());
             }
 
             String comment = Comments.getCommentAsString(next);
@@ -274,12 +271,12 @@ public class ResolvedTypes {
      * @param other
      */
     private void merge(ResolvedTypes other) {
-        if (other.isResolved() && !other.isPrimitive()) {
+        if (other.resolved && !other.primitive) {
             if (other.getValue() instanceof ObjectNode) {
                 ObjectNode directValue = (ObjectNode) other.getValue();
                 objectNode.setAll(directValue);
             }
-            cells.addAll(other.getCells());
+            cells.addAll(other.cells);
         }
     }
 
@@ -291,17 +288,17 @@ public class ResolvedTypes {
      * @param description
      */
     private void put(String key, ResolvedTypes other, String description) {
-        if (other.isResolved()) {
+        if (other.resolved) {
             if (Objects.nonNull(other.getValue())) {
                 objectNode.putPOJO(key, other.getValue());
             }
-            Cell cell = new Cell(key, other.getName());
-            if (other.isPrimitive()) {
+            Cell cell = new Cell(key, other.name);
+            if (other.primitive) {
                 cell.setValue(String.valueOf(other.getValue()));
             }
             cell.setDescription(description);
             cells.add(cell);
-            cells.addAll(other.getCells());
+            cells.addAll(other.cells);
         }
     }
 

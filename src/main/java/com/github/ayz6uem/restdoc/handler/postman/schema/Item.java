@@ -1,166 +1,55 @@
 package com.github.ayz6uem.restdoc.handler.postman.schema;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Item extends Node {
+public class Item {
 
+    String id = UUID.randomUUID().toString();
+    String name;
+    String description;
     Request request = new Request();
-    Response response = new Response();
+    List<Response> response = new ArrayList<>();
 
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class Request{
-
-        Url url = new Url();
-        Method method;
-        String description;
-        List<Header> header = new ArrayList<>();
-        Body body = new Body();
-        List<Parameter> pathVariables = new ArrayList<>();
-
-        public void addDescription(String description) {
-            if(Objects.isNull(description)){
-                return;
-            }
-            description +=  "\r\n\r\n";
-            if (this.description == null) {
-                this.description = description;
-            } else {
-                this.description += description;
-            }
-        }
-
+    public String getId() {
+        return id;
     }
 
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class Url{
-
-        String raw;
-        String protocol = "http";
-        String host = "{{host}}";
-        String path;
-        String port;
-        List<Parameter> query = new ArrayList<>();
-        List<Parameter> pathVariable = new ArrayList<>();
-
-        public String getQueryString(){
-            StringBuilder stringBuilder = new StringBuilder();
-            Parameter.join(query,stringBuilder);
-            if(stringBuilder.length()>0){
-                stringBuilder.insert(0,"?");
-            }
-            return stringBuilder.toString();
-        }
-
+    public void setId(String id) {
+        this.id = id;
     }
 
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @NoArgsConstructor
-    public static class Header{
-
-
-        String key;
-        String value;
-        String description;
-
-        public Header(String key, String value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public String toString(){
-            return key + ": " + value;
-        }
+    public String getName() {
+        return name;
     }
 
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class Body{
-
-        BodyMode mode;
-        String raw;
-        List<Parameter> rawParameter = new ArrayList<>();
-        List<Parameter> urlencoded = new ArrayList<>();
-        List<Parameter> formdata = new ArrayList<>();
-        FileParameter file;
-
-        @JsonIgnore
-        public boolean isEmpty(){
-            return Objects.isNull(raw) && urlencoded.isEmpty() && formdata.isEmpty();
-        }
-
-        public String toString(){
-            if(raw!=null){
-                return raw;
-            }
-            StringBuilder stringBuilder = new StringBuilder();
-            Parameter.join(urlencoded,stringBuilder);
-            Parameter.join(formdata,stringBuilder);
-            return stringBuilder.toString();
-        }
-
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class Parameter{
-
-        String key;
-        String type;
-        Object value;
-        String src;
-        String description;
-        boolean disabled = false;
-
-        public static void join(List<Parameter> parameters, StringBuilder stringBuilder){
-            parameters.forEach(parameter -> {
-                if(stringBuilder.length()!=0){
-                    stringBuilder.append("&");
-                }
-                stringBuilder.append(parameter.getKey()).append("=").append(parameter.getValue());
-            });
-        }
+    public String getDescription() {
+        return description;
     }
 
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class FileParameter{
-
-        String src;
-        String content;
-
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class Response{
-
-        String name = "example";
-        List<Header> header = new ArrayList<>();
-        String body;
-        List<Parameter> bodyParameter = new ArrayList<>();
-
-        @JsonIgnore
-        public boolean isEmpty(){
-            return header.isEmpty() && StringUtils.isEmpty(body);
-        }
-
+    public Request getRequest() {
+        return request;
     }
 
+    public void setRequest(Request request) {
+        this.request = request;
+    }
+
+    public List<Response> getResponse() {
+        return response;
+    }
+
+    public void setResponse(List<Response> response) {
+        this.response = response;
+    }
 
 }

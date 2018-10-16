@@ -35,9 +35,9 @@ public class AsciidocHandler implements RestDocHandler {
             builder.paragraph(tree.getDescription(),true);
         }
 
-        for (int i = 0; i < tree.getNodes().size(); i++) {
-            Node node = tree.getNodes().get(i);
-            buildNode(node, "", i + 1);
+        for (int i = 0; i < tree.getGroups().size(); i++) {
+            Group group = tree.getGroups().get(i);
+            buildGroup(group, "", i + 1);
         }
 
         String adoc = restDoc.getEnv().getOut() + "/" + restDoc.getEnv().getProject();
@@ -47,22 +47,14 @@ public class AsciidocHandler implements RestDocHandler {
     }
 
 
-    private void buildNode(Node node, String prefix, int num) {
-        if (node instanceof Group) {
-            buildGroup((Group) node, prefix, num);
-        } else if (node instanceof HttpMessage) {
-            buildHttpMessage((HttpMessage) node, prefix, num);
-        }
-    }
-
     private void buildGroup(Group group, String prefix, int num) {
         builder.sectionTitleLevel1(prefix + num + " " + group.getName());
         if (Objects.nonNull(group.getDescription())) {
             builder.paragraph(group.getDescription(),true);
         }
         for (int i = 0; i < group.getNodes().size(); i++) {
-            Node node = group.getNodes().get(i);
-            buildNode(node, prefix + num + ".", i + 1);
+            HttpMessage httpMessage = group.getNodes().get(i);
+            buildHttpMessage(httpMessage, prefix + num + ".", i + 1);
         }
     }
 
