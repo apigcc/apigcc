@@ -1,6 +1,7 @@
 package com.github.ayz6uem.restdoc.example.advanced;
 
 import com.github.ayz6uem.restdoc.example.common.*;
+import org.jruby.ir.Tuple;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
  * 用户模块（标题）
  * 用户示例模块文字描述（详情）
  * 支持多行文字
+ * @index 2
  */
 @RestController
 @RequestMapping("/users")
@@ -124,6 +126,16 @@ public class UserController extends BaseController {
     @GetMapping("/role")
     public ResultData<Integer> listFromRole(Role role){
         return ResultData.ok();
+    }
+
+    /**
+     * 批量上传用户信息
+     * @param list
+     * @return
+     */
+    @PostMapping("/batch")
+    public ResultData batch(@RequestBody List<UserDTO> list){
+        return null;
     }
 
 }

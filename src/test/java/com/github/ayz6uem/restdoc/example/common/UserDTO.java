@@ -2,6 +2,7 @@ package com.github.ayz6uem.restdoc.example.common;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class UserDTO {
 
@@ -9,9 +10,7 @@ public class UserDTO {
      * 编号
      */
     Integer id;
-    /*
-     * 姓名
-     */
+    /*姓名*/
     String name;
     //年龄
     int age;
@@ -27,6 +26,8 @@ public class UserDTO {
      * 用户图标
      */
     String[] icons;
+
+    Map<String,String> attrs;
 
     public Integer getId() {
         return id;
@@ -74,5 +75,13 @@ public class UserDTO {
 
     public void setIcons(String[] icons) {
         this.icons = icons;
+    }
+
+    public Map<String, String> getAttrs() {
+        return attrs;
+    }
+
+    public void setAttrs(Map<String, String> attrs) {
+        this.attrs = attrs;
     }
 }

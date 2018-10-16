@@ -1,6 +1,8 @@
 package com.github.ayz6uem.restdoc.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.ayz6uem.restdoc.schema.Cell;
+import com.github.ayz6uem.restdoc.util.ObjectMappers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,5 +58,45 @@ public class HttpRequest {
 
     public void setCells(List<Cell> cells) {
         this.cells = cells;
+    }
+
+    public Object queryString() {
+        if (HttpRequestMethod.GET.equals(method)) {
+            return cells.size() > 0 ? "?" + Cell.join(cells) : "";
+        }
+        return "";
+    }
+
+    public boolean hasBody() {
+        return !HttpRequestMethod.GET.equals(method) && (body != null || hasParameter());
+    }
+
+    public String bodyString() {
+        if (getBody() != null && getBody() instanceof JsonNode) {
+            return ObjectMappers.toPretty(getBody());
+        } else {
+            return Cell.join(cells);
+        }
+    }
+
+    public boolean hasParameter() {
+        for (Cell cell : cells) {
+            if (!cell.isDisabled()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 根据请求方法，参数等
+     * 设置合理的content-Type
+     * 最低是 form_urlencoded，如果已经是json，并不会覆盖
+     * @return
+     */
+    public void checkContentType() {
+        if (hasBody()) {
+            headers.setContentType(HttpHeaders.ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
+        }
     }
 }

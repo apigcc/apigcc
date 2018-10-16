@@ -3,15 +3,14 @@ package com.github.ayz6uem.restdoc.schema;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.ayz6uem.restdoc.http.HttpMessage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 请求组，如一个folder，一个Controller
  */
 public class Group extends Node {
+
+    public static Comparator<Group> COMPARATOR = Comparator.comparingInt(o -> o.index);
 
     @JsonIgnore
     Tree parent;
@@ -22,6 +21,8 @@ public class Group extends Node {
      * 如：Spring在Controller的RequestMapping，可以存在扩展属性中
      */
     Map<String, Object> ext = new HashMap<>();
+
+    int index = 99;
 
     public boolean isEmpty() {
         return nodes.isEmpty();
@@ -49,5 +50,13 @@ public class Group extends Node {
 
     public void setParent(Tree parent) {
         this.parent = parent;
+    }
+
+    public void setIndex(Optional<Integer> index) {
+        index.ifPresent(integer -> this.index = integer);
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

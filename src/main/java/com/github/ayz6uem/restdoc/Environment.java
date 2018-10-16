@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
-public class Enviroment {
+public class Environment {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -96,43 +96,43 @@ public class Enviroment {
      */
     Framework currentFramework = Framework.SPRINGMVC;
 
-    public Enviroment source(String ... values){
+    public Environment source(String ... values){
         this.sources.addAll(Sets.newHashSet(values));
         dependency(values);
         return this;
     }
 
-    public Enviroment dependency(String ... values){
+    public Environment dependency(String ... values){
         this.dependencies.addAll(Sets.newHashSet(values));
         return this;
     }
 
-    public Enviroment jar(String ... values){
+    public Environment jar(String ... values){
         this.jars.addAll(Sets.newHashSet(values));
         return this;
     }
 
-    public Enviroment project(String value){
+    public Environment project(String value){
         this.project = value;
         return this;
     }
 
-    public Enviroment out(String value){
+    public Environment out(String value){
         this.out = value;
         return this;
     }
 
-    public Enviroment title(String value){
+    public Environment title(String value){
         this.title = value;
         return this;
     }
 
-    public Enviroment description(String value){
+    public Environment description(String value){
         this.description = value;
         return this;
     }
 
-    public Enviroment ignore(String ... values){
+    public Environment ignore(String ... values){
         this.ignoreTypes.addAll(Sets.newHashSet(values));
         return this;
     }

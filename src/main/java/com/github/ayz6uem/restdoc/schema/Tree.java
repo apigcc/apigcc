@@ -3,8 +3,7 @@ package com.github.ayz6uem.restdoc.schema;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.ayz6uem.restdoc.RestDoc;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Rest api Tree
@@ -44,10 +43,6 @@ public class Tree extends Node {
 
     public List<Group> getGroups() {
         return groups;
-    }
-
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
     }
 
     public RestDoc getContext() {

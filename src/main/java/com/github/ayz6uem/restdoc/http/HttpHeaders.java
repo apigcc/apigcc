@@ -80,17 +80,6 @@ public class HttpHeaders extends LinkedHashMap<String, String> {
         return get(Names.CONTENT_TYPE);
     }
 
-    /**
-     * 根据请求方法
-     * 设置合理的content-Type
-     * @param method
-     * @return
-     */
-    public void setContentType(HttpRequestMethod method){
-        if(!HttpRequestMethod.GET.equals(method)){
-            setContentType(ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
-        }
-    }
 
     /**
      * 加入一个header集合

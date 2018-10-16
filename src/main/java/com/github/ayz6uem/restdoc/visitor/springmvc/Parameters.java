@@ -2,6 +2,7 @@ package com.github.ayz6uem.restdoc.visitor.springmvc;
 
 import com.github.ayz6uem.restdoc.ast.Annotations;
 import com.github.ayz6uem.restdoc.ast.Comments;
+import com.github.ayz6uem.restdoc.ast.Defaults;
 import com.github.ayz6uem.restdoc.ast.ResolvedTypes;
 import com.github.ayz6uem.restdoc.schema.Cell;
 import com.github.javaparser.ast.body.Parameter;
@@ -23,7 +24,8 @@ public class Parameters {
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     public static final String REQUEST_BODY = "RequestBody";
-    public static final String REQUEST_Param = "RequestParam";
+    public static final String REQUEST_PARAM = "RequestParam";
+    public static final String REQUEST_HEADER = "RequestHeader";
     public static final String PATH_VARIABLE = "PathVariable";
 
     public static final String MVC_MODEL = "MODEL";
@@ -43,6 +45,10 @@ public class Parameters {
      */
     boolean requestBody;
     /**
+     * 是否是header
+     */
+    boolean header;
+    /**
      * 是否文件字段
      */
     boolean file;
@@ -60,13 +66,14 @@ public class Parameters {
     public static Parameters of(Parameter expr) {
         Parameters parameters = new Parameters();
 
-        //TODO ignore file mvc ?
+        //TODO file mvc ?
 
         if (expr.isAnnotationPresent(PATH_VARIABLE)) {
             parameters.setPathVariable(true);
-            Cell cell = new Cell(expr.getNameAsString(), expr.getTypeAsString(), true);
-            cell.setDescription(Comments.getCommentFromMethod(expr));
-            parameters.cells.add(cell);
+            parameters.resolvePath(expr);
+        } else if(expr.isAnnotationPresent(REQUEST_HEADER)){
+            parameters.setHeader(true);
+            parameters.resolveHeader(expr);
         } else {
             if (expr.isAnnotationPresent(REQUEST_BODY)) {
                 parameters.setRequestBody(true);
@@ -78,11 +85,39 @@ public class Parameters {
         return parameters;
     }
 
+    private void resolvePath(Parameter expr){
+        Cell cell = new Cell(expr.getNameAsString(), expr.getTypeAsString(), true);
+        cell.setDescription(Comments.getCommentFromMethod(expr));
+        cell.setValue(Defaults.get(cell.getType()));
+        cells.add(cell);
+    }
+    private void resolveHeader(Parameter expr){
+        name = expr.getNameAsString();
+        type = expr.getTypeAsString();
+        value = Defaults.get(type);
+        //解析RequestParam 获取字段名和默认值
+        Object valueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_HEADER), "value");
+        Object defaultValueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_HEADER), "defaultValue");
+        if (valueAttr != null) {
+            name = String.valueOf(valueAttr);
+        }
+        if (defaultValueAttr != null) {
+            value = defaultValueAttr;
+        }
+        Cell cell = new Cell(name, type, true);
+        cell.setDescription(Comments.getCommentFromMethod(expr));
+        cell.setValue(value);
+        cells.add(cell);
+    }
+
     private void tryResolve(Parameter expr) {
         try {
             ResolvedParameterDeclaration parameterDeclaration = expr.resolve();
             ResolvedType resolvedType = parameterDeclaration.getType();
             ResolvedTypes astResolvedType = ResolvedTypes.of(resolvedType);
+            if(!astResolvedType.resolved){
+                return;
+            }
             setPrimitive(astResolvedType.primitive);
             setValue(astResolvedType.getValue());
 
@@ -91,8 +126,8 @@ public class Parameters {
                 Cell cell = new Cell(expr.getNameAsString(), astResolvedType.name, astResolvedType.getValue());
 
                 //解析RequestParam 获取字段名和默认值
-                Object valueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_Param), "value");
-                Object defaultValueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_Param), "defaultValue");
+                Object valueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_PARAM), "value");
+                Object defaultValueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_PARAM), "defaultValue");
                 if (valueAttr != null) {
                     cell.setName(String.valueOf(valueAttr));
                 }
@@ -189,5 +224,13 @@ public class Parameters {
 
     public void setCells(List<Cell> cells) {
         this.cells = cells;
+    }
+
+    public boolean isHeader() {
+        return header;
+    }
+
+    public void setHeader(boolean header) {
+        this.header = header;
     }
 }

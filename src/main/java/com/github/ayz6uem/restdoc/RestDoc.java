@@ -1,12 +1,14 @@
 package com.github.ayz6uem.restdoc;
 
 import com.github.ayz6uem.restdoc.handler.RestDocHandler;
+import com.github.ayz6uem.restdoc.schema.Group;
 import com.github.ayz6uem.restdoc.schema.Tree;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.utils.SourceRoot;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -14,14 +16,14 @@ import java.util.Iterator;
  */
 public class RestDoc {
 
-    Enviroment env;
+    Environment env;
     Tree tree;
 
     public RestDoc() {
-        this(new Enviroment());
+        this(new Environment());
     }
 
-    public RestDoc(Enviroment env) {
+    public RestDoc(Environment env) {
         this.env = env;
         this.tree = new Tree();
         this.tree.setContext(this);
@@ -31,7 +33,7 @@ public class RestDoc {
     }
 
     public RestDoc(String root) {
-        this(new Enviroment().source(root));
+        this(new Environment().source(root));
     }
 
     public RestDoc parse() {
@@ -43,6 +45,10 @@ public class RestDoc {
             SourceRoot root = new SourceRoot(Paths.get(source),configuration);
             root.tryToParseParallelized().forEach(result -> result.ifSuccessful(cu -> cu.accept(env.visitor(), this.getTree())));
         }
+
+        //对Group进行排序
+        Collections.sort(tree.getGroups(), Group.COMPARATOR);
+
         return this;
     }
 
@@ -63,7 +69,7 @@ public class RestDoc {
         return tree;
     }
 
-    public Enviroment getEnv() {
+    public Environment getEnv() {
         return env;
     }
 }

@@ -5,6 +5,11 @@ package com.github.ayz6uem.restdoc.example.common;
  */
 public enum Role {
 
-    ADMIN,USER,VIP;
+    ADMIN("管理员"),USER("用户"),VIP("会员");
 
+    String text;
+
+    Role(String text) {
+        this.text = text;
+    }
 }

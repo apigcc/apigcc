@@ -1,6 +1,6 @@
 package com.github.ayz6uem.restdoc.example;
 
-import com.github.ayz6uem.restdoc.Enviroment;
+import com.github.ayz6uem.restdoc.Environment;
 import com.github.ayz6uem.restdoc.RestDoc;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,7 @@ public class ApplicationTest {
 
     @Test
     public void testRestdoc(){
-        Enviroment env = new Enviroment()
+        Environment env = new Environment()
                 .source(source)
                 .project("example")
                 .title("示例接口文档")

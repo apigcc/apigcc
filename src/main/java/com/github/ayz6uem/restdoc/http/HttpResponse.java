@@ -1,6 +1,8 @@
 package com.github.ayz6uem.restdoc.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.ayz6uem.restdoc.schema.Cell;
+import com.github.ayz6uem.restdoc.util.ObjectMappers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,4 +52,16 @@ public class HttpResponse {
     public void setCells(List<Cell> cells) {
         this.cells = cells;
     }
+
+    public boolean hasBody(){
+        return body != null;
+    }
+
+    public String bodyString(){
+        if(getBody()!=null && getBody() instanceof JsonNode){
+            return ObjectMappers.toPretty(getBody());
+        }
+        return "";
+    }
+
 }

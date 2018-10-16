@@ -46,6 +46,17 @@ public class Cell {
         return Arrays.asList(name, type, value==null?"":String.valueOf(value), description);
     }
 
+    public static String join(List<Cell> cells){
+        StringBuilder sb = new StringBuilder();
+        for (Cell cell : cells) {
+            if(sb.length()>0){
+                sb.append("&");
+            }
+            sb.append(cell.getName()).append("=").append(cell.getValue());
+        }
+        return sb.toString();
+    }
+
     public String getName() {
         return name;
     }

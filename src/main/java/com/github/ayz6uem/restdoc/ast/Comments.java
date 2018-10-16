@@ -18,28 +18,53 @@ public class Comments {
 
     public String name;
     public String description;
-    public Map<String,String> params = new HashMap<>();
+    public Map<String, String> params = new HashMap<>();
+    public List<Comments> tags = new ArrayList<>();
 
-    public static Comments of(Comment n){
+    public static Comments of(Comment n) {
         Comments comments = new Comments();
         String content = getContent(n);
         comments.setContent(content);
-        n.ifJavadocComment(javadocComment->{
+        n.ifJavadocComment(javadocComment -> {
             Javadoc javadoc = javadocComment.parse();
             comments.parseBlockTags(javadoc.getBlockTags());
         });
         return comments;
     }
 
-    private void setContent(String content){
-        if(Objects.isNull(content)){
+    public static String getTagContent(Optional<Comment> optional, String key) {
+        if (optional.isPresent()) {
+            Comment comment = optional.get();
+            Comments comments = Comments.of(comment);
+            for (int i = 0; i < comments.tags.size(); i++) {
+                //使用Comments保存tag
+                Comments tag = comments.tags.get(i);
+                if (Objects.equals(tag.name, key)) {
+                    return tag.description;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Optional<Integer> getIndexTag(Optional<Comment> optional) {
+        String indexString = getTagContent(optional, "index");
+        try{
+            return Optional.of(Integer.parseInt(indexString));
+        }catch (Exception e){
+            return Optional.empty();
+        }
+    }
+
+    private void setContent(String content) {
+        if (Objects.isNull(content)) {
             return;
         }
-        String[] arr = content.split("(\\r\\n)+",2);
-        if(arr.length>=1){
+        String[] arr = content.split("(\\r\\n)+", 2);
+        if (arr.length >= 1) {
             name = arr[0];
         }
-        if(arr.length>=2){
+        if (arr.length >= 2) {
             description = arr[1];
         }
     }
@@ -47,55 +72,61 @@ public class Comments {
     private void parseBlockTags(List<JavadocBlockTag> blockTags) {
         for (int i = 0; i < blockTags.size(); i++) {
             JavadocBlockTag blockTag = blockTags.get(i);
-            if("param".equals(blockTag.getTagName())
+            if ("param".equals(blockTag.getTagName())
                     && blockTag.getName().isPresent()
-                    && !blockTag.getContent().isEmpty()){
+                    && !blockTag.getContent().isEmpty()) {
                 String name = blockTag.getName().get();
-                params.put(name,getContent(blockTag.getContent()));
+                params.put(name, getContent(blockTag.getContent()));
+            } else {
+                Comments comments = new Comments();
+                comments.name = blockTag.getTagName();
+                comments.description = getContent(blockTag.getContent());
+                tags.add(comments);
             }
         }
     }
 
-    public static String getContent(Comment comment){
-        if(comment instanceof JavadocComment){
-            return getContent(((JavadocComment)comment).parse().getDescription());
-        }else{
+    public static String getContent(Comment comment) {
+        if (comment instanceof JavadocComment) {
+            return getContent(((JavadocComment) comment).parse().getDescription());
+        } else {
             return comment.getContent();
         }
 
     }
-    private static String getContent(JavadocDescription javadocDescription){
+
+    private static String getContent(JavadocDescription javadocDescription) {
         StringBuilder sb = new StringBuilder();
-        javadocDescription.getElements().forEach(element->{
+        javadocDescription.getElements().forEach(element -> {
             String elementString = element.toText();
-            if(Objects.nonNull(elementString)){
+            if (Objects.nonNull(elementString)) {
                 sb.append(elementString);
             }
         });
         return sb.toString();
     }
 
-    public static String getCommentAsString(ResolvedFieldDeclaration declaration){
-        if(!(declaration instanceof JavaParserFieldDeclaration)){
+    public static String getCommentAsString(ResolvedFieldDeclaration declaration) {
+        if (!(declaration instanceof JavaParserFieldDeclaration)) {
             return null;
         }
         Optional<Comment> optional = ((JavaParserFieldDeclaration) declaration).getWrappedNode().getComment();
-        return optional.isPresent()?getContent(optional.get()):null;
+        return optional.isPresent() ? getContent(optional.get()) : null;
     }
 
     public static String getCommentAsString(ResolvedParameterDeclaration declaration) {
 
-        if(!(declaration instanceof JavaParserParameterDeclaration)){
+        if (!(declaration instanceof JavaParserParameterDeclaration)) {
             return null;
         }
-        Optional<Comment> optional = ((JavaParserParameterDeclaration)declaration).getWrappedNode().getComment();
-        return optional.isPresent()?getContent(optional.get()):null;
+        Optional<Comment> optional = ((JavaParserParameterDeclaration) declaration).getWrappedNode().getComment();
+        return optional.isPresent() ? getContent(optional.get()) : null;
     }
 
     public static String getCommentFromMethod(Parameter expr) {
-        if(expr.getParentNode().isPresent()){
-            MethodDeclaration method = (MethodDeclaration)expr.getParentNode().get();
-            if(method.getComment().isPresent()){
+        if (expr.getParentNode().isPresent()) {
+            MethodDeclaration method = (MethodDeclaration) expr.getParentNode().get();
+            if (method.getComment().isPresent()) {
                 Comments comments = Comments.of(method.getComment().get());
                 return comments.params.get(expr.getNameAsString());
             }

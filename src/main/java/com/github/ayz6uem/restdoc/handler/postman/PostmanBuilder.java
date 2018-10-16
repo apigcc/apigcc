@@ -90,6 +90,7 @@ public class PostmanBuilder implements RestDocHandler {
         item.setRequest(request);
 
         Response response = new Response();
+        response.setName(httpMessage.getResponse().getStatus().toString());
         response.setOriginalRequest(request);
         httpMessage.getResponse().getHeaders().forEach((key,value)-> response.getHeader().add(new Header(key,value)));
         response.setBody(ObjectMappers.toPretty(httpMessage.getResponse().getBody()));

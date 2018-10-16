@@ -2,14 +2,10 @@ package com.github.ayz6uem.restdoc.ast;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.ayz6uem.restdoc.Enviroment;
+import com.github.ayz6uem.restdoc.Environment;
 import com.github.ayz6uem.restdoc.schema.Cell;
 import com.github.ayz6uem.restdoc.util.ObjectMappers;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.PackageDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
@@ -24,7 +20,10 @@ import com.github.javaparser.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 语法树中Symbol处理
@@ -48,7 +47,6 @@ public class ResolvedTypes {
     public ObjectNode objectNode;
     public List<Cell> cells = new ArrayList<>();
 
-
     public Object getValue() {
         return value == null ? objectNode : value;
     }
@@ -67,13 +65,7 @@ public class ResolvedTypes {
         } catch (UnsolvedSymbolException e) {
             log.debug("try to resolve fail:" + type.toString());
             //解析失败 查找泛型参数
-            if (type instanceof ClassOrInterfaceType) {
-                ClassOrInterfaceType classType = (ClassOrInterfaceType) type;
-                if (classType.getTypeArguments().isPresent()) {
-                    resolvedTypes.tryResolveTypeArguments(classType.getTypeArguments().get());
-                    resolvedTypes.resolved = true;
-                }
-            }
+            resolvedTypes.tryResolveTypeArguments(type);
         }
         return resolvedTypes;
     }
@@ -121,38 +113,50 @@ public class ResolvedTypes {
     /**
      * 解析泛型参数
      *
-     * @param nodes
+     * @param type
      */
+    private void tryResolveTypeArguments(Type type) {
+        if (type instanceof ClassOrInterfaceType) {
+            ClassOrInterfaceType classType = (ClassOrInterfaceType) type;
+            if (classType.getTypeArguments().isPresent()) {
+                tryResolveTypeArguments(classType.getTypeArguments().get());
+                resolved = true;
+            }
+        }
+    }
+
     private void tryResolveTypeArguments(NodeList<Type> nodes) {
+        ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
         nodes.forEach(type -> {
             ResolvedTypes argumentResolved = ResolvedTypes.of(type);
             if (argumentResolved.resolved) {
-                value = argumentResolved.getValue();
+                arrayNode.addPOJO(argumentResolved.getValue());
                 cells.addAll(argumentResolved.cells);
             }
         });
+        value = arrayNode;
     }
 
     /**
      * 基本解析流程
      *
-     * @param resolvedType
+     * @param resolvedType type解析之后的类型
      */
     private void resolve(ResolvedType resolvedType) {
 
         resolveName(resolvedType);
 
         //忽略的类型
-        if (Enviroment.ignoreTypes.contains(this.name)) {
+        if (Environment.ignoreTypes.contains(this.name)) {
             return;
         }
 
         if (resolvedType.isPrimitive() || Numbers.isAssignableBy(resolvedType)) {
             primitive = true;
-            value = 0;
+            value = Defaults.DEFAULT_INTEGER;
         } else if (Strings.isAssignableBy(resolvedType)) {
             primitive = true;
-            value = "";
+            value = Defaults.DEFAULT_STRING;
         } else if (resolvedType.isArray()) {
             resolveArray(resolvedType);
         } else if (resolvedType.isReferenceType()) {
@@ -160,15 +164,17 @@ public class ResolvedTypes {
             if (referenceType.getTypeDeclaration().isEnum()) {
                 //枚举类型
                 primitive = true;
-                value = "";
+                value = Enums.getNames(referenceType.getTypeDeclaration().asEnum());
             } else if (Collections.isAssignableBy(resolvedType)) {
                 resolveCollection(referenceType);
             } else if (Maps.isAssignableBy(resolvedType)) {
                 //Map类型，解析为一个object
+                value = Defaults.DEFAULT_MAP;
             } else if (Dates.isAssignableBy(resolvedType)) {
-                //日期类型
+                //TODO 日期格式 从配置中 从注解中读取日期格式
+                value = Defaults.DEFAULT_STRING;
             } else if (Langs.isAssignableBy(resolvedType)) {
-                //java类型，不处理
+                //java包中的类型，不处理
             } else {
                 resolvePojo(referenceType);
             }
@@ -201,6 +207,7 @@ public class ResolvedTypes {
         if (resolvedType.isArray()) {
             ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
             ResolvedTypes componentType = ResolvedTypes.of(resolvedType.asArrayType().getComponentType());
+            componentType.prefix("[].");
             if (componentType.resolved) {
                 arrayNode.addPOJO(componentType.getValue());
                 value = arrayNode;
@@ -215,7 +222,16 @@ public class ResolvedTypes {
      * @param referenceType
      */
     private void resolveCollection(ResolvedReferenceType referenceType) {
-
+        if (referenceType.getTypeParametersMap().size() == 1) {
+            ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
+            ResolvedTypes componentType = ResolvedTypes.of(referenceType.getTypeParametersMap().get(0).b);
+            componentType.prefix("[].");
+            if (componentType.resolved) {
+                arrayNode.addPOJO(componentType.getValue());
+                value = arrayNode;
+                cells.addAll(componentType.cells);
+            }
+        }
     }
 
     /**
@@ -247,6 +263,7 @@ public class ResolvedTypes {
         while (iterator.hasNext()) {
             ResolvedFieldDeclaration next = iterator.next();
             ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), referenceType.getTypeParametersMap());
+            resolvedTypes.prefix(next.getName()+".");
             //处理类字段的默认值
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
@@ -254,9 +271,7 @@ public class ResolvedTypes {
                     //忽略静态属性
                     continue;
                 }
-
-                Optional<Expression> initializer = field.getVariableDeclarator().getInitializer();
-                initializer.ifPresent(expr -> resolvedTypes.value = expr.toString());
+                Fields.getInitializer(field).ifPresent(value -> resolvedTypes.value = value);
             }
 
             String comment = Comments.getCommentAsString(next);
@@ -302,58 +317,9 @@ public class ResolvedTypes {
         }
     }
 
-    /**
-     * 获取类型权限定名
-     *
-     * @param n
-     * @return
-     */
-    public static String getFullName(ClassOrInterfaceDeclaration n) {
-        return getPackageName(n) + "." + getNameInScope(n);
-    }
-
-    /**
-     * 获取类型的包名，包括内部类
-     *
-     * @param n
-     * @return
-     */
-    public static String getPackageName(ClassOrInterfaceDeclaration n) {
-        if (n.getParentNode().isPresent()) {
-            if (n.getParentNode().get() instanceof CompilationUnit) {
-                CompilationUnit cu = (CompilationUnit) n.getParentNode().get();
-                if (cu.getPackageDeclaration().isPresent()) {
-                    PackageDeclaration packageDeclaration = cu.getPackageDeclaration().get();
-                    return packageDeclaration.getNameAsString();
-                }
-            }
-            if (n.getParentNode().get() instanceof ClassOrInterfaceDeclaration) {
-                return getPackageName((ClassOrInterfaceDeclaration) n.getParentNode().get());
-            }
-        }
-        return "";
-    }
-
-    /**
-     * 获取内部类的名称
-     * eg:
-     * Auth.Login
-     *
-     * @param n
-     * @return
-     */
-    public static String getNameInScope(ClassOrInterfaceDeclaration n) {
-        StringBuilder stringBuilder = new StringBuilder();
-        appendNameInScope(n, stringBuilder);
-        return stringBuilder.toString();
-    }
-
-    private static void appendNameInScope(ClassOrInterfaceDeclaration n, StringBuilder stringBuilder) {
-        stringBuilder.insert(0, n.getNameAsString());
-        if (n.getParentNode().isPresent() && n.getParentNode().get() instanceof ClassOrInterfaceDeclaration) {
-            ClassOrInterfaceDeclaration scope = (ClassOrInterfaceDeclaration) n.getParentNode().get();
-            stringBuilder.insert(0, ".");
-            appendNameInScope(scope, stringBuilder);
+    public void prefix(String prefix) {
+        for (Cell cell : cells) {
+            cell.setName(prefix + cell.getName());
         }
     }
 

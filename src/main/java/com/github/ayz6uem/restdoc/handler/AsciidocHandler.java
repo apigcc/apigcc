@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * adoc文件构建器
  */
 public class AsciidocHandler implements RestDocHandler {
 
@@ -69,16 +69,13 @@ public class AsciidocHandler implements RestDocHandler {
             builder.textLine(request.getMethod()
                     + " "
                     + request.getUri()
+                    + request.queryString()
                     + " "
                     + message.getVersion());
             request.getHeaders().forEach((k,v) -> builder.textLine(k+": "+v));
-            builder.newLine();
-            if(request.getBody()!=null){
-                if(request.getBody() instanceof JsonNode){
-                    builder.textLine((ObjectMappers.toPretty(request.getBody())));
-                }else{
-                    builder.textLine(String.valueOf(request.getBody()));
-                }
+            if(request.hasBody()){
+                builder.newLine();
+                builder.textLine(request.bodyString());
             }
         }, "REQUEST");
 
@@ -89,13 +86,9 @@ public class AsciidocHandler implements RestDocHandler {
             builder.block(builder -> {
                 builder.textLine(message.getVersion()+" " + response.getStatus());
                 response.getHeaders().forEach((k,v) -> builder.textLine(k + ": "+v));
-                builder.newLine();
-                if(response.getBody()!=null){
-                    if(response.getBody() instanceof JsonNode){
-                        builder.textLine((ObjectMappers.toPretty(response.getBody())));
-                    }else{
-                        builder.textLine(String.valueOf(response.getBody()));
-                    }
+                if(response.hasBody()){
+                    builder.newLine();
+                    builder.textLine(response.bodyString());
                 }
             }, "RESPONSE");
             table(response.getCells());

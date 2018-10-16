@@ -5,19 +5,20 @@ import java.util.List;
 
 public class Response{
 
-    String id = "example";
+    String name;
     Request originalRequest ;
     List<Header> header = new ArrayList<>();
     String body;
     String status;
     Integer code;
+    String _postman_previewlanguage = "json";
 
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Request getOriginalRequest() {
@@ -58,5 +59,13 @@ public class Response{
 
     public void setCode(Integer code) {
         this.code = code;
+    }
+
+    public String get_postman_previewlanguage() {
+        return _postman_previewlanguage;
+    }
+
+    public void set_postman_previewlanguage(String _postman_previewlanguage) {
+        this._postman_previewlanguage = _postman_previewlanguage;
     }
 }

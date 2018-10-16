@@ -5,6 +5,9 @@ import org.asciidoctor.*;
 
 import java.io.File;
 
+/**
+ * Asciidoctorj文档转换工具
+ */
 public class HtmlHandler implements RestDocHandler {
 
     @Override

@@ -1,5 +1,6 @@
 package com.github.ayz6uem.restdoc.visitor.springmvc;
 
+import com.github.ayz6uem.restdoc.ast.Classes;
 import com.github.ayz6uem.restdoc.ast.Comments;
 import com.github.ayz6uem.restdoc.ast.ResolvedTypes;
 import com.github.ayz6uem.restdoc.http.HttpHeaders;
@@ -37,21 +38,32 @@ public class SpringVisitor extends NodeVisitor {
         if (arg != null && arg instanceof Tree) {
             Tree tree = (Tree) arg;
             if (Controllers.accept(n.getAnnotations())) {
-                String name = ResolvedTypes.getNameInScope(n);
-                String fullName = ResolvedTypes.getFullName(n);
+                String name = Classes.getNameInScope(n);
+                String fullName = Classes.getFullName(n);
                 Group group = new Group();
                 group.setParent(tree);
                 group.setId(fullName);
                 group.setName(name);
+                if(n.getComment().isPresent()){
+                    Comments comments = Comments.of(n.getComment().get());
+                    if(StringUtils.isNotEmpty(comments.name)){
+                        group.setName(comments.name);
+                    }
+                    group.setDescription(comments.description);
+                    group.setIndex(Comments.getIndexTag(n.getComment()));
+                }
                 //path 和 method 影响方法的处理
                 Optional<RequestMappings> optional = RequestMappings.of(n);
                 if (optional.isPresent()) {
                     group.getExt().put("path", optional.get().getPath());
                     group.getExt().put("method", optional.get().getMethod());
                 }
-                tree.getGroups().add(group);
 
                 super.visit(n, group);
+
+                if(!group.isEmpty()){
+                    tree.getGroups().add(group);
+                }
             }
         }
         super.visit(n, arg);
@@ -78,8 +90,6 @@ public class SpringVisitor extends NodeVisitor {
             n.getParameters().forEach(p -> visit(p, message));
             n.getAnnotations().forEach(p -> visit(p, message));
             n.getComment().ifPresent(l -> visit(l, message));
-
-            //TODO 没有body，有cells时，生成queryString。
 
         }
         super.visit(n, arg);
@@ -116,8 +126,9 @@ public class SpringVisitor extends NodeVisitor {
                 request.setMethod(HttpRequestMethod.POST);
             }
             request.getHeaders().setContentType(HttpHeaders.ContentType.MULTIPART_FORM_DATA);
-        }
-        if (parameters.isRequestBody()) {
+        }else if(parameters.isHeader()){
+            request.getHeaders().put(parameters.getName(),String.valueOf(parameters.getValue()));
+        }else if (parameters.isRequestBody()) {
             //RequestBody 修改请求头为json
             if (HttpRequestMethod.GET.equals(request.getMethod())) {
                 request.setMethod(HttpRequestMethod.POST);
@@ -138,11 +149,9 @@ public class SpringVisitor extends NodeVisitor {
             return;
         }
         Group group = message.getParent();
-
         RequestMappings requestMappings = RequestMappings.of(n);
         message.getRequest().setMethod(requestMappings.getMethod());
-        //根据method 设置默认content-Type
-        message.getRequest().getHeaders().setContentType(requestMappings.getMethod());
+        message.getRequest().checkContentType();
         message.getRequest().setUri(URL.normalize(group.getExt().get("path"), requestMappings.getPath()));
         message.getRequest().getHeaders().add(requestMappings.getHeaders());
     }

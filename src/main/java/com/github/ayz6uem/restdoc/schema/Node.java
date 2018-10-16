@@ -1,5 +1,11 @@
 package com.github.ayz6uem.restdoc.schema;
 
+/**
+ * Tree Group HttpMessage继承Node，已方便在visit中传播
+ * @see Tree
+ * @see Group
+ * @see com.github.ayz6uem.restdoc.http.HttpMessage
+ */
 public class Node {
 
     String id;

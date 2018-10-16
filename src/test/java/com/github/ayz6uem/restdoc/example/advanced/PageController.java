@@ -1,13 +1,17 @@
 package com.github.ayz6uem.restdoc.example.advanced;
 
-import com.github.ayz6uem.restdoc.example.common.BaseController;
+import com.github.ayz6uem.restdoc.example.common.*;
 import com.github.ayz6uem.restdoc.example.hello.Greeting;
+import org.jruby.ir.Tuple;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
+/**
+ * @index 4
+ */
 @Controller
 @RequestMapping("/page")
 public class PageController extends BaseController{
@@ -32,4 +36,20 @@ public class PageController extends BaseController{
         return new Greeting(1,"hello world");
     }
 
+
+    /**
+     * 未知的多泛型的tuple 演示
+     * @return
+     */
+    @GetMapping("/tuple")
+    @ResponseBody
+    public Tuple<UserDTO,User> tuple(){
+        return null;
+    }
+
+    @PostMapping("/multi")
+    @ResponseBody
+    public ResultData<Wrapper<UserDTO>> multi(@RequestBody ResultData<Wrapper<List<UserDTO>>> resultData){
+        return null;
+    }
 }
