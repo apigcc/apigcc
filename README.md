@@ -6,7 +6,34 @@
 A rest document generator with parse the source code
 
 ### Usage
+
 execute this example:
+```java
+/**
+ * Building a RESTful Web Service
+ * 来自spring的官方示例:https://spring.io/guides/gs/rest-service/
+ * @index 1
+ */
+@RestController
+public class GreetingController {
+
+    private static final String template = "Hello, %s!";
+    private final AtomicLong counter = new AtomicLong();
+
+    /**
+     * Web Endpoint greeting
+     * @param name who is this
+     * @return
+     */
+    @RequestMapping("/greeting")
+    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
+        return new Greeting(counter.incrementAndGet(),
+                String.format(template, name));
+    }
+}
+```
+
+then we run this code:
 ```java
 String source = System.getProperty("user.dir")+"/src/test/java";
 Enviroment env = new Enviroment()
@@ -18,8 +45,11 @@ RestDoc restDoc = new RestDoc(env);
 restDoc.parse();
 restDoc.build();
 ```
+then we will get files in /build/restdoc/
 
-![example](https://github.com/ayz6uem/restdoc/blob/master/example/example.jpg)
+
+then user.html look like this:
+![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/greeting.jpg)
 
 ### Plans
 
