@@ -66,7 +66,7 @@ public class PostmanBuilder implements RestDocHandler {
 
         Request request = new Request();
         request.setDescription(httpMessage.getDescription());
-        request.getUrl().setPath(httpMessage.getRequest().getUri());
+        request.getUrl().setPath(httpMessage.getRequest().getUris().get(0));
         request.setMethod(Method.of(httpMessage.getRequest().getMethod()));
         httpMessage.getRequest().getHeaders().forEach((key,value)-> request.getHeader().add(new Header(key,value)));
         if(Method.GET.equals(request.getMethod())){

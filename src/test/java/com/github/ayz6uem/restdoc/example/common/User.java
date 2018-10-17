@@ -1,10 +1,18 @@
 package com.github.ayz6uem.restdoc.example.common;
 
+import java.util.List;
+
 public class User {
 
     int id;
     String name;
     Integer age;
+
+    User user;
+
+    UserDTO userDTO;
+
+    List<User> users;
 
     public int getId() {
         return id;

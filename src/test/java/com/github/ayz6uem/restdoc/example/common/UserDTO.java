@@ -29,6 +29,8 @@ public class UserDTO {
 
     Map<String,String> attrs;
 
+    User user;
+
     public Integer getId() {
         return id;
     }

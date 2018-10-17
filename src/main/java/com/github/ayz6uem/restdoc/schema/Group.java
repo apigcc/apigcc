@@ -12,6 +12,8 @@ public class Group extends Node {
 
     public static Comparator<Group> COMPARATOR = Comparator.comparingInt(o -> o.index);
 
+    boolean rest;
+
     @JsonIgnore
     Tree parent;
 
@@ -58,5 +60,13 @@ public class Group extends Node {
 
     public int getIndex() {
         return index;
+    }
+
+    public boolean isRest() {
+        return rest;
+    }
+
+    public void setRest(boolean rest) {
+        this.rest = rest;
     }
 }

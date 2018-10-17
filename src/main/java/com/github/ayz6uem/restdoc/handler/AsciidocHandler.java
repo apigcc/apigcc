@@ -66,12 +66,14 @@ public class AsciidocHandler implements RestDocHandler {
 
         HttpRequest request = message.getRequest();
         builder.block(builder -> {
-            builder.textLine(request.getMethod()
-                    + " "
-                    + request.getUri()
-                    + request.queryString()
-                    + " "
-                    + message.getVersion());
+            for (String uri : request.getUris()) {
+                builder.textLine(request.getMethod()
+                        + " "
+                        + uri
+                        + request.queryString()
+                        + " "
+                        + message.getVersion());
+            }
             request.getHeaders().forEach((k,v) -> builder.textLine(k+": "+v));
             if(request.hasBody()){
                 builder.newLine();

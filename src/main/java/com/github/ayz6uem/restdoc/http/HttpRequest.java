@@ -13,7 +13,7 @@ import java.util.List;
 public class HttpRequest {
 
     HttpRequestMethod method;
-    String uri;
+    List<String> uris = new ArrayList<>();
     HttpHeaders headers = new HttpHeaders();
 
     Object body;
@@ -28,12 +28,12 @@ public class HttpRequest {
         this.method = method;
     }
 
-    public String getUri() {
-        return uri;
+    public List<String> getUris() {
+        return uris;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setUris(List<String> uris) {
+        this.uris = uris;
     }
 
     public HttpHeaders getHeaders() {

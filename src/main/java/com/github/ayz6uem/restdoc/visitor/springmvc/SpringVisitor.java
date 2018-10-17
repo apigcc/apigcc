@@ -44,6 +44,7 @@ public class SpringVisitor extends NodeVisitor {
                 group.setParent(tree);
                 group.setId(fullName);
                 group.setName(name);
+                group.setRest(Controllers.isResponseBody(n));
                 if(n.getComment().isPresent()){
                     Comments comments = Comments.of(n.getComment().get());
                     if(StringUtils.isNotEmpty(comments.name)){
@@ -55,7 +56,7 @@ public class SpringVisitor extends NodeVisitor {
                 //path 和 method 影响方法的处理
                 Optional<RequestMappings> optional = RequestMappings.of(n);
                 if (optional.isPresent()) {
-                    group.getExt().put("path", optional.get().getPath());
+                    group.getExt().put("path", optional.get().getPath().get(0));
                     group.getExt().put("method", optional.get().getMethod());
                 }
 
@@ -79,17 +80,19 @@ public class SpringVisitor extends NodeVisitor {
     public void visit(MethodDeclaration n, Node arg) {
         if (arg != null && arg instanceof Group && RequestMappings.accept(n.getAnnotations())) {
             Group group = (Group) arg;
-            //请求方法处理成HttpMessage
-            HttpMessage message = new HttpMessage();
-            message.setParent(group);
-            message.setName(n.getNameAsString());
-            message.setId(group.getId() + "." + message.getName());
-            group.getNodes().add(message);
+            if(group.isRest() || RequestMappings.isRequestBody(n)){
+                //请求方法处理成HttpMessage
+                HttpMessage message = new HttpMessage();
+                message.setParent(group);
+                message.setName(n.getNameAsString());
+                message.setId(group.getId() + "." + message.getName());
+                group.getNodes().add(message);
 
-            visit(n.getType(), message);
-            n.getParameters().forEach(p -> visit(p, message));
-            n.getAnnotations().forEach(p -> visit(p, message));
-            n.getComment().ifPresent(l -> visit(l, message));
+                visit(n.getType(), message);
+                n.getAnnotations().forEach(p -> visit(p, message));
+                n.getParameters().forEach(p -> visit(p, message));
+                n.getComment().ifPresent(l -> visit(l, message));
+            }
 
         }
         super.visit(n, arg);
@@ -152,7 +155,9 @@ public class SpringVisitor extends NodeVisitor {
         RequestMappings requestMappings = RequestMappings.of(n);
         message.getRequest().setMethod(requestMappings.getMethod());
         message.getRequest().checkContentType();
-        message.getRequest().setUri(URL.normalize(group.getExt().get("path"), requestMappings.getPath()));
+        for (String path : requestMappings.getPath()) {
+            message.getRequest().getUris().add(URL.normalize(group.getExt().get("path"), path));
+        }
         message.getRequest().getHeaders().add(requestMappings.getHeaders());
     }
 

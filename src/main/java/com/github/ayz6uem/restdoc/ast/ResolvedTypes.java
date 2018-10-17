@@ -20,10 +20,8 @@ import com.github.javaparser.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 语法树中Symbol处理
@@ -32,11 +30,17 @@ import java.util.Objects;
 public class ResolvedTypes {
 
     static Logger log = LoggerFactory.getLogger(ResolvedTypes.class);
+    /**
+     * 已解析类型结果池，防止循环递归
+     */
+    private static Map<ResolvedType,ResolvedTypes> POOL = new ConcurrentHashMap<>();
 
     /**
      * 获取解析结果前，应判断是否已解析
      */
     public boolean resolved;
+
+
 
     /**
      * 是否基本类型
@@ -58,16 +62,14 @@ public class ResolvedTypes {
      * @return
      */
     public static ResolvedTypes of(Type type) {
-        ResolvedTypes resolvedTypes = new ResolvedTypes();
         try {
-            resolvedTypes.resolve(type.resolve());
-            resolvedTypes.resolved = true;
+            ResolvedType resolvedType = type.resolve();
+            return of(resolvedType);
         } catch (UnsolvedSymbolException e) {
             log.debug("try to resolve fail:" + type.toString());
             //解析失败 查找泛型参数
-            resolvedTypes.tryResolveTypeArguments(type);
+            return tryResolveTypeArguments(type);
         }
-        return resolvedTypes;
     }
 
     /**
@@ -77,12 +79,16 @@ public class ResolvedTypes {
      * @return
      */
     public static ResolvedTypes of(ResolvedType resolvedType) {
+        if(POOL.containsKey(resolvedType)){
+            return POOL.get(resolvedType).duplicate();
+        }
         ResolvedTypes resolvedTypes = new ResolvedTypes();
+        POOL.put(resolvedType,resolvedTypes);
         if (!resolvedType.isTypeVariable()) {
             resolvedTypes.resolve(resolvedType);
             resolvedTypes.resolved = true;
         }
-        return resolvedTypes;
+        return resolvedTypes.duplicate();
     }
 
     /**
@@ -115,26 +121,26 @@ public class ResolvedTypes {
      *
      * @param type
      */
-    private void tryResolveTypeArguments(Type type) {
+    private static ResolvedTypes tryResolveTypeArguments(Type type) {
+        ResolvedTypes typeArgumentResolvedTypes = new ResolvedTypes();
         if (type instanceof ClassOrInterfaceType) {
             ClassOrInterfaceType classType = (ClassOrInterfaceType) type;
             if (classType.getTypeArguments().isPresent()) {
-                tryResolveTypeArguments(classType.getTypeArguments().get());
-                resolved = true;
+                ObjectNode node = ObjectMappers.instance().createObjectNode();
+                for (int i = 0; i < classType.getTypeArguments().get().size(); i++) {
+                    Type typeArgument = classType.getTypeArguments().get().get(i);
+                    ResolvedTypes argumentResolved = of(typeArgument);
+                    if (argumentResolved.resolved) {
+                        String field = (i == 0) ? "?" : ("?" + i);
+                        argumentResolved.prefix(field+".");
+                        node.putPOJO(field, argumentResolved.getValue());
+                        typeArgumentResolvedTypes.cells.addAll(argumentResolved.cells);
+                    }
+                }
+                typeArgumentResolvedTypes.value = node;
             }
         }
-    }
-
-    private void tryResolveTypeArguments(NodeList<Type> nodes) {
-        ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
-        nodes.forEach(type -> {
-            ResolvedTypes argumentResolved = ResolvedTypes.of(type);
-            if (argumentResolved.resolved) {
-                arrayNode.addPOJO(argumentResolved.getValue());
-                cells.addAll(argumentResolved.cells);
-            }
-        });
-        value = arrayNode;
+        return typeArgumentResolvedTypes;
     }
 
     /**
@@ -255,22 +261,21 @@ public class ResolvedTypes {
         try {
             referenceType.getDirectAncestors().forEach(direct -> merge(ResolvedTypes.of(direct)));
         } catch (Exception e) {
-            log.warn("parse parent fail:" + referenceType);
+            log.debug("parse parent fail:" + referenceType);
         }
 
         //解析各字段
         Iterator<ResolvedFieldDeclaration> iterator = referenceType.getTypeDeclaration().getDeclaredFields().iterator();
         while (iterator.hasNext()) {
             ResolvedFieldDeclaration next = iterator.next();
+            if(next.isStatic() || referenceType.equals(next.getType())){
+                continue;
+            }
             ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), referenceType.getTypeParametersMap());
-            resolvedTypes.prefix(next.getName()+".");
+            resolvedTypes.prefix(next.getName() + ".");
             //处理类字段的默认值
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
-                if (field.isStatic()) {
-                    //忽略静态属性
-                    continue;
-                }
                 Fields.getInitializer(field).ifPresent(value -> resolvedTypes.value = value);
             }
 
@@ -321,6 +326,22 @@ public class ResolvedTypes {
         for (Cell cell : cells) {
             cell.setName(prefix + cell.getName());
         }
+    }
+
+    private ResolvedTypes duplicate() {
+        ResolvedTypes resolvedTypes = new ResolvedTypes();
+        resolvedTypes.name = this.name;
+        resolvedTypes.resolved = this.resolved;
+        resolvedTypes.primitive = this.primitive;
+        resolvedTypes.value = this.value;
+        resolvedTypes.objectNode = this.objectNode;
+        for (Cell cell : this.cells) {
+            Cell newCell = new Cell(cell.getName(),cell.getType(),cell.isDisabled());
+            newCell.setValue(cell.getValue());
+            newCell.setDescription(cell.getDescription());
+            resolvedTypes.cells.add(newCell);
+        }
+        return resolvedTypes;
     }
 
 }

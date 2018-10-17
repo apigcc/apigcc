@@ -71,10 +71,6 @@ then user.html look like this:
 ### Problems
 
 1. 解决自定义的argumentResolve。 配置忽略某种参数类型 （实现有难度）
-1. 注释的描述里要处理 {@link }
-1. ModelMap忽略 Model忽略 ModelAndView处理
-1. ResponseBody
-1. requestMapping 多路径处理
 1. 多个接口公用一个请求参数，如 add update，update 多一个id，解决方案是 自定义注释 @ignore ？
 1. postman脚本
 1. 哪些参数必传，哪些非必传

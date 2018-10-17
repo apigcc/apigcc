@@ -12,11 +12,7 @@ public class Fields {
         Optional<Expression> initializer = field.getVariableDeclarator().getInitializer();
         if(initializer.isPresent()){
             Expression expr = initializer.get();
-            if(expr.isStringLiteralExpr()){
-                value = expr.asStringLiteralExpr().getValue();
-            }else{
-                value = expr.toString();
-            }
+            value = Expressions.getValue(expr);
         }
         return Optional.ofNullable(value);
     }

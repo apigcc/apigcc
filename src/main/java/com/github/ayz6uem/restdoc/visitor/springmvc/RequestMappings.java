@@ -3,20 +3,27 @@ package com.github.ayz6uem.restdoc.visitor.springmvc;
 import com.github.ayz6uem.restdoc.ast.Annotations;
 import com.github.ayz6uem.restdoc.http.HttpHeaders;
 import com.github.ayz6uem.restdoc.http.HttpRequestMethod;
+import com.github.ayz6uem.restdoc.util.Book;
+import com.github.ayz6uem.restdoc.util.URL;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserClassDeclaration;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Spring @RequestMapping 解析工具
  */
 public class RequestMappings {
+
+    static Logger log = LoggerFactory.getLogger(RequestMappings.class);
 
     public static final String GET_MAPPING = "GetMapping";
     public static final String POST_MAPPING = "PostMapping";
@@ -76,7 +83,7 @@ public class RequestMappings {
     }
 
     HttpRequestMethod method;
-    String path;
+    List<String> path = new ArrayList<>();
     HttpHeaders headers = new HttpHeaders();
 
     public static RequestMappings of(AnnotationExpr n) {
@@ -89,7 +96,7 @@ public class RequestMappings {
         RequestMappings requestMappings = new RequestMappings();
         //解析并设置http请求方法
         if (annotationAttrs.containsKey("method")) {
-            HttpRequestMethod m = ATTRS_METHOD.get(String.valueOf(annotationAttrs.get("method")));
+            HttpRequestMethod m = ATTRS_METHOD.get(annotationAttrs.get("method"));
             if (m != null) {
                 requestMappings.setMethod(m);
             }
@@ -98,9 +105,16 @@ public class RequestMappings {
         }
         //解析并设置http请求路径
         if (annotationAttrs.containsKey("value")) {
-            requestMappings.setPath(String.valueOf(annotationAttrs.get("value")));
+            Object value = annotationAttrs.get("value");
+            if(value instanceof List){
+                for (Object o : (List)value) {
+                    requestMappings.getPath().add(String.valueOf(o));
+                }
+            }else{
+                requestMappings.getPath().add(String.valueOf(value));
+            }
         } else {
-            requestMappings.setPath("");
+            requestMappings.getPath().add("");
         }
         //TODO 解析headers
 
@@ -116,12 +130,41 @@ public class RequestMappings {
      * @return
      */
     public static Optional<RequestMappings> of(ClassOrInterfaceDeclaration n) {
+
+
         RequestMappings requestMappings = null;
-        Optional<AnnotationExpr> requestMapping = n.getAnnotationByName(RequestMappings.REQUEST_MAPPING);
+
+        Optional<AnnotationExpr> requestMapping = n.getAnnotationByName(REQUEST_MAPPING);
         if (requestMapping.isPresent()) {
             requestMappings = RequestMappings.of(requestMapping.get());
+            requestMappings.setParent(getParentPath(n));
         }
         return Optional.ofNullable(requestMappings);
+    }
+
+    public static String getParentPath(ClassOrInterfaceDeclaration n){
+        String parent = "";
+        try{
+            for (ClassOrInterfaceType classOrInterfaceType : n.getExtendedTypes()) {
+                ResolvedReferenceType resolve = classOrInterfaceType.resolve();
+                for (ResolvedReferenceType referenceType : resolve.getDirectAncestors()) {
+                    Optional<AnnotationExpr> requestMapping = ((JavaParserClassDeclaration) referenceType.getTypeDeclaration()).getWrappedNode().getAnnotationByName(REQUEST_MAPPING);
+                    if (requestMapping.isPresent()) {
+                        RequestMappings extend = RequestMappings.of(requestMapping.get());
+                        parent = URL.normalize(parent, extend.getPath().get(0));
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.debug("getParentPath:"+e.getMessage());
+        }
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        for (int i = 0; i < getPath().size(); i++) {
+            getPath().set(i, URL.normalize(parent,getPath().get(i)));
+        }
     }
 
     private RequestMappings() {
@@ -135,11 +178,11 @@ public class RequestMappings {
         this.method = method;
     }
 
-    public String getPath() {
+    public List<String> getPath() {
         return path;
     }
 
-    public void setPath(String path) {
+    public void setPath(List<String> path) {
         this.path = path;
     }
 
@@ -149,5 +192,9 @@ public class RequestMappings {
 
     public void setHeaders(HttpHeaders headers) {
         this.headers = headers;
+    }
+
+    public static boolean isRequestBody(MethodDeclaration n) {
+        return n.isAnnotationPresent("ResponseBody");
     }
 }

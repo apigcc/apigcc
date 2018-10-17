@@ -1,9 +1,12 @@
 package com.github.ayz6uem.restdoc.ast;
 
-import com.github.javaparser.ast.expr.*;
-import com.google.common.collect.Sets;
+import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class Annotations {
 
@@ -16,27 +19,10 @@ public class Annotations {
         Map<String,Object> attrs = new HashMap<>();
         if(n instanceof SingleMemberAnnotationExpr){
             SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) n;
-            if(singleMemberAnnotationExpr.getMemberValue() instanceof StringLiteralExpr){
-                StringLiteralExpr stringLiteralExpr = (StringLiteralExpr) singleMemberAnnotationExpr.getMemberValue();
-                attrs.put("value",stringLiteralExpr.asString());
-            }
+            attrs.put("value", Expressions.getValue(singleMemberAnnotationExpr.getMemberValue()));
         }else if(n instanceof NormalAnnotationExpr){
             NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) (n);
-            normalAnnotationExpr.getPairs().forEach(ne -> {
-                if(ne.getValue() instanceof StringLiteralExpr){
-                    attrs.put(ne.getNameAsString(), ((StringLiteralExpr)ne.getValue()).getValue());
-                }else if(ne.getValue() instanceof IntegerLiteralExpr){
-                    attrs.put(ne.getNameAsString(), ((IntegerLiteralExpr)ne.getValue()).getValue());
-                }else if(ne.getValue() instanceof DoubleLiteralExpr){
-                    attrs.put(ne.getNameAsString(), ((DoubleLiteralExpr)ne.getValue()).getValue());
-                }else if(ne.getValue() instanceof LongLiteralExpr){
-                    attrs.put(ne.getNameAsString(), ((LongLiteralExpr)ne.getValue()).getValue());
-                }else if(ne.getValue() instanceof BooleanLiteralExpr){
-                    attrs.put(ne.getNameAsString(), ((BooleanLiteralExpr)ne.getValue()).getValue());
-                }else{
-                    attrs.put(ne.getNameAsString(), ne.getValue().toString());
-                }
-            });
+            normalAnnotationExpr.getPairs().forEach(ne -> attrs.put(ne.getNameAsString(), Expressions.getValue(ne.getValue())));
         }
         return attrs;
     }
