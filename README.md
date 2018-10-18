@@ -1,4 +1,4 @@
-# Restdoc
+# Apiggy
 
 ![](https://img.shields.io/badge/language-java-yellow.svg)
 ![](https://img.shields.io/badge/build-processing-green.svg)
