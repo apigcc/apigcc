@@ -11,7 +11,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 
-group 'com.github.ayz6uem'
+group 'com.github.apigggy'
 version '1.0'
 
 sourceCompatibility = 1.8

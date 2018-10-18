@@ -1,9 +1,9 @@
-# Apiggy
+# 🐷 Apiggy 
 
 ![](https://img.shields.io/badge/language-java-yellow.svg)
 ![](https://img.shields.io/badge/build-processing-green.svg)
 
-A rest document generator with parse the source code
+A rest document generator with parse the source code.
 
 ### Usage
 
@@ -35,15 +35,14 @@ public class GreetingController {
 
 then we run this code:
 ```java
-String source = System.getProperty("user.dir")+"/src/test/java";
-Enviroment env = new Enviroment()
+Environment env = new Environment()
         .source(source)
-        .project("user")
-        .title("User服务接口文档")
-        .description("用户服务文档，使用默认模板");
-RestDoc restDoc = new RestDoc(env);
-restDoc.parse();
-restDoc.build();
+        .project("example")
+        .title("示例接口文档")
+        .description("示例接口文档，使用默认模板");
+Apiggy piggy = new Apiggy(env);
+piggy.lookup();
+piggy.build();
 ```
 then we will get files in /build/restdoc/
 
