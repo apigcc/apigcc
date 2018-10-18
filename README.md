@@ -1,4 +1,4 @@
-# 🐷 Apiggy 
+# 🐷 Apiggs
 
 ![](https://img.shields.io/badge/language-java-yellow.svg)
 ![](https://img.shields.io/badge/build-processing-green.svg)
@@ -40,9 +40,10 @@ Environment env = new Environment()
         .project("example")
         .title("示例接口文档")
         .description("示例接口文档，使用默认模板");
-Apiggy piggy = new Apiggy(env);
-piggy.lookup();
-piggy.build();
+
+Apiggs pig = new Apiggs(env);
+pig.lookup();
+pig.build();
 ```
 then we will get files in /build/restdoc/
 
