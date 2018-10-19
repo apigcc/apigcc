@@ -2,8 +2,23 @@
 
 ![](https://img.shields.io/badge/language-java-yellow.svg)
 ![](https://img.shields.io/badge/build-processing-green.svg)
+[ ![Download](https://api.bintray.com/packages/apiggs/maven/apiggs/images/download.svg) ](https://bintray.com/apiggs/maven/apiggs/_latestVersion)
 
 A rest document generator with parse the source code.
+
+### install
+#### gradle-plugin
+```groovy
+buildscript {
+    repositories {
+        maven { url 'https://dl.bintray.com/apiggs/maven'}
+    }
+    dependencies {
+        classpath 'com.github.apiggs:apiggs-gradle-plugin:1.0'
+    }
+}
+apply plugin: 'com.github.apiggs'
+```
 
 ### Usage
 
@@ -33,19 +48,15 @@ public class GreetingController {
 }
 ```
 
-then we run this code:
-```java
-Environment env = new Environment()
-        .source(source)
-        .project("example")
-        .title("示例接口文档")
-        .description("示例接口文档，使用默认模板");
-
-Apiggs pig = new Apiggs(env);
-pig.lookup();
-pig.build();
+then we run this cmd:
+```groovy
+gradle apiggs
 ```
-then we will get files in /build/restdoc/
+or use this task
+```
+Tasks/documentation/apiggs
+```
+then we will get files in build/apiggs/
 
 
 then user.html look like this:

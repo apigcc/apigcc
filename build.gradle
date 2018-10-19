@@ -1,5 +1,14 @@
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.8.1'
+    }
+}
+
 apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply plugin: 'com.novoda.bintray-release'
 
 group 'com.github.apiggs'
 version '1.0'
@@ -24,10 +33,14 @@ dependencies {
     testCompile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.0.RELEASE'
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+publish {
+    userOrg = 'apiggs'
+    groupId = group
+    artifactId = name
+    publishVersion = version
+    desc = 'A rest document generator with parse the source code.'
+    website = 'https://github.com/apiggs/apiggs'
+    bintrayUser = BINTRAYUSER
+    bintrayKey = BINTRAYKEY
+    dryRun = false
 }
