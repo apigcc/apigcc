@@ -6,6 +6,7 @@ import com.github.apiggs.schema.Tree;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.utils.SourceRoot;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -31,7 +32,7 @@ public class Apiggs {
     }
 
     public Apiggs(String root) {
-        this(new Environment().source(root));
+        this(new Environment().source(Paths.get(root)));
     }
 
     /**
@@ -42,8 +43,8 @@ public class Apiggs {
     public Apiggs lookup() {
         //是否使用责任链？
         ParserConfiguration configuration = env.buildParserConfiguration();
-        for (String source : env.sources) {
-            SourceRoot root = new SourceRoot(Paths.get(source), configuration);
+        for (Path source : env.getSources()) {
+            SourceRoot root = new SourceRoot(source, configuration);
             root.tryToParseParallelized().forEach(result -> result.ifSuccessful(cu -> cu.accept(env.visitor(), this.getTree())));
         }
 

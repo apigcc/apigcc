@@ -17,12 +17,19 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
 public class Environment {
 
+    public static final Path DEFAULT_PRODUCTION = Paths.get("apiggs");
+    public static final Path DEFAULT_SOURCE_STRUCTURE = Paths.get("src","main","java");
+  
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -30,9 +37,9 @@ public class Environment {
      */
     public static Iterable<TreeHandler> DEFAULT_PIPELINE = Lists.newArrayList(new PostmanBuilder(), new AsciidocTreeHandler(), new HtmlTreeHandler());
 
-    public static final String DEFAULT_OUT_PATH = "build/apiggy/";
-    public static final String DEFAULT_PROJECT_PATH = System.getProperty("user.dir");
-    public static final String DEFAULT_SOURCE_PATH = DEFAULT_PROJECT_PATH + "/src/main/java/";
+    public static final Path DEFAULT_OUT_PATH = Paths.get("build").resolve(DEFAULT_PRODUCTION);
+    public static final Path DEFAULT_PROJECT_PATH = Paths.get(System.getProperty("user.dir"));
+    public static final Path DEFAULT_SOURCE_PATH = DEFAULT_PROJECT_PATH.resolve(DEFAULT_SOURCE_STRUCTURE);
 
     private enum Framework {
 
@@ -55,37 +62,38 @@ public class Environment {
      * or just some code
      * default: parse user.dir 's code
      */
-    Set<String> sources = Sets.newHashSet(DEFAULT_SOURCE_PATH);
+
+    private Set<Path> sources = Sets.newHashSet();
 
     /**
      * dependency source code folders
      */
-    Set<String> dependencies = Sets.newHashSet(DEFAULT_PROJECT_PATH, DEFAULT_SOURCE_PATH);
+    private Set<Path> dependencies = Sets.newHashSet();
 
     /**
      * dependency third jars
      */
-    Set<String> jars = Sets.newHashSet();
+    private Set<Path> jars = Sets.newHashSet();
 
     /**
      * 输出目录
      */
-    String out = DEFAULT_OUT_PATH;
+    private Path out = DEFAULT_OUT_PATH;
 
     /**
      * 项目名称 生成 index.json index.adoc index.html
      */
-    String project = "index";
+    private String project = "index";
 
     /**
      * 文档标题
      */
-    String title;
+    private String title;
 
     /**
      * 文档描述
      */
-    String description;
+    private String description;
     /**
      * 忽略哪些类型的参数、类解析
      */
@@ -94,20 +102,24 @@ public class Environment {
     /**
      * 当前项目使用了什么框架
      */
-    Framework currentFramework = Framework.SPRINGMVC;
+    private Framework currentFramework = Framework.SPRINGMVC;
 
-    public Environment source(String ... values){
-        this.sources.addAll(Sets.newHashSet(values));
+    public Environment source(Path ... values){
+        for (Path value : values) {
+            this.sources.add(value);
+        }
         dependency(values);
         return this;
     }
 
-    public Environment dependency(String ... values){
-        this.dependencies.addAll(Sets.newHashSet(values));
+    public Environment dependency(Path ... values){
+        for (Path value : values) {
+            this.dependencies.add(value);
+        }
         return this;
     }
 
-    public Environment jar(String ... values){
+    public Environment jar(Path ... values){
         this.jars.addAll(Sets.newHashSet(values));
         return this;
     }
@@ -117,8 +129,8 @@ public class Environment {
         return this;
     }
 
-    public Environment out(String value){
-        this.out = value;
+    public Environment out(Path value){
+        this.out = value.resolve(DEFAULT_PRODUCTION);
         return this;
     }
 
@@ -150,7 +162,9 @@ public class Environment {
     }
 
     public ParserConfiguration buildParserConfiguration(){
-        Objects.requireNonNull(sources,"source can not be null");
+        if(sources.isEmpty()){
+            source(DEFAULT_SOURCE_PATH);
+        }
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
         combinedTypeSolver.add(new ReflectionTypeSolver());
 
@@ -172,19 +186,19 @@ public class Environment {
         return currentFramework().visitor();
     }
 
-    public Set<String> getSources() {
+    public Set<Path> getSources() {
         return sources;
     }
 
-    public Set<String> getDependencies() {
+    public Set<Path> getDependencies() {
         return dependencies;
     }
 
-    public Set<String> getJars() {
+    public Set<Path> getJars() {
         return jars;
     }
 
-    public String getOut() {
+    public Path getOut() {
         return out;
     }
 

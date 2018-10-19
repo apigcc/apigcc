@@ -15,10 +15,10 @@ public class HtmlTreeHandler implements TreeHandler {
     public void handle(Tree tree, Environment env) {
         Options options = OptionsBuilder.options()
                 .mkDirs(true)
-                .toDir(new File(env.getOut()))
+                .toDir(env.getOut().toFile())
                 .safe(SafeMode.UNSAFE)
                 .get();
-        AsciiDocDirectoryWalker directoryWalker = new AsciiDocDirectoryWalker(env.getOut());
+        AsciiDocDirectoryWalker directoryWalker = new AsciiDocDirectoryWalker(env.getOut().toString());
         Asciidoctor.Factory.create().convertDirectory(directoryWalker,options);
 
     }
