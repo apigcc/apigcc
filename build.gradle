@@ -2,14 +2,9 @@ group 'com.github.apiggs'
 version '1.0'
 
 ext {
-    VERSION_CODE = 1
-
     DESCRIPTION = 'A rest document generator with parse the source code.'
-
     SITE_URL = 'https://github.com/apiggs/apiggs'
     GIT_URL = 'https://github.com/apiggs/apiggs.git'
-    COMPILE_SDK = 23
-    BUILD_TOOLS = '23.0.1'
 
     LICENSE = 'MIT License'
 
@@ -60,8 +55,8 @@ publish {
     publishVersion = version
     desc = project.DESCRIPTION
     website = project.SITE_URL
-    bintrayUser = project.BINTRAYUSER
-    bintrayKey = project.BINTRAYKEY
+//    bintrayUser = project.BINTRAYUSER
+//    bintrayKey = project.BINTRAYKEY
     dryRun = false
 }
 
