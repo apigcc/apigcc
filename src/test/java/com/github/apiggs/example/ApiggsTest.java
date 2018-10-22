@@ -3,6 +3,7 @@ package com.github.apiggs.example;
 import com.github.apiggs.Apiggs;
 import com.github.apiggs.Environment;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;

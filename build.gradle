@@ -1,3 +1,25 @@
+group 'com.github.apiggs'
+version '1.0'
+
+ext {
+    VERSION_CODE = 1
+
+    DESCRIPTION = 'A rest document generator with parse the source code.'
+
+    SITE_URL = 'https://github.com/apiggs/apiggs'
+    GIT_URL = 'https://github.com/apiggs/apiggs.git'
+    COMPILE_SDK = 23
+    BUILD_TOOLS = '23.0.1'
+
+    LICENSE = 'MIT License'
+
+    DEVELOPER_ID = 'ayz6uem'
+    DEVELOPER_NAME = 'ayz6uem'
+    DEVELOPER_EMAIL = '360188606@qq.com'
+
+    IS_UPLOADING = project.getGradle().startParameter.taskNames.any{it.contains('bintrayUpload')}
+}
+
 buildscript {
     repositories {
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
@@ -9,9 +31,6 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'com.novoda.bintray-release'
-
-group 'com.github.apiggs'
-version '1.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -34,13 +53,58 @@ dependencies {
 }
 
 publish {
-    userOrg = 'apiggs'
+    userOrg = name
     groupId = group
     artifactId = name
     publishVersion = version
-    desc = 'A rest document generator with parse the source code.'
-    website = 'https://github.com/apiggs/apiggs'
-//    bintrayUser = BINTRAYUSER
-//    bintrayKey = BINTRAYKEY
+    desc = project.DESCRIPTION
+    website = project.SITE_URL
+    bintrayUser = project.BINTRAYUSER
+    bintrayKey = project.BINTRAYKEY
     dryRun = false
+}
+
+
+if (IS_UPLOADING) {
+    apply plugin: 'maven'
+
+    gradle.taskGraph.whenReady { taskGraph ->
+        taskGraph.getAllTasks().find {
+            it.path == ":generatePomFileForMavenPublication"
+        }.doLast {
+            file("build/publications/maven/pom-default.xml").delete()
+            println 'Overriding pom-file to make sure we can sync to maven central!'
+            pom {
+                //noinspection GroovyAssignabilityCheck
+                project {
+                    name "$project.name"
+                    artifactId name
+                    packaging 'jar'
+                    description DESCRIPTION
+                    url SITE_URL
+                    version version
+
+                    scm {
+                        url GIT_URL
+                        connection GIT_URL
+                        developerConnection GIT_URL
+                    }
+
+                    licenses {
+                        license {
+                            name LICENSE
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id DEVELOPER_ID
+                            name DEVELOPER_NAME
+                            email DEVELOPER_EMAIL
+                        }
+                    }
+                }
+            }.writeTo("build/publications/maven/pom-default.xml")
+        }
+    }
 }
