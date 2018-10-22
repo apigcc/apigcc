@@ -40,7 +40,7 @@ publish {
     publishVersion = version
     desc = 'A rest document generator with parse the source code.'
     website = 'https://github.com/apiggs/apiggs'
-    bintrayUser = BINTRAYUSER
-    bintrayKey = BINTRAYKEY
+//    bintrayUser = BINTRAYUSER
+//    bintrayKey = BINTRAYKEY
     dryRun = false
 }
