@@ -83,7 +83,7 @@ public class Environment {
     /**
      * 项目名称 生成 index.json index.adoc index.html
      */
-    private String project = "index";
+    private String id = "index";
 
     /**
      * 文档标题
@@ -94,6 +94,10 @@ public class Environment {
      * 文档描述
      */
     private String description;
+    /**
+     * 文档版本
+     */
+    private String version;
     /**
      * 忽略哪些类型的参数、类解析
      */
@@ -124,8 +128,8 @@ public class Environment {
         return this;
     }
 
-    public Environment project(String value){
-        this.project = value;
+    public Environment id(String value){
+        this.id = value;
         return this;
     }
 
@@ -141,6 +145,11 @@ public class Environment {
 
     public Environment description(String value){
         this.description = value;
+        return this;
+    }
+
+    public Environment version(String value){
+        this.version = value;
         return this;
     }
 
@@ -202,8 +211,8 @@ public class Environment {
         return out;
     }
 
-    public String getProject() {
-        return project;
+    public String getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -216,5 +225,9 @@ public class Environment {
 
     public static Set<String> getIgnoreTypes() {
         return IGNORE_TYPES;
+    }
+
+    public String getVersion() {
+        return version;
     }
 }

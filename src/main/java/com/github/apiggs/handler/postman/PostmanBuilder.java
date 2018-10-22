@@ -27,7 +27,7 @@ public class PostmanBuilder implements TreeHandler {
     public void handle(Tree tree, Environment env) {
         try {
             Postman postman = buildPostman(tree);
-            File outFile = new File(env.getOut() + "/" + env.getProject() + ".json");
+            File outFile = env.getOut().resolve(env.getId() + ".json").toFile();
             FileUtils.writeStringToFile(outFile, ObjectMappers.toPretty(postman));
         } catch (IOException e) {
             log.error("build postman.json fail:" + e.getMessage(), e);

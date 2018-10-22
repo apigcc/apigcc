@@ -27,6 +27,9 @@ public class AsciidocTreeHandler implements TreeHandler {
     @Override
     public void handle(Tree tree, Environment env) {
         builder.documentTitle(tree.getName());
+        if (Objects.nonNull(tree.getVersion())){
+            builder.paragraph("version:"+tree.getVersion());
+        }
         if(Objects.nonNull(tree.getDescription())){
             builder.paragraph(tree.getDescription(),true);
         }
@@ -36,10 +39,8 @@ public class AsciidocTreeHandler implements TreeHandler {
             buildGroup(group, "", i + 1);
         }
 
-        String adoc = env.getOut() + "/" + env.getProject();
-
-        Path indexFile = Paths.get(adoc);
-        builder.writeToFile(indexFile, StandardCharsets.UTF_8);
+        Path adoc = env.getOut().resolve(env.getId());
+        builder.writeToFile(adoc, StandardCharsets.UTF_8);
     }
 
 

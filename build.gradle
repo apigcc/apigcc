@@ -31,6 +31,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -64,47 +65,42 @@ publish {
     dryRun = false
 }
 
+gradle.taskGraph.whenReady { taskGraph ->
+    taskGraph.getAllTasks().find {
+        it.path == ":generatePomFileForMavenPublication"
+    }.doLast {
+        file("build/publications/maven/pom-default.xml").delete()
+        println 'Overriding pom-file to make sure we can sync to maven central!'
+        pom {
+            //noinspection GroovyAssignabilityCheck
+            project {
+                name "$project.name"
+                artifactId name
+                packaging 'jar'
+                description DESCRIPTION
+                url SITE_URL
+                version version
 
-if (IS_UPLOADING) {
-    apply plugin: 'maven'
+                scm {
+                    url GIT_URL
+                    connection GIT_URL
+                    developerConnection GIT_URL
+                }
 
-    gradle.taskGraph.whenReady { taskGraph ->
-        taskGraph.getAllTasks().find {
-            it.path == ":generatePomFileForMavenPublication"
-        }.doLast {
-            file("build/publications/maven/pom-default.xml").delete()
-            println 'Overriding pom-file to make sure we can sync to maven central!'
-            pom {
-                //noinspection GroovyAssignabilityCheck
-                project {
-                    name "$project.name"
-                    artifactId name
-                    packaging 'jar'
-                    description DESCRIPTION
-                    url SITE_URL
-                    version version
-
-                    scm {
-                        url GIT_URL
-                        connection GIT_URL
-                        developerConnection GIT_URL
-                    }
-
-                    licenses {
-                        license {
-                            name LICENSE
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id DEVELOPER_ID
-                            name DEVELOPER_NAME
-                            email DEVELOPER_EMAIL
-                        }
+                licenses {
+                    license {
+                        name LICENSE
                     }
                 }
-            }.writeTo("build/publications/maven/pom-default.xml")
-        }
+
+                developers {
+                    developer {
+                        id DEVELOPER_ID
+                        name DEVELOPER_NAME
+                        email DEVELOPER_EMAIL
+                    }
+                }
+            }
+        }.writeTo("build/publications/maven/pom-default.xml")
     }
 }

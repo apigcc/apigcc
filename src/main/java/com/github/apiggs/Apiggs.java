@@ -26,9 +26,10 @@ public class Apiggs {
         this.env = env;
         this.tree = new Tree();
         this.tree.setContext(this);
-        this.tree.setId(env.getProject());
+        this.tree.setId(env.getId());
         this.tree.setName(env.getTitle());
         this.tree.setDescription(env.getDescription());
+        this.tree.setVersion(env.getVersion());
     }
 
     public Apiggs(String root) {
