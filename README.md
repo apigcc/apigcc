@@ -7,18 +7,11 @@
 A rest document generator with parse the source code.
 
 ### install
-#### gradle-plugin
-```groovy
-buildscript {
-    repositories {
-        maven { url 'https://dl.bintray.com/apiggs/maven'}
-    }
-    dependencies {
-        classpath 'com.github.apiggs:apiggs-gradle-plugin:1.0'
-    }
-}
-apply plugin: 'com.github.apiggs'
-```
+use one of them:
+
+1. [apiggs-gradle-plugin](https://github.com/apiggs/apiggs-gradle-plugin) **free**
+1. [apiggs-maven-plugin](https://github.com/apiggs/apiggs-maven-plugin) **free**
+1. [apiggs-idea-plugin](https://github.com/apiggs/apiggs-idea-plugin)
 
 ### Usage
 
@@ -48,14 +41,6 @@ public class GreetingController {
 }
 ```
 
-then we run this cmd:
-```groovy
-gradle apiggs
-```
-or use this task
-```
-Tasks/documentation/apiggs
-```
 then we will get files in build/apiggs/
 
 
