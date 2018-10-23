@@ -8,9 +8,9 @@
 
 ### 引入插件
 
-1. [apiggs-gradle-plugin](https://github.com/apiggs/apiggs-gradle-plugin) **free**
-1. [apiggs-maven-plugin](https://github.com/apiggs/apiggs-maven-plugin) **free**
-1. [apiggs-idea-plugin](https://github.com/apiggs/apiggs-idea-plugin)
+* [apiggs-gradle-plugin](https://github.com/apiggs/apiggs-gradle-plugin) **free**
+* [apiggs-maven-plugin](https://github.com/apiggs/apiggs-maven-plugin) **free**
+* [apiggs-idea-plugin](https://github.com/apiggs/apiggs-idea-plugin)
 
 > 具体引入方式请参考链接，apiggs-maven-plugin找不到时请使用jcenter仓库
 
@@ -42,8 +42,10 @@ public class GreetingController {
 ```
 
 ### 运行插件
-gradle 运行 task: Tasks/documentation/apiggs
-maven 运行 compile
+
+* gradle 运行 task: Tasks/documentation/apiggs
+* maven 运行 compile
+
 ### Apiggs生成结果
 在编译目录下生成 apiggs文件夹，并生成三个文件：
 1. <project>.json ，可直接导入postman
