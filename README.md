@@ -1,21 +1,21 @@
-# 🐷 Apiggs
+# 🐷 Apiggs - 代码零侵入的Spring RestDoc 生成工具
 
 ![](https://img.shields.io/badge/language-java-yellow.svg)
 ![](https://img.shields.io/badge/build-processing-green.svg)
 [ ![Download](https://api.bintray.com/packages/apiggs/maven/apiggs/images/download.svg) ](https://bintray.com/apiggs/maven/apiggs/_latestVersion)
 
-A rest document generator with parse the source code.
+一个代码零侵入的RestDoc文档生成工具。工具通过分析基于注解的spring mvc代码，分析代码，获取注释，生成RestDoc文档。
 
-### install
-use one of them:
+### 引入插件
 
 1. [apiggs-gradle-plugin](https://github.com/apiggs/apiggs-gradle-plugin) **free**
 1. [apiggs-maven-plugin](https://github.com/apiggs/apiggs-maven-plugin) **free**
 1. [apiggs-idea-plugin](https://github.com/apiggs/apiggs-idea-plugin)
 
-### Usage
+> 具体引入方式请参考链接，apiggs-maven-plugin找不到时请使用jcenter仓库
 
-execute this example:
+### 准备代码，加入javadoc注释
+
 ```java
 /**
  * Building a RESTful Web Service
@@ -41,10 +41,15 @@ public class GreetingController {
 }
 ```
 
-then we will get files in build/apiggs/
+### 运行插件
+gradle 运行 task: Tasks/documentation/apiggs
+maven 运行 compile
+### Apiggs生成结果
+在编译目录下生成 apiggs文件夹，并生成三个文件：
+1. <project>.json ，可直接导入postman
+1. <project>.adoc，文档源文件
+1. <project>.html，源文件渲染结果，效果如下图
 
-
-then user.html look like this:
 ![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/greeting.jpg)
 
 ### Plans
