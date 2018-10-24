@@ -1,6 +1,5 @@
 package com.github.apiggs;
 
-import com.github.apiggs.ast.ResolvedTypes;
 import com.github.apiggs.handler.AsciidocTreeHandler;
 import com.github.apiggs.handler.HtmlTreeHandler;
 import com.github.apiggs.handler.TreeHandler;
@@ -18,17 +17,17 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 
 public class Environment {
 
-    public static final Path DEFAULT_PRODUCTION = Paths.get("apiggs");
+    public static final String NAME = "apiggs";
+
+    public static final Path DEFAULT_PRODUCTION = Paths.get(NAME);
     public static final Path DEFAULT_SOURCE_STRUCTURE = Paths.get("src","main","java");
   
     Logger log = LoggerFactory.getLogger(this.getClass());
@@ -77,6 +76,11 @@ public class Environment {
     private Set<Path> jars = Sets.newHashSet();
 
     /**
+     * 输出文件包裹的文件夹
+     */
+    private Path production = DEFAULT_PRODUCTION;
+
+    /**
      * 输出目录
      */
     private Path out = DEFAULT_OUT_PATH;
@@ -103,9 +107,6 @@ public class Environment {
      * 忽略哪些类型的参数、类解析
      */
     public static ThreadLocal<Set<String>> ignoreTypes = new ThreadLocal<>();
-    static {
-        ignoreTypes.set(Sets.newHashSet());
-    }
 
     /**
      * 当前项目使用了什么框架
@@ -116,7 +117,9 @@ public class Environment {
 
     public Environment source(Path ... values){
         for (Path value : values) {
-            this.sources.add(value);
+            if(Files.exists(value)){
+                this.sources.add(value);
+            }
         }
         dependency(values);
         return this;
@@ -124,13 +127,19 @@ public class Environment {
 
     public Environment dependency(Path ... values){
         for (Path value : values) {
-            this.dependencies.add(value);
+            if(Files.exists(value)) {
+                this.dependencies.add(value);
+            }
         }
         return this;
     }
 
     public Environment jar(Path ... values){
-        this.jars.addAll(Sets.newHashSet(values));
+        for (Path value : values) {
+            if(Files.exists(value)) {
+                this.jars.add(value);
+            }
+        }
         return this;
     }
 
@@ -139,8 +148,13 @@ public class Environment {
         return this;
     }
 
+    public Environment production(Path value){
+        this.production = value;
+        return this;
+    }
+
     public Environment out(Path value){
-        this.out = value.resolve(DEFAULT_PRODUCTION);
+        this.out = value.resolve(production);
         return this;
     }
 
@@ -160,7 +174,7 @@ public class Environment {
     }
 
     public Environment ignore(String ... values){
-        ignoreTypes.get().addAll(Sets.newHashSet(values));
+        getIgnoreTypes().addAll(Sets.newHashSet(values));
         return this;
     }
 
@@ -230,7 +244,12 @@ public class Environment {
     }
 
     public static Set<String> getIgnoreTypes() {
-        return ignoreTypes.get();
+        Set<String> ignores = ignoreTypes.get();
+        if(ignores==null){
+            ignores = Sets.newHashSet();
+            ignoreTypes.set(ignores);
+        }
+        return ignores;
     }
 
     public String getVersion() {
