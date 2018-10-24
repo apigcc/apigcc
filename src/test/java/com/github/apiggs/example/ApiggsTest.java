@@ -15,9 +15,9 @@ public class ApiggsTest {
                 .id("example")
                 .title("示例接口文档")
                 .description("示例接口文档，使用默认模板");
-        Apiggs piggy = new Apiggs(env);
-        piggy.lookup();
-        piggy.build();
+        Apiggs piggs = new Apiggs(env);
+        piggs.lookup();
+        piggs.build();
     }
 
 }

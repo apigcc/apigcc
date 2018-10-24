@@ -18,6 +18,8 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
@@ -174,6 +176,19 @@ public class SpringVisitor extends NodeVisitor {
         }
         if (StringUtils.isNotEmpty(comments.description)) {
             message.setDescription(comments.description);
+        }
+
+        //解析@return标签
+        if (comments.returnTag!=null && StringUtils.isNotEmpty(comments.returnTag.content)){
+            SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = context.getEnv().getTypeSolver().tryToSolveType(comments.returnTag.content);
+            if(symbolReference.isSolved()){
+                ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();
+                ResolvedTypes resolvedTypes = ResolvedTypes.of(typeDeclaration);
+                if (resolvedTypes.resolved) {
+                    message.getResponse().setBody(resolvedTypes.getValue());
+                    message.getResponse().getCells().addAll(resolvedTypes.cells);
+                }
+            }
         }
     }
 

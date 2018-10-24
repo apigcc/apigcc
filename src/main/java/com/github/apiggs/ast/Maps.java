@@ -1,5 +1,6 @@
 package com.github.apiggs.ast;
 
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 import com.google.common.collect.Sets;
@@ -20,14 +21,11 @@ public class Maps {
 
     /**
      * 判断是否是基本数字类型
-     * @param resolvedType
+     * @param typeDeclaration
      * @return
      */
-    public static boolean isAssignableBy(ResolvedType resolvedType){
-        if(resolvedType instanceof ReferenceTypeImpl){
-            return IDS.contains(((ReferenceTypeImpl) resolvedType).getId());
-        }
-        return false;
+    public static boolean isAssignableBy(ResolvedReferenceTypeDeclaration typeDeclaration){
+        return IDS.contains(typeDeclaration.getId());
     }
 
 }

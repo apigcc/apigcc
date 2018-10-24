@@ -1,7 +1,7 @@
 package com.github.apiggs;
 
-import com.github.apiggs.schema.Group;
 import com.github.apiggs.handler.TreeHandler;
+import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.utils.SourceRoot;
@@ -25,11 +25,12 @@ public class Apiggs {
     public Apiggs(Environment env) {
         this.env = env;
         this.tree = new Tree();
-        this.tree.setContext(this);
         this.tree.setId(env.getId());
         this.tree.setName(env.getTitle());
         this.tree.setDescription(env.getDescription());
         this.tree.setVersion(env.getVersion());
+
+        env.visitor().setContext(this);
     }
 
     public Apiggs(String root) {
@@ -42,7 +43,7 @@ public class Apiggs {
      * @return
      */
     public Apiggs lookup() {
-        //是否使用责任链？
+
         ParserConfiguration configuration = env.buildParserConfiguration();
         for (Path source : env.getSources()) {
             SourceRoot root = new SourceRoot(source, configuration);
@@ -77,4 +78,5 @@ public class Apiggs {
     public Environment getEnv() {
         return env;
     }
+
 }

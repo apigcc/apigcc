@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.CheckReturnValue;
 import java.util.List;
 
 /**
@@ -119,8 +120,8 @@ public class UserController extends BaseController {
 
     /**
      * 查询角色下的用户总数
-     * @param role 枚举类型
-     * @return
+     * @param role 枚举类型{@link Role}
+     * @return java.lang.String
      */
     @GetMapping("/role")
     public ResultData<Integer> listFromRole(Role role){
@@ -130,11 +131,10 @@ public class UserController extends BaseController {
     /**
      * 批量上传用户信息
      * @param list
-     * @return
+     * @return com.github.apiggs.example.common.UserDTO
      */
     @PostMapping("/batch")
-    public ResultData batch(@RequestBody List<UserDTO> list){
-        return null;
+    public void batch(@RequestBody List<UserDTO> list){
     }
 
 }

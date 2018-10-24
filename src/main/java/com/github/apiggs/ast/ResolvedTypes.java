@@ -9,6 +9,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -32,15 +33,12 @@ public class ResolvedTypes {
     /**
      * 已解析类型结果池，防止循环递归
      */
-    private static Map<ResolvedType,ResolvedTypes> POOL = new ConcurrentHashMap<>();
+    private static Map<Object,ResolvedTypes> POOL = new ConcurrentHashMap<>();
 
     /**
      * 获取解析结果前，应判断是否已解析
      */
     public boolean resolved;
-
-
-
     /**
      * 是否基本类型
      */
@@ -91,6 +89,23 @@ public class ResolvedTypes {
     }
 
     /**
+     * 只解析类型的定义，用于解析字符串类名时，只能获取到定义
+     * @param typeDeclaration
+     * @return
+     */
+    public static ResolvedTypes of(ResolvedReferenceTypeDeclaration typeDeclaration){
+        if(POOL.containsKey(typeDeclaration)){
+            return POOL.get(typeDeclaration).duplicate();
+        }
+        ResolvedTypes resolvedTypes = new ResolvedTypes();
+        POOL.put(typeDeclaration,resolvedTypes);
+        resolvedTypes.name = typeDeclaration.getName();
+        resolvedTypes.resolved = true;
+        resolvedTypes.resolve(typeDeclaration, null);
+        return resolvedTypes;
+    }
+
+    /**
      * 解析泛型的参数类型，需结合外部环境
      *
      * @param type
@@ -104,11 +119,12 @@ public class ResolvedTypes {
         }
         //泛型解析
         ResolvedTypeVariable resolvedType = type.asTypeVariable();
-
-        for (int i = 0; i < typeParametersMap.size(); i++) {
-            Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair = typeParametersMap.get(i);
-            if (Objects.equals(resolvedType.asTypeParameter(), pair.a)) {
-                return ResolvedTypes.of(pair.b);
+        if(typeParametersMap!=null){
+            for (int i = 0; i < typeParametersMap.size(); i++) {
+                Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair = typeParametersMap.get(i);
+                if (Objects.equals(resolvedType.asTypeParameter(), pair.a)) {
+                    return ResolvedTypes.of(pair.b);
+                }
             }
         }
         // 未成功解析
@@ -152,7 +168,7 @@ public class ResolvedTypes {
         resolveName(resolvedType);
 
         //忽略的类型
-        if (Environment.IGNORE_TYPES.contains(this.name)) {
+        if(Environment.getIgnoreTypes().contains(this.name)){
             return;
         }
 
@@ -166,25 +182,31 @@ public class ResolvedTypes {
             resolveArray(resolvedType);
         } else if (resolvedType.isReferenceType()) {
             ResolvedReferenceType referenceType = resolvedType.asReferenceType();
-            if (referenceType.getTypeDeclaration().isEnum()) {
-                //枚举类型
-                primitive = true;
-                value = Enums.getNames(referenceType.getTypeDeclaration().asEnum());
-            } else if (com.github.apiggs.ast.Collections.isAssignableBy(resolvedType)) {
-                resolveCollection(referenceType);
-            } else if (Maps.isAssignableBy(resolvedType)) {
-                //Map类型，解析为一个object
-                value = Defaults.DEFAULT_MAP;
-            } else if (Dates.isAssignableBy(resolvedType)) {
-                //TODO 日期格式 从配置中 从注解中读取日期格式
-                value = Defaults.DEFAULT_STRING;
-            } else if (Langs.isAssignableBy(resolvedType)) {
-                //java包中的类型，不处理
-            } else {
-                resolvePojo(referenceType);
-            }
+            ResolvedReferenceTypeDeclaration typeDeclaration = referenceType.getTypeDeclaration();
+            List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap = referenceType.getTypeParametersMap();
+            resolve(typeDeclaration, typeParametersMap);
         }
 
+    }
+
+    private void resolve(ResolvedReferenceTypeDeclaration typeDeclaration, List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap){
+        if (typeDeclaration.isEnum()) {
+            //枚举类型
+            primitive = true;
+            value = Enums.getNames(typeDeclaration.asEnum());
+        } else if (Collections.isAssignableBy(typeDeclaration)) {
+            resolveCollection(typeParametersMap);
+        } else if (Maps.isAssignableBy(typeDeclaration)) {
+            //Map类型，解析为一个object
+            value = Defaults.DEFAULT_MAP;
+        } else if (Dates.isAssignableBy(typeDeclaration)) {
+            //TODO 日期格式 从配置中 从注解中读取日期格式
+            value = Defaults.DEFAULT_STRING;
+        } else if (Langs.isAssignableBy(typeDeclaration)) {
+            //java包中的类型，不处理
+        } else {
+            resolvePojo(typeDeclaration, typeParametersMap);
+        }
     }
 
     /**
@@ -224,12 +246,12 @@ public class ResolvedTypes {
     /**
      * 解析集合
      *
-     * @param referenceType
+     * @param typeParametersMap
      */
-    private void resolveCollection(ResolvedReferenceType referenceType) {
-        if (referenceType.getTypeParametersMap().size() == 1) {
+    private void resolveCollection(List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
+        if (typeParametersMap!=null && typeParametersMap.size() == 1) {
             ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
-            ResolvedTypes componentType = ResolvedTypes.of(referenceType.getTypeParametersMap().get(0).b);
+            ResolvedTypes componentType = ResolvedTypes.of(typeParametersMap.get(0).b);
             componentType.prefix("[].");
             if (componentType.resolved) {
                 arrayNode.addPOJO(componentType.getValue());
@@ -243,34 +265,35 @@ public class ResolvedTypes {
      * 解析Pojo类，String 类
      * 递归解析父类，直到java.lang.Object
      *
-     * @param resolvedReferenceType
+     * @param typeDeclaration
+     * @param typeParametersMap
      */
-    private void resolvePojo(ResolvedReferenceType resolvedReferenceType) {
+    private void resolvePojo(ResolvedReferenceTypeDeclaration typeDeclaration, List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
         objectNode = ObjectMappers.instance().createObjectNode();
-        resolveFields(resolvedReferenceType);
+        resolveFields(typeDeclaration, typeParametersMap);
     }
 
     /**
      * 解析类型各字段
      *
-     * @param referenceType
+     * @param typeDeclaration
      */
-    private void resolveFields(ResolvedReferenceType referenceType) {
+    private void resolveFields(ResolvedReferenceTypeDeclaration typeDeclaration, List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
         //先解析父类的字段
         try {
-            referenceType.getDirectAncestors().forEach(direct -> merge(ResolvedTypes.of(direct)));
+            typeDeclaration.getAncestors().forEach(direct -> merge(ResolvedTypes.of(direct)));
         } catch (Exception e) {
-            log.debug("parse parent fail:" + referenceType);
+            log.debug("parse parent fail:" + typeDeclaration);
         }
 
         //解析各字段
-        Iterator<ResolvedFieldDeclaration> iterator = referenceType.getTypeDeclaration().getDeclaredFields().iterator();
+        Iterator<ResolvedFieldDeclaration> iterator = typeDeclaration.getDeclaredFields().iterator();
         while (iterator.hasNext()) {
             ResolvedFieldDeclaration next = iterator.next();
-            if(next.isStatic() || referenceType.equals(next.getType())){
+            if(next.isStatic() || typeDeclaration.equals(next.getType())){
                 continue;
             }
-            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), referenceType.getTypeParametersMap());
+            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
             resolvedTypes.prefix(next.getName() + ".");
             //处理类字段的默认值
             if (next instanceof JavaParserFieldDeclaration) {

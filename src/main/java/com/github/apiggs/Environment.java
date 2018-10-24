@@ -1,5 +1,6 @@
 package com.github.apiggs;
 
+import com.github.apiggs.ast.ResolvedTypes;
 import com.github.apiggs.handler.AsciidocTreeHandler;
 import com.github.apiggs.handler.HtmlTreeHandler;
 import com.github.apiggs.handler.TreeHandler;
@@ -101,12 +102,17 @@ public class Environment {
     /**
      * 忽略哪些类型的参数、类解析
      */
-    public static Set<String> IGNORE_TYPES = Sets.newHashSet();
+    public static ThreadLocal<Set<String>> ignoreTypes = new ThreadLocal<>();
+    static {
+        ignoreTypes.set(Sets.newHashSet());
+    }
 
     /**
      * 当前项目使用了什么框架
      */
     private Framework currentFramework = Framework.SPRINGMVC;
+
+    private CombinedTypeSolver typeSolver;
 
     public Environment source(Path ... values){
         for (Path value : values) {
@@ -154,7 +160,7 @@ public class Environment {
     }
 
     public Environment ignore(String ... values){
-        IGNORE_TYPES.addAll(Sets.newHashSet(values));
+        ignoreTypes.get().addAll(Sets.newHashSet(values));
         return this;
     }
 
@@ -174,20 +180,20 @@ public class Environment {
         if(sources.isEmpty()){
             source(DEFAULT_SOURCE_PATH);
         }
-        CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
-        combinedTypeSolver.add(new ReflectionTypeSolver());
+        typeSolver = new CombinedTypeSolver();
+        typeSolver.add(new ReflectionTypeSolver());
 
-        dependencies.forEach(value-> combinedTypeSolver.add(new JavaParserTypeSolver(value)));
+        dependencies.forEach(value-> typeSolver.add(new JavaParserTypeSolver(value)));
         jars.forEach(value->{
             try {
-                combinedTypeSolver.add(new JarTypeSolver(value));
+                typeSolver.add(new JarTypeSolver(value));
             } catch (IOException e) {
                 log.warn(value+" got an error:"+e.getMessage());
             }
         });
 
         ParserConfiguration parserConfiguration = new ParserConfiguration();
-        parserConfiguration.setSymbolResolver(new JavaSymbolSolver(combinedTypeSolver));
+        parserConfiguration.setSymbolResolver(new JavaSymbolSolver(typeSolver));
         return parserConfiguration;
     }
 
@@ -224,10 +230,14 @@ public class Environment {
     }
 
     public static Set<String> getIgnoreTypes() {
-        return IGNORE_TYPES;
+        return ignoreTypes.get();
     }
 
     public String getVersion() {
         return version;
+    }
+
+    public CombinedTypeSolver getTypeSolver() {
+        return typeSolver;
     }
 }

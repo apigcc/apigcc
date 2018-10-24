@@ -1,9 +1,7 @@
 package com.github.apiggs.schema;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.apiggs.Apiggs;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Rest api Tree
@@ -21,9 +19,6 @@ public class Tree extends Node {
     String realm;
     String version;
     List<Group> groups = new ArrayList<>();
-
-    @JsonIgnore
-    Apiggs context;
 
     public String getRealm() {
         return realm;
@@ -43,14 +38,6 @@ public class Tree extends Node {
 
     public List<Group> getGroups() {
         return groups;
-    }
-
-    public Apiggs getContext() {
-        return context;
-    }
-
-    public void setContext(Apiggs context) {
-        this.context = context;
     }
 
 }
