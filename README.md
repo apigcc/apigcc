@@ -66,6 +66,8 @@ compile
 
 ![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/WX20181025-202423.png)
 
+想了解更多，请查看[Wiki](https://github.com/apiggs/apiggs/wiki)
+
 ### Versions
 
 #### 1.1
