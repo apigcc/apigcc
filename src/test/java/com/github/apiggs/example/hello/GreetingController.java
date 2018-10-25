@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Building a RESTful Web Service
- * 来自spring的官方示例:https://spring.io/guides/gs/rest-service/
+ * 欢迎使用Apiggs
  * @index 1
  */
 @RestController
@@ -18,12 +17,12 @@ public class GreetingController {
     private final AtomicLong counter = new AtomicLong();
 
     /**
-     * Web Endpoint greeting
-     * @param name who is this
+     * 示例接口
+     * @param name 名称
      * @return
      */
     @RequestMapping("/greeting")
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
+    public Greeting greeting(@RequestParam(value="name", defaultValue="apiggs") String name) {
         return new Greeting(counter.incrementAndGet(),
                 String.format(template, name));
     }

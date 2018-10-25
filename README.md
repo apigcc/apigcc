@@ -24,8 +24,8 @@ Apiggs是一个**非侵入**的RestDoc文档生成工具。工具通过分析代
 
 ```java
 /**
- * Building a RESTful Web Service
- * 来自spring的官方示例:https://spring.io/guides/gs/rest-service/
+ * 欢迎使用Apiggs
+ * @index 1
  */
 @RestController
 public class GreetingController {
@@ -34,12 +34,12 @@ public class GreetingController {
     private final AtomicLong counter = new AtomicLong();
 
     /**
-     * Web Endpoint greeting
-     * @param name who is this
+     * 示例接口
+     * @param name 名称
      * @return
      */
     @RequestMapping("/greeting")
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
+    public Greeting greeting(@RequestParam(value="name", defaultValue="apiggs") String name) {
         return new Greeting(counter.incrementAndGet(),
                 String.format(template, name));
     }
@@ -64,7 +64,7 @@ compile
 1. .adoc文件，Asciidoc源文件
 1. .html文件，源文件渲染结果，效果如下图
 
-![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/greeting.jpg)
+![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/WX20181025-202423.png)
 
 ### Versions
 

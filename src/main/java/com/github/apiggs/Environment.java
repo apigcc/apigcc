@@ -28,18 +28,17 @@ public class Environment {
     public static final String NAME = "apiggs";
 
     public static final Path DEFAULT_PRODUCTION = Paths.get(NAME);
-    public static final Path DEFAULT_SOURCE_STRUCTURE = Paths.get("src","main","java");
-  
+    public static final Path DEFAULT_SOURCE_STRUCTURE = Paths.get("src", "main", "java");
+    public static final Path DEFAULT_PROJECT_PATH = Paths.get(System.getProperty("user.dir"));
+    public static final Path DEFAULT_OUT = Paths.get("build");
+
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * 默认的文档树访问器
+     * 默认的文档构建器
      */
     public static Iterable<TreeHandler> DEFAULT_PIPELINE = Lists.newArrayList(new PostmanBuilder(), new AsciidocTreeHandler(), new HtmlTreeHandler());
 
-    public static final Path DEFAULT_OUT_PATH = Paths.get("build").resolve(DEFAULT_PRODUCTION);
-    public static final Path DEFAULT_PROJECT_PATH = Paths.get(System.getProperty("user.dir"));
-    public static final Path DEFAULT_SOURCE_PATH = DEFAULT_PROJECT_PATH.resolve(DEFAULT_SOURCE_STRUCTURE);
 
     private enum Framework {
 
@@ -51,18 +50,22 @@ public class Environment {
             this.visitor = visitor;
         }
 
-        public NodeVisitor visitor(){
+        public NodeVisitor visitor() {
             return visitor;
         }
 
     }
 
     /**
+     * project根目录
+     */
+    private Path project = DEFAULT_PROJECT_PATH;
+
+    /**
      * source code folder wait for parse
      * or just some code
      * default: parse user.dir 's code
      */
-
     private Set<Path> sources = Sets.newHashSet();
 
     /**
@@ -83,7 +86,7 @@ public class Environment {
     /**
      * 输出目录
      */
-    private Path out = DEFAULT_OUT_PATH;
+    private Path out = DEFAULT_OUT;
 
     /**
      * 项目名称 生成 index.json index.adoc index.html
@@ -115,9 +118,12 @@ public class Environment {
 
     private CombinedTypeSolver typeSolver;
 
-    public Environment source(Path ... values){
+    public Environment source(Path... values) {
         for (Path value : values) {
-            if(Files.exists(value)){
+            if(!value.isAbsolute()){
+                value = project.resolve(value);
+            }
+            if (Files.exists(value)) {
                 this.sources.add(value);
             }
         }
@@ -125,84 +131,96 @@ public class Environment {
         return this;
     }
 
-    public Environment dependency(Path ... values){
+    public Environment dependency(Path... values) {
         for (Path value : values) {
-            if(Files.exists(value)) {
+            if(!value.isAbsolute()){
+                value = project.resolve(value);
+            }
+            if (Files.exists(value)) {
                 this.dependencies.add(value);
             }
         }
         return this;
     }
 
-    public Environment jar(Path ... values){
+    public Environment jar(Path... values) {
         for (Path value : values) {
-            if(Files.exists(value)) {
+            if(!value.isAbsolute()){
+                value = project.resolve(value);
+            }
+            if (Files.exists(value)) {
                 this.jars.add(value);
             }
         }
         return this;
     }
 
-    public Environment id(String value){
+    public Environment id(String value) {
         this.id = value;
         return this;
     }
 
-    public Environment production(Path value){
+    public Environment project(Path value) {
+        this.project = value;
+        return this;
+    }
+
+    public Environment production(Path value) {
         this.production = value;
         return this;
     }
 
-    public Environment out(Path value){
-        this.out = value.resolve(production);
+    public Environment out(Path value) {
+        this.out = value;
         return this;
     }
 
-    public Environment title(String value){
+    public Environment title(String value) {
         this.title = value;
         return this;
     }
 
-    public Environment description(String value){
+    public Environment description(String value) {
         this.description = value;
         return this;
     }
 
-    public Environment version(String value){
+    public Environment version(String value) {
         this.version = value;
         return this;
     }
 
-    public Environment ignore(String ... values){
+    public Environment ignore(String... values) {
         getIgnoreTypes().addAll(Sets.newHashSet(values));
         return this;
     }
 
-    public Iterable<TreeHandler> pipeline(){
+    public Iterable<TreeHandler> pipeline() {
         return DEFAULT_PIPELINE;
     }
 
     /**
      * 通过某种方法判断当前项目采用了什么框架
+     *
      * @return
      */
-    public Framework currentFramework(){
+    public Framework currentFramework() {
         return currentFramework;
     }
 
-    public ParserConfiguration buildParserConfiguration(){
-        if(sources.isEmpty()){
-            source(DEFAULT_SOURCE_PATH);
+    public ParserConfiguration buildParserConfiguration() {
+        if (sources.isEmpty()) {
+            source(project.resolve(DEFAULT_SOURCE_STRUCTURE));
         }
         typeSolver = new CombinedTypeSolver();
         typeSolver.add(new ReflectionTypeSolver());
 
-        dependencies.forEach(value-> typeSolver.add(new JavaParserTypeSolver(value)));
-        jars.forEach(value->{
+        dependencies.forEach(value -> typeSolver.add(new JavaParserTypeSolver(value)));
+        jars.forEach(value -> {
             try {
                 typeSolver.add(new JarTypeSolver(value));
             } catch (IOException e) {
-                log.warn(value+" got an error:"+e.getMessage());
+                log.warn(value + " got an error:" + e.getMessage());
             }
         });
 
@@ -211,7 +229,7 @@ public class Environment {
         return parserConfiguration;
     }
 
-    public NodeVisitor visitor(){
+    public NodeVisitor visitor() {
         return currentFramework().visitor();
     }
 
@@ -227,8 +245,11 @@ public class Environment {
         return jars;
     }
 
-    public Path getOut() {
-        return out;
+    public Path getOutPath() {
+        if(out.isAbsolute()){
+            return out;
+        }
+        return project.resolve(out).resolve(production);
     }
 
     public String getId() {
@@ -245,7 +266,7 @@ public class Environment {
 
     public static Set<String> getIgnoreTypes() {
         Set<String> ignores = ignoreTypes.get();
-        if(ignores==null){
+        if (ignores == null) {
             ignores = Sets.newHashSet();
             ignoreTypes.set(ignores);
         }
@@ -258,5 +279,9 @@ public class Environment {
 
     public CombinedTypeSolver getTypeSolver() {
         return typeSolver;
+    }
+
+    public Path getProject() {
+        return project;
     }
 }

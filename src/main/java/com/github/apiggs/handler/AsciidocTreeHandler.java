@@ -11,7 +11,6 @@ import com.github.apiggs.util.AttributeAsciidocBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +38,7 @@ public class AsciidocTreeHandler implements TreeHandler {
             buildGroup(group, "", i + 1);
         }
 
-        Path adoc = env.getOut().resolve(env.getId());
+        Path adoc = env.getOutPath().resolve(env.getId());
         builder.writeToFile(adoc, StandardCharsets.UTF_8);
     }
 
