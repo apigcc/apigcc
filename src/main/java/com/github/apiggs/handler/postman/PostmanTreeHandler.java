@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * Postman v2.1 json文件构建
  */
-public class PostmanBuilder implements TreeHandler {
+public class PostmanTreeHandler implements TreeHandler {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 

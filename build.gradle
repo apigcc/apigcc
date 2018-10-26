@@ -46,6 +46,7 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.0.RELEASE'
+    testCompile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 }
 
 publish {

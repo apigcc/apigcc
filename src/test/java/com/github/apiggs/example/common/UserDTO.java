@@ -1,5 +1,6 @@
 package com.github.apiggs.example.common;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ public class UserDTO {
      */
     Integer id;
     /*姓名*/
+    @NotEmpty
     String name;
     //年龄
     int age;
