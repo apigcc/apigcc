@@ -1,20 +1,19 @@
 package com.github.apiggs.handler.postman;
 
+import com.github.apiggs.Environment;
+import com.github.apiggs.handler.TreeHandler;
 import com.github.apiggs.handler.postman.schema.*;
+import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpMessage;
+import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.ObjectMappers;
-import com.github.apiggs.Environment;
-import com.github.apiggs.handler.TreeHandler;
-import com.github.apiggs.http.HttpHeaders;
-import com.github.apiggs.schema.Cell;
-import org.apache.commons.io.FileUtils;
+import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Postman v2.1 json文件构建
@@ -25,14 +24,9 @@ public class PostmanTreeHandler implements TreeHandler {
 
     @Override
     public void handle(Tree tree, Environment env) {
-        try {
-            Postman postman = buildPostman(tree);
-            File outFile = env.getOutPath().resolve(env.getId() + ".json").toFile();
-            FileUtils.writeStringToFile(outFile, ObjectMappers.toPretty(postman));
-        } catch (IOException e) {
-            log.error("build postman.json fail:" + e.getMessage(), e);
-        }
-
+        Postman postman = buildPostman(tree);
+        Path outFile = env.getOutPath().resolve(env.getId() + ".json");
+        write(outFile, ObjectMappers.toPretty(postman), Charsets.UTF_8);
     }
 
     private Postman buildPostman(Tree tree) {

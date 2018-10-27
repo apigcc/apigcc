@@ -1,9 +1,9 @@
 package com.github.apiggs.visitor.springmvc;
 
 import com.github.apiggs.ast.Annotations;
+import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpRequestMethod;
 import com.github.apiggs.util.URL;
-import com.github.apiggs.http.HttpHeaders;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;

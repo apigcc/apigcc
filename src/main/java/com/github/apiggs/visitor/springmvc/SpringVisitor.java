@@ -20,7 +20,7 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Strings;
 
 import java.util.Optional;
 
@@ -49,7 +49,7 @@ public class SpringVisitor extends NodeVisitor {
                 group.setRest(Controllers.isResponseBody(n));
                 if(n.getComment().isPresent()){
                     Comments comments = Comments.of(n.getComment().get());
-                    if(StringUtils.isNotEmpty(comments.name)){
+                    if(!Strings.isNullOrEmpty(comments.name)){
                         group.setName(comments.name);
                     }
                     group.setDescription(comments.description);
@@ -171,15 +171,15 @@ public class SpringVisitor extends NodeVisitor {
      */
     private void visit(Comment n, HttpMessage message) {
         Comments comments = Comments.of(n);
-        if (StringUtils.isNotEmpty(comments.name)) {
+        if (!Strings.isNullOrEmpty(comments.name)) {
             message.setName(comments.name);
         }
-        if (StringUtils.isNotEmpty(comments.description)) {
+        if (!Strings.isNullOrEmpty(comments.description)) {
             message.setDescription(comments.description);
         }
 
         //解析@return标签
-        if (comments.returnTag!=null && StringUtils.isNotEmpty(comments.returnTag.content)){
+        if (comments.returnTag!=null && !Strings.isNullOrEmpty(comments.returnTag.content)){
             SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = context.getEnv().getTypeSolver().tryToSolveType(comments.returnTag.content);
             if(symbolReference.isSolved()){
                 ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();

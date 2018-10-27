@@ -4,10 +4,11 @@ import com.github.apiggs.Environment;
 import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
 import com.github.apiggs.http.HttpResponse;
+import com.github.apiggs.markup.MarkupBuilder;
+import com.github.apiggs.markup.asciidoc.AsciiDoc;
 import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
-import com.github.apiggs.util.AttributeAsciidocBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -21,16 +22,16 @@ import java.util.Objects;
  */
 public class AsciidocTreeHandler implements TreeHandler {
 
-    AttributeAsciidocBuilder builder = AttributeAsciidocBuilder.newInstance();
+    MarkupBuilder builder = MarkupBuilder.getInstance();
 
     @Override
     public void handle(Tree tree, Environment env) {
-        builder.documentTitle(tree.getName());
+        builder.header(tree.getName(),AsciiDoc.DOCTYPE_BOOK,AsciiDoc.TOC_LEFT);
         if (Objects.nonNull(tree.getVersion())){
             builder.paragraph("version:"+tree.getVersion());
         }
         if(Objects.nonNull(tree.getDescription())){
-            builder.paragraph(tree.getDescription(),true);
+            builder.paragraph(tree.getDescription());
         }
 
         for (int i = 0; i < tree.getGroups().size(); i++) {
@@ -38,15 +39,15 @@ public class AsciidocTreeHandler implements TreeHandler {
             buildGroup(group, "", i + 1);
         }
 
-        Path adoc = env.getOutPath().resolve(env.getId());
-        builder.writeToFile(adoc, StandardCharsets.UTF_8);
+        Path adoc = env.getOutPath().resolve(env.getId()+AsciiDoc.EXTENSION);
+        write(adoc, builder.getContent(), StandardCharsets.UTF_8);
     }
 
 
     private void buildGroup(Group group, String prefix, int num) {
-        builder.sectionTitleLevel1(prefix + num + " " + group.getName());
+        builder.title(1, prefix + num + " " + group.getName());
         if (Objects.nonNull(group.getDescription())) {
-            builder.paragraph(group.getDescription(),true);
+            builder.paragraph(group.getDescription());
         }
         for (int i = 0; i < group.getNodes().size(); i++) {
             HttpMessage httpMessage = group.getNodes().get(i);
@@ -55,13 +56,13 @@ public class AsciidocTreeHandler implements TreeHandler {
     }
 
     private void buildHttpMessage(HttpMessage message, String prefix, int num) {
-        builder.sectionTitleLevel2(prefix + num + " " + message.getName());
+        builder.title(2, prefix + num + " " + message.getName());
         if (Objects.nonNull(message.getDescription())) {
-            builder.paragraph(message.getDescription(),true);
+            builder.paragraph(message.getDescription());
         }
 
         HttpRequest request = message.getRequest();
-        builder.block(builder -> {
+        builder.listing(builder -> {
             for (String uri : request.getUris()) {
                 builder.textLine(request.getMethod()
                         + " "
@@ -72,23 +73,23 @@ public class AsciidocTreeHandler implements TreeHandler {
             }
             request.getHeaders().forEach((k,v) -> builder.textLine(k+": "+v));
             if(request.hasBody()){
-                builder.newLine();
+                builder.br();
                 builder.textLine(request.bodyString());
             }
-        }, "REQUEST");
+        }, "source,REQUEST");
 
         table(request.getCells());
 
         HttpResponse response = message.getResponse();
         if (!response.isEmpty()) {
-            builder.block(builder -> {
+            builder.listing(builder -> {
                 builder.textLine(message.getVersion()+" " + response.getStatus());
                 response.getHeaders().forEach((k,v) -> builder.textLine(k + ": "+v));
                 if(response.hasBody()){
-                    builder.newLine();
+                    builder.br();
                     builder.textLine(response.bodyString());
                 }
-            }, "RESPONSE");
+            }, "source,RESPONSE");
             table(response.getCells());
         }
 

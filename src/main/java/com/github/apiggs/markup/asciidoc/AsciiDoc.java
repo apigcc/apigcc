@@ -1,7 +1,11 @@
 package com.github.apiggs.markup.asciidoc;
 
 public enum AsciiDoc implements CharSequence {
-    HEADER("= "),
+    EXTENSION(".adoc"),
+    /**
+     * 各种关键字
+     */
+    HEADER("====="),
     TABLE("|==="),
     TABLE_CELL("|"),
     TITLE("="),
@@ -21,17 +25,31 @@ public enum AsciiDoc implements CharSequence {
     PASSTHROUGH("++++"),
     QUOTE("____"),
     EXAMPLE("===="),
-    NOTE("[NOTE]"),
-    TIP("[TIP]"),
-    IMPORTANT("[IMPORTANT]"),
-    WARNING("[WARNING]"),
-    CAUTION("[CAUTION]"),
+    NOTE("NOTE"),
+    TIP("TIP"),
+    IMPORTANT("IMPORTANT"),
+    WARNING("WARNING"),
+    CAUTION("CAUTION"),
     PAGEBREAKS("<<<"),
     HARDBREAKS("[%hardbreaks]"),
     WHITESPACE(" "),
     BR("\r\n"),
     NEW_LINE("\r\n\r\n"),
-    HBR(" +");
+    HBR(" +"),
+    /**
+     * 文档属性
+     */
+    TOC_LEFT(":toc: left"),
+    DOCTYPE_BOOK(":doctype: book"),
+    /**
+     * 文字样式
+     */
+    STYLE_BIG("big"),
+    STYLE_SMALL("small"),
+    STYLE_UNDERLINE("underline"),
+    STYLE_OVERLINE("overline"),
+    STYLE_LINE_THROUGH("line-through"),
+    ;
 
     private final String markup;
 

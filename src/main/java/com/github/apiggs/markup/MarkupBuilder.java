@@ -2,12 +2,6 @@ package com.github.apiggs.markup;
 
 import com.github.apiggs.markup.asciidoc.AsciiDocBuilder;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -57,7 +51,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder paragraph(String text);
+    MarkupBuilder paragraph(String text, CharSequence ... attrs);
     /**
      * 带icon的各种段落
      */
@@ -74,21 +68,21 @@ public interface MarkupBuilder {
     /**
      * 各种block
      */
-    MarkupBuilder block(Consumer<MarkupBuilder> consumer, CharSequence flag, String ... attrs);
+    MarkupBuilder block(Consumer<MarkupBuilder> consumer, CharSequence flag, CharSequence ... attrs);
 
-    MarkupBuilder listing(Consumer<MarkupBuilder> consumer, String ... attrs);
+    MarkupBuilder listing(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
 
-    MarkupBuilder literal(Consumer<MarkupBuilder> consumer, String ... attrs);
+    MarkupBuilder literal(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
 
-    MarkupBuilder sidebar(Consumer<MarkupBuilder> consumer, String ... attrs);
+    MarkupBuilder sidebar(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
 
-    MarkupBuilder comment(Consumer<MarkupBuilder> consumer, String ... attrs);
+    MarkupBuilder comment(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
 
-    MarkupBuilder passthrough(Consumer<MarkupBuilder> consumer, String ... attrs);
+    MarkupBuilder passthrough(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
 
-    MarkupBuilder quote(Consumer<MarkupBuilder> consumer, String ... attrs);
+    MarkupBuilder quote(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
 
-    MarkupBuilder example(Consumer<MarkupBuilder> consumer, String ... attrs);
+    MarkupBuilder example(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
 
     /**
      * 列表 默认数字
@@ -137,7 +131,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder emphasized(String text, String ... textStyle);
+    MarkupBuilder emphasized(String text, CharSequence ... textStyle);
 
     /**
      * 加粗
@@ -145,7 +139,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder strong(String text, String ... textStyle);
+    MarkupBuilder strong(String text, CharSequence ... textStyle);
 
     /**
      * 等宽
@@ -153,7 +147,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder monospaced(String text, String ... textStyle);
+    MarkupBuilder monospaced(String text, CharSequence ... textStyle);
 
     /**
      * 单引号
@@ -161,7 +155,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder quoted(String text, String ... textStyle);
+    MarkupBuilder quoted(String text, CharSequence ... textStyle);
 
     /**
      * 双引号
@@ -169,7 +163,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder doubleQuoted(String text, String ... textStyle);
+    MarkupBuilder doubleQuoted(String text, CharSequence ... textStyle);
 
     /**
      * 正常的引用文字
@@ -177,7 +171,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder unquoted(String text, String ... textStyle);
+    MarkupBuilder unquoted(String text, CharSequence ... textStyle);
 
 
     /**
@@ -213,26 +207,6 @@ public interface MarkupBuilder {
      * @return
      */
     String getContent();
-
-    /**
-     * 写入文件中
-     * @param file
-     */
-    default void write(Path file, Charset charset, OpenOption ... openOptions) {
-        if (file.getParent() != null) {
-            try {
-                Files.createDirectories(file.getParent());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed create directory", e);
-            }
-        }
-
-        try (BufferedWriter writer = Files.newBufferedWriter(file, charset, openOptions)) {
-            writer.write(getContent());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write file", e);
-        }
-    }
 
 }
 

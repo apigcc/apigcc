@@ -18,6 +18,7 @@ public class PageController extends BaseController {
 
     /**
      * 默认页面，由于不是restful的，restdoc将忽略该Endpoint
+     *
      * @return
      */
     @GetMapping
@@ -28,6 +29,12 @@ public class PageController extends BaseController {
     /**
      * Hello with ResponseBody
      * 由于带有@ResponseBody，restdoc将解析该Endpoint
+     *
+     * *********
+     * hhh
+     * \*********
+     * hhhh
+     * *********
      * @return
      */
     @GetMapping("/hello")
