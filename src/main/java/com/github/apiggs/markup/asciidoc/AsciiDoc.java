@@ -5,7 +5,7 @@ public enum AsciiDoc implements CharSequence {
     /**
      * 各种关键字
      */
-    HEADER("====="),
+    HEADER("= "),
     TABLE("|==="),
     TABLE_CELL("|"),
     TITLE("="),

@@ -1,7 +1,7 @@
 package com.github.apiggs.example.common;
 
 /**
- * @responseCode
+ * @code
  */
 public enum Code{
 

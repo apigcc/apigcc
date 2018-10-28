@@ -20,9 +20,8 @@ public class AsciiDocBuilder implements MarkupBuilder {
     @Override
     public MarkupBuilder header(String text, CharSequence... attrs) {
         Validate.notBlank(text, "header must not be blank");
-        content.append(nobr(text.trim()));
-        br();
         content.append(HEADER);
+        content.append(nobr(text.trim()));
         br();
         for (CharSequence attr : attrs) {
             content.append(attr);

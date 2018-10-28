@@ -3,7 +3,7 @@ package com.github.apiggs.visitor;
 import com.github.apiggs.Apiggs;
 import com.github.apiggs.ast.Comments;
 import com.github.apiggs.ast.Enums;
-import com.github.apiggs.ast.extend.ExtendTag;
+import com.github.apiggs.ast.extend.DocTag;
 import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
@@ -29,10 +29,16 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
             Tree tree = (Tree) arg;
             Comments javadoc = Comments.of(n);
             for (Comments.Tag tag : javadoc.tags) {
-                if(Objects.equals(tag.name,ExtendTag.readme.name())){
+                if(Objects.equals(tag.name,DocTag.readme.name())){
                     tree.setReadme(tag.content);
                 }
-                if(Objects.equals(tag.name,ExtendTag.responseCode.name())){
+                if(Objects.equals(tag.name,DocTag.title.name())){
+                    tree.setName(tag.content);
+                }
+                if(Objects.equals(tag.name,DocTag.description.name())){
+                    tree.setDescription(tag.content);
+                }
+                if(Objects.equals(tag.name,DocTag.code.name())){
                     tree.getResponseCode().addAll(parseResponseCode(n));
                 }
             }
