@@ -9,6 +9,8 @@ import com.github.apiggs.markup.asciidoc.AsciiDoc;
 import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
+import com.github.apiggs.util.loging.Logger;
+import com.github.apiggs.util.loging.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -22,6 +24,7 @@ import java.util.Objects;
  */
 public class AsciidocTreeHandler implements TreeHandler {
 
+    Logger log = LoggerFactory.getLogger(this.getClass());
     MarkupBuilder builder = MarkupBuilder.getInstance();
 
     @Override
@@ -41,6 +44,7 @@ public class AsciidocTreeHandler implements TreeHandler {
 
         Path adoc = env.getOutPath().resolve(env.getId()+AsciiDoc.EXTENSION);
         write(adoc, builder.getContent(), StandardCharsets.UTF_8);
+        log.info("build {}",adoc);
     }
 
 

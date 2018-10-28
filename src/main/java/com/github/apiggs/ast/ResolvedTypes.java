@@ -17,8 +17,6 @@ import com.github.javaparser.resolution.types.ResolvedTypeVariable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.utils.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ResolvedTypes {
 
-    static Logger log = LoggerFactory.getLogger(ResolvedTypes.class);
     /**
      * 已解析类型结果池，防止循环递归
      */
@@ -63,7 +60,6 @@ public class ResolvedTypes {
             ResolvedType resolvedType = type.resolve();
             return of(resolvedType);
         } catch (UnsolvedSymbolException e) {
-            log.debug("try to resolve fail:" + type.toString());
             //解析失败 查找泛型参数
             return tryResolveTypeArguments(type);
         }
@@ -283,7 +279,6 @@ public class ResolvedTypes {
         try {
             typeDeclaration.getAncestors().forEach(direct -> merge(ResolvedTypes.of(direct)));
         } catch (Exception e) {
-            log.debug("parse parent fail:" + typeDeclaration);
         }
 
         //解析各字段

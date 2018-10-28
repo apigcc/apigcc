@@ -1,16 +1,16 @@
 package com.github.apiggs.visitor.springmvc;
 
-import com.github.apiggs.ast.Comments;
-import com.github.apiggs.ast.ResolvedTypes;
 import com.github.apiggs.ast.Annotations;
+import com.github.apiggs.ast.Comments;
 import com.github.apiggs.ast.Defaults;
+import com.github.apiggs.ast.ResolvedTypes;
 import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.loging.Logger;
+import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class Parameters {
 
-    Logger log = LoggerFactory.getLogger(this.getClass());
+    static Logger log = LoggerFactory.getLogger(Parameters.class);
 
     public static final String REQUEST_BODY = "RequestBody";
     public static final String REQUEST_PARAM = "RequestParam";
@@ -141,7 +141,7 @@ public class Parameters {
             cells.addAll(astResolvedType.cells);
 
         } catch (Exception e) {
-            log.debug("try to resolve fail:" + expr.toString());
+            log.debug("parameters parse fail:{}",expr.toString());
         }
     }
 

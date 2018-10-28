@@ -4,8 +4,12 @@ import com.google.common.base.Strings;
 
 public class Validate {
 
+    public static boolean isBlank(String text) {
+        return Strings.isNullOrEmpty(text) || Strings.isNullOrEmpty(text.trim());
+    }
+
     public static void notBlank(String text, String message) {
-        if (Strings.isNullOrEmpty(text)) {
+        if (Strings.isNullOrEmpty(text) || Strings.isNullOrEmpty(text.trim())) {
             throw new IllegalArgumentException(message);
         }
     }

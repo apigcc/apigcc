@@ -1,5 +1,7 @@
 package com.github.apiggs.ast;
 
+import com.github.apiggs.util.loging.Logger;
+import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.Comment;
@@ -10,8 +12,6 @@ import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -21,6 +21,7 @@ import java.util.*;
 public class Comments {
 
     static Logger log = LoggerFactory.getLogger(Comments.class);
+
     /**
      * 注释第一行
      */
@@ -137,7 +138,7 @@ public class Comments {
             try{
                 return Optional.of(Integer.parseInt(indexString));
             }catch (Exception e){
-                log.debug("parse index error:"+indexString);
+                log.debug("read index fail:{}",indexString);
             }
         }
         return Optional.empty();
@@ -148,7 +149,7 @@ public class Comments {
             return;
         }
         this.content = content;
-        String[] arr = content.split("(\\r\\n)|(\\n)+", 2);
+        String[] arr = content.split("(\\r\\n)|(\\r)|(\\n)+", 2);
         if (arr.length >= 1) {
             name = arr[0];
         }

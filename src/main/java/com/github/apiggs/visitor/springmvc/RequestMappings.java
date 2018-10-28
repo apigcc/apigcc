@@ -4,6 +4,8 @@ import com.github.apiggs.ast.Annotations;
 import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpRequestMethod;
 import com.github.apiggs.util.URL;
+import com.github.apiggs.util.loging.Logger;
+import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -12,8 +14,6 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserClassDeclaration;
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -155,7 +155,7 @@ public class RequestMappings {
                 }
             }
         }catch (Exception e){
-            log.debug("getParentPath:"+e.getMessage());
+            log.debug("parse super fail:{}",e.getMessage());
         }
         return parent;
     }

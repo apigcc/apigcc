@@ -9,9 +9,9 @@ import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.ObjectMappers;
+import com.github.apiggs.util.loging.Logger;
+import com.github.apiggs.util.loging.LoggerFactory;
 import com.google.common.base.Charsets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 
@@ -25,8 +25,9 @@ public class PostmanTreeHandler implements TreeHandler {
     @Override
     public void handle(Tree tree, Environment env) {
         Postman postman = buildPostman(tree);
-        Path outFile = env.getOutPath().resolve(env.getId() + ".json");
-        write(outFile, ObjectMappers.toPretty(postman), Charsets.UTF_8);
+        Path file = env.getOutPath().resolve(env.getId() + ".json");
+        write(file, ObjectMappers.toPretty(postman), Charsets.UTF_8);
+        log.info("build {}",file);
     }
 
     private Postman buildPostman(Tree tree) {

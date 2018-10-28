@@ -20,7 +20,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
     @Override
     public MarkupBuilder header(String text, CharSequence... attrs) {
         Validate.notBlank(text, "header must not be blank");
-        content.append(nobr(text));
+        content.append(nobr(text.trim()));
         br();
         content.append(HEADER);
         br();
@@ -38,23 +38,23 @@ public class AsciiDocBuilder implements MarkupBuilder {
         Validate.between(level, 1, MAX_TITLE, "title level can not be " + level);
         br();
         content.append(Strings.repeat(TITLE.toString(), level + 1)).append(WHITESPACE)
-                .append(nobr(text));
+                .append(nobr(text.trim()));
         br();
         return this;
     }
 
     @Override
     public MarkupBuilder text(String text) {
-        if(Strings.isNullOrEmpty(text)){
+        if(Validate.isBlank(text)){
             return this;
         }
-        content.append(text);
+        content.append(text.trim());
         return this;
     }
 
     @Override
     public MarkupBuilder textLine(String text) {
-        if(Strings.isNullOrEmpty(text)){
+        if(Validate.isBlank(text)){
             return this;
         }
         text(nobr(text));
@@ -64,7 +64,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder paragraph(String text, CharSequence... attrs) {
-        if(Strings.isNullOrEmpty(text)){
+        if(Validate.isBlank(text)){
             return this;
         }
         content.append(HARDBREAKS);
@@ -174,7 +174,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder list(String text, CharSequence flag) {
-        if (Strings.isNullOrEmpty(text)) {
+        if (!Validate.isBlank(text)) {
             content.append(flag).append(nobr(text));
         }
         return this;
@@ -182,7 +182,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder url(String text, String url) {
-        if (Strings.isNullOrEmpty(text)) {
+        if (!Validate.isBlank(text) && !!Validate.isBlank(url)) {
             content.append(url).append("[").append(nobr(text)).append("]");
             br();
         }
@@ -191,7 +191,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder image(String text, String url) {
-        if (Strings.isNullOrEmpty(text)) {
+        if (!Validate.isBlank(text) && !Validate.isBlank(url)) {
             text("image:");
             url(text, url);
         }
@@ -243,7 +243,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
 
     public MarkupBuilder style(CharSequence flag, String text, CharSequence... textStyle) {
-        if (Strings.isNullOrEmpty(text)) {
+        if (Validate.isBlank(text)) {
             return this;
         }
         if (Objects.nonNull(textStyle) && textStyle.length > 0) {
@@ -322,6 +322,9 @@ public class AsciiDocBuilder implements MarkupBuilder {
     }
 
     String nobr(String content) {
+        if(Validate.isBlank(content)){
+           return content;
+        }
         return content.replaceAll(BR.toString(),
                 Matcher.quoteReplacement(WHITESPACE.toString()));
     }

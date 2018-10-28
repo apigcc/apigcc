@@ -3,6 +3,8 @@ package com.github.apiggs;
 import com.github.apiggs.handler.TreeHandler;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
+import com.github.apiggs.util.loging.Logger;
+import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.utils.SourceRoot;
 
@@ -14,6 +16,8 @@ import java.util.Arrays;
  * 🐷 工具入口类、上下文
  */
 public class Apiggs {
+
+    Logger log = LoggerFactory.getLogger(this.getClass());
 
     Environment env;
     Tree tree;
@@ -40,18 +44,25 @@ public class Apiggs {
     /**
      * 搜寻给定代码及依赖环境
      * 找到Endpoints，构建Tree
+     *
      * @return
      */
     public Apiggs lookup() {
 
         ParserConfiguration configuration = env.buildParserConfiguration();
         for (Path source : env.getSources()) {
+            log.info("parsing source dir: {}", source);
             SourceRoot root = new SourceRoot(source, configuration);
             root.tryToParseParallelized().forEach(result -> result.ifSuccessful(cu -> cu.accept(env.visitor(), this.getTree())));
         }
 
         //对Group进行排序
         tree.getGroups().sort(Group.COMPARATOR);
+
+        Integer totalNodes = tree.getGroups().stream()
+                .map(g -> g.getNodes().size())
+                .reduce(0, (sum, i) -> sum += i);
+        log.info("found controllers:{} endpoints:{}", tree.getGroups().size(), totalNodes);
 
         return this;
     }
@@ -63,11 +74,11 @@ public class Apiggs {
         env.pipeline().forEach(this::build);
     }
 
-    public void build(TreeHandler... handlers){
+    public void build(TreeHandler... handlers) {
         Arrays.stream(handlers).forEach(this::build);
     }
 
-    public void build(TreeHandler handler){
+    public void build(TreeHandler handler) {
         handler.handle(tree, env);
     }
 
