@@ -1,6 +1,7 @@
 package com.github.apiggs.schema;
 
-import java.util.Arrays;
+import com.google.common.collect.Lists;
+
 import java.util.List;
 
 /**
@@ -42,8 +43,12 @@ public class Cell {
         this.disabled = disabled;
     }
 
-    public List<String> toList() {
-        return Arrays.asList(name, type, value==null?"":String.valueOf(value), description);
+    public List<String> allList() {
+        return Lists.newArrayList(name, type, value==null?"":String.valueOf(value), description);
+    }
+
+    public List<String> nameValueList(){
+        return Lists.newArrayList(name,value==null?"":String.valueOf(value),description);
     }
 
     public static String join(List<Cell> cells){

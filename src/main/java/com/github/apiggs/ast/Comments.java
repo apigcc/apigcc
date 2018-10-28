@@ -1,5 +1,6 @@
 package com.github.apiggs.ast;
 
+import com.github.apiggs.ast.extend.ExtendTag;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -133,7 +134,7 @@ public class Comments {
     }
 
     public static Optional<Integer> getIndexTag(Optional<Comment> optional) {
-        String indexString = getTagContent(optional, CommentTag.index.toString());
+        String indexString = getTagContent(optional, ExtendTag.index.toString());
         if(indexString!=null){
             try{
                 return Optional.of(Integer.parseInt(indexString));

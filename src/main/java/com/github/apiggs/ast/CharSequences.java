@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * String类型工具类
  */
-public class Strings {
+public class CharSequences {
 
     public static final Set<String> IDS = Sets.newHashSet(
             String.class.getName(),

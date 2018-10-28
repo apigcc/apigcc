@@ -19,6 +19,8 @@ public class Tree extends Node {
     String realm;
     String version;
     List<Group> groups = new ArrayList<>();
+    String readme;
+    List<Cell> responseCode = new ArrayList<>();
 
     public String getRealm() {
         return realm;
@@ -40,4 +42,15 @@ public class Tree extends Node {
         return groups;
     }
 
+    public List<Cell> getResponseCode() {
+        return responseCode;
+    }
+
+    public String getReadme() {
+        return readme;
+    }
+
+    public void setReadme(String readme) {
+        this.readme = readme;
+    }
 }

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * 以下是文档说明
  * @readme 所有接口均使用Https调用
  * /app路径下的接口为app专用
  * /mini路径下的接口为小程序专用

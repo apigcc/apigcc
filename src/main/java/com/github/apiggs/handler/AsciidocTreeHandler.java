@@ -11,6 +11,7 @@ import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
+import com.google.common.base.Strings;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -37,9 +38,21 @@ public class AsciidocTreeHandler implements TreeHandler {
             builder.paragraph(tree.getDescription());
         }
 
-        for (int i = 0; i < tree.getGroups().size(); i++) {
-            Group group = tree.getGroups().get(i);
-            buildGroup(group, "", i + 1);
+        int section = 1;
+
+        if(!Strings.isNullOrEmpty(tree.getReadme())){
+            builder.title(1, section + " 文档说明");
+            builder.paragraph(tree.getReadme());
+            section ++;
+        }
+        if(!tree.getResponseCode().isEmpty()){
+            builder.title(1, section + " 响应码");
+            responseCode(tree.getResponseCode());
+            section++;
+        }
+
+        for (Group group : tree.getGroups()) {
+            buildGroup(group,section++);
         }
 
         Path adoc = env.getOutPath().resolve(env.getId()+AsciiDoc.EXTENSION);
@@ -48,14 +61,14 @@ public class AsciidocTreeHandler implements TreeHandler {
     }
 
 
-    private void buildGroup(Group group, String prefix, int num) {
-        builder.title(1, prefix + num + " " + group.getName());
+    private void buildGroup(Group group, int num) {
+        builder.title(1,  num + " " + group.getName());
         if (Objects.nonNull(group.getDescription())) {
             builder.paragraph(group.getDescription());
         }
         for (int i = 0; i < group.getNodes().size(); i++) {
             HttpMessage httpMessage = group.getNodes().get(i);
-            buildHttpMessage(httpMessage, prefix + num + ".", i + 1);
+            buildHttpMessage(httpMessage,  num + ".", i + 1);
         }
     }
 
@@ -103,10 +116,18 @@ public class AsciidocTreeHandler implements TreeHandler {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
             responseTable.add(Arrays.asList("NAME", "TYPE", "DEFAULT", "DESCRIPTION"));
-            cells.forEach(parameter -> responseTable.add(parameter.toList()));
+            cells.forEach(parameter -> responseTable.add(parameter.allList()));
             builder.table(responseTable);
         }
+    }
 
+    private void responseCode(List<Cell> cells){
+        if (cells.size() > 0) {
+            List<List<String>> responseTable = new ArrayList<>();
+            responseTable.add(Arrays.asList("NAME", "VALUE", "DESCRIPTION"));
+            cells.forEach(parameter -> responseTable.add(parameter.nameValueList()));
+            builder.table(responseTable);
+        }
     }
 
 }

@@ -171,7 +171,7 @@ public class ResolvedTypes {
         if (resolvedType.isPrimitive() || Numbers.isAssignableBy(resolvedType)) {
             primitive = true;
             value = Defaults.DEFAULT_INTEGER;
-        } else if (Strings.isAssignableBy(resolvedType)) {
+        } else if (CharSequences.isAssignableBy(resolvedType)) {
             primitive = true;
             value = Defaults.DEFAULT_STRING;
         } else if (resolvedType.isArray()) {
