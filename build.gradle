@@ -1,5 +1,5 @@
 group 'com.github.apiggs'
-version '1.3'
+version '1.4-SNAPSHOT'
 
 ext {
     DESCRIPTION = 'A rest document generator with parse the source code.'

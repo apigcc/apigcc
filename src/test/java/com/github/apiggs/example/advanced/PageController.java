@@ -22,41 +22,58 @@ public class PageController extends BaseController {
      * @return
      */
     @GetMapping
-    public ModelAndView index(){
+    public ModelAndView index() {
         return new ModelAndView();
     }
 
     /**
      * Hello with ResponseBody
      * 由于带有@ResponseBody，restdoc将解析该Endpoint
-     *
+     * <p>
      * *********
      * hhh
      * \*********
      * hhhh
      * *********
+     * <p>
+     * class ************** {
+     * <p>
+     * }
+     *
      * @return
      */
     @GetMapping("/hello")
     @ResponseBody
-    public Greeting hello(){
-        return new Greeting(1,"hello world");
+    public Greeting hello() {
+        return new Greeting(1, "hello world");
     }
 
 
     /**
      * 未知的多泛型的tuple 演示
+     *
      * @return
      */
     @GetMapping("/tuple")
     @ResponseBody
-    public Tuple<UserDTO,User> tuple(){
+    public Tuple<UserDTO, User> tuple() {
+        return null;
+    }
+
+    /**
+     * 多个RequestMethod
+     *
+     * @return
+     */
+    @RequestMapping(value = "/multiMethod", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
+    @ResponseBody
+    public ResultData multiMethod() {
         return null;
     }
 
     @PostMapping("/multi")
     @ResponseBody
-    public ResultData<Wrapper<UserDTO>> multi(@RequestBody ResultData<Wrapper<List<UserDTO>>> resultData){
+    public ResultData<Wrapper<UserDTO>> multi(@RequestBody ResultData<Wrapper<List<UserDTO>>> resultData) {
         return null;
     }
 }

@@ -95,7 +95,11 @@ public class RequestMappings {
         RequestMappings requestMappings = new RequestMappings();
         //解析并设置http请求方法
         if (annotationAttrs.containsKey("method")) {
-            HttpRequestMethod m = ATTRS_METHOD.get(annotationAttrs.get("method"));
+            Object methodString = annotationAttrs.get("method");
+            if(annotationAttrs.get("method") instanceof List){
+                methodString = ((List)annotationAttrs.get("method")).get(0);
+            }
+            HttpRequestMethod m = ATTRS_METHOD.get(methodString);
             if (m != null) {
                 requestMappings.setMethod(m);
             }
