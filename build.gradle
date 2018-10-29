@@ -1,5 +1,5 @@
 group 'com.github.apiggs'
-version '1.2'
+version '1.3'
 
 ext {
     DESCRIPTION = 'A rest document generator with parse the source code.'
@@ -54,8 +54,8 @@ publish {
     publishVersion = version
     desc = project.DESCRIPTION
     website = project.SITE_URL
-//    bintrayUser = project.BINTRAYUSER
-//    bintrayKey = project.BINTRAYKEY
+    bintrayUser = project.BINTRAYUSER
+    bintrayKey = project.BINTRAYKEY
     dryRun = false
 }
 

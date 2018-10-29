@@ -70,7 +70,7 @@ compile
 
 ### Versions
 
-#### 1.2 snapshot
+#### 1.3
 * 自实现asciidoc构建器，移除对swagger2markup:markup-document-builder的依赖
 * 实现自己的日志工具，移除对slf4j的依赖
 * 支持@readme
