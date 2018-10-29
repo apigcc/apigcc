@@ -16,9 +16,8 @@ Apiggs是一个**非侵入**的RestDoc文档生成工具。工具通过分析代
 
 ### 引入插件
 
-* [apiggs-gradle-plugin](https://github.com/apiggs/apiggs-gradle-plugin) **free**
-* [apiggs-maven-plugin](https://github.com/apiggs/apiggs-maven-plugin) **free**
-* [apiggs-idea-plugin](https://github.com/apiggs/apiggs-idea-plugin)
+* [apiggs-gradle-plugin](https://github.com/apiggs/apiggs-gradle-plugin)
+* [apiggs-maven-plugin](https://github.com/apiggs/apiggs-maven-plugin)
 
 ### 有这样一段代码
 
