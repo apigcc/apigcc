@@ -27,7 +27,7 @@ public class PostmanTreeHandler implements TreeHandler {
         Postman postman = buildPostman(tree);
         Path file = env.getOutPath().resolve(env.getId() + ".json");
         write(file, ObjectMappers.toPretty(postman), Charsets.UTF_8);
-        log.info("build {}",file);
+        log.info("Build {}",file);
     }
 
     private Postman buildPostman(Tree tree) {

@@ -59,7 +59,7 @@ public class AsciidocTreeHandler implements TreeHandler {
 
         Path adoc = env.getOutPath().resolve(env.getId()+AsciiDoc.EXTENSION);
         write(adoc, builder.getContent(), StandardCharsets.UTF_8);
-        log.info("build {}",adoc);
+        log.info("Build {}",adoc);
     }
 
 

@@ -22,6 +22,6 @@ public class HtmlTreeHandler implements TreeHandler {
                 .get();
         AsciiDocDirectoryWalker directoryWalker = new AsciiDocDirectoryWalker(env.getOutPath().toString());
         Asciidoctor.Factory.create().convertDirectory(directoryWalker,options);
-        log.info("render {}",env.getOutPath());
+        log.info("Render {}",env.getOutPath());
     }
 }

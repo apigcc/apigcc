@@ -51,7 +51,7 @@ public class Apiggs {
 
         ParserConfiguration configuration = env.buildParserConfiguration();
         for (Path source : env.getSources()) {
-            log.info("parsing source dir: {}", source);
+            log.info("Parsing source : {}", source);
             SourceRoot root = new SourceRoot(source, configuration);
             root.tryToParseParallelized().forEach(result -> result.ifSuccessful(cu -> cu.accept(env.visitor(), this.getTree())));
         }
@@ -62,7 +62,7 @@ public class Apiggs {
         Integer totalNodes = tree.getGroups().stream()
                 .map(g -> g.getNodes().size())
                 .reduce(0, (sum, i) -> sum += i);
-        log.info("found controllers:{} endpoints:{}", tree.getGroups().size(), totalNodes);
+        log.info("\r\nFound {} Controllers, {} Endpoints", tree.getGroups().size(), totalNodes);
 
         return this;
     }

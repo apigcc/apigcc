@@ -38,10 +38,6 @@ public class SimpleLogger implements Logger {
         if(Level.COMPARATOR.compare(level,this.level) < 0){
             return;
         }
-        out.print(level);
-        out.print(" ");
-        out.print(LocalDateTime.now().format(formatter));
-        out.print(" ");
         out.println(format(message,args));
     }
 

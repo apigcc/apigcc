@@ -247,7 +247,7 @@ public class Environment {
 
     public Path getOutPath() {
         if(out.isAbsolute()){
-            return out;
+            return out.resolve(production);
         }
         return project.resolve(out).resolve(production);
     }

@@ -54,6 +54,9 @@ public class Cell {
     public static String join(List<Cell> cells){
         StringBuilder sb = new StringBuilder();
         for (Cell cell : cells) {
+            if(cell.disabled){
+                continue;
+            }
             if(sb.length()>0){
                 sb.append("&");
             }
