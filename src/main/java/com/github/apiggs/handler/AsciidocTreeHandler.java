@@ -1,11 +1,13 @@
 package com.github.apiggs.handler;
 
 import com.github.apiggs.Environment;
+import com.github.apiggs.handler.postman.schema.Method;
 import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
 import com.github.apiggs.http.HttpResponse;
 import com.github.apiggs.markup.MarkupBuilder;
 import com.github.apiggs.markup.asciidoc.AsciiDoc;
+import com.github.apiggs.markup.asciidoc.Color;
 import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
@@ -45,9 +47,9 @@ public class AsciidocTreeHandler implements TreeHandler {
             builder.paragraph(tree.getReadme());
             section ++;
         }
-        if(!tree.getResponseCode().isEmpty()){
+        if(!tree.getCodes().isEmpty()){
             builder.title(1, section + " 响应码");
-            responseCode(tree.getResponseCode());
+            nvd(tree.getCodes());
             section++;
         }
 
@@ -91,11 +93,11 @@ public class AsciidocTreeHandler implements TreeHandler {
             request.getHeaders().forEach((k,v) -> builder.textLine(k+": "+v));
             if(request.hasBody()){
                 builder.br();
-                builder.textLine(request.bodyString());
+                builder.text(request.bodyString());
             }
         }, "source,REQUEST");
 
-        table(request.getCells());
+        ntdd(request.getCells());
 
         HttpResponse response = message.getResponse();
         if (!response.isEmpty()) {
@@ -104,15 +106,15 @@ public class AsciidocTreeHandler implements TreeHandler {
                 response.getHeaders().forEach((k,v) -> builder.textLine(k + ": "+v));
                 if(response.hasBody()){
                     builder.br();
-                    builder.textLine(response.bodyString());
+                    builder.text(response.bodyString());
                 }
             }, "source,RESPONSE");
-            table(response.getCells());
+            ntdd(response.getCells());
         }
 
     }
 
-    private void table(List<Cell> cells){
+    private void ntdd(List<Cell> cells){
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
             responseTable.add(Arrays.asList("NAME", "TYPE", "DEFAULT", "DESCRIPTION"));
@@ -121,7 +123,7 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
     }
 
-    private void responseCode(List<Cell> cells){
+    private void nvd(List<Cell> cells){
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
             responseTable.add(Arrays.asList("NAME", "VALUE", "DESCRIPTION"));

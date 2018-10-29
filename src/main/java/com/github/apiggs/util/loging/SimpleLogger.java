@@ -56,6 +56,7 @@ public class SimpleLogger implements Logger {
             cursor = m.end();
             index++;
         }
+        stringBuilder.append(template, cursor, template.length());
         return stringBuilder.toString();
     }
 

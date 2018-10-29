@@ -149,6 +149,7 @@ public class ResolvedTypes {
                     }
                 }
                 typeArgumentResolvedTypes.value = node;
+                typeArgumentResolvedTypes.resolved = true;
             }
         }
         return typeArgumentResolvedTypes;

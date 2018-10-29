@@ -7,19 +7,19 @@ public enum Color implements CharSequence{
     WHITE("white"),
     SILVER("silver"),
     GRAY("gray"),
-    BLACK("lack"),
-    RED("ed"),
-    MAROON("aroon"),
-    YELLOW("ellow"),
-    OLIVE("live"),
-    LIME("ime"),
-    GREEN("reen"),
-    AQUA("qua"),
-    TEAL("eal"),
-    BLUE("lue"),
-    NAVY("avy"),
-    FUCHSIA("uchsia"),
-    PURPLE("urple");
+    BLACK("black"),
+    RED("red"),
+    MAROON("maroon"),
+    YELLOW("yellow"),
+    OLIVE("olive"),
+    LIME("lime"),
+    GREEN("green"),
+    AQUA("aqua"),
+    TEAL("teal"),
+    BLUE("blue"),
+    NAVY("navy"),
+    FUCHSIA("fuchsia"),
+    PURPLE("purple");
 
     private String text;
 

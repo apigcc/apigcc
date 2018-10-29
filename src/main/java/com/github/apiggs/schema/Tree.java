@@ -20,7 +20,7 @@ public class Tree extends Node {
     String version;
     List<Group> groups = new ArrayList<>();
     String readme;
-    List<Cell> responseCode = new ArrayList<>();
+    List<Cell> codes = new ArrayList<>();
 
     public String getRealm() {
         return realm;
@@ -42,8 +42,8 @@ public class Tree extends Node {
         return groups;
     }
 
-    public List<Cell> getResponseCode() {
-        return responseCode;
+    public List<Cell> getCodes() {
+        return codes;
     }
 
     public String getReadme() {

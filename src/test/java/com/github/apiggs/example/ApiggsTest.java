@@ -19,9 +19,7 @@ public class ApiggsTest {
 
     @Test
     public void testApiggs() {
-        Path project = Paths.get("/","Users","wz","Desktop","Apiggs","apiggs");
         Environment env = new Environment()
-                .project(project)
                 .source(Paths.get("src","test","java"))
                 .id("example")
                 .title("示例接口文档")

@@ -15,6 +15,9 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 解析源码树
+ */
 public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
 
     protected Apiggs context;
@@ -39,14 +42,14 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
                     tree.setDescription(tag.content);
                 }
                 if(Objects.equals(tag.name,DocTag.code.name())){
-                    tree.getResponseCode().addAll(parseResponseCode(n));
+                    tree.getCodes().addAll(parseCode(n));
                 }
             }
         }
         super.visit(n, arg);
     }
 
-    private List<Cell> parseResponseCode(JavadocComment n){
+    private List<Cell> parseCode(JavadocComment n){
         if(n.getCommentedNode().isPresent()){
             if(n.getCommentedNode().get() instanceof EnumDeclaration){
                 return Enums.toDetails((EnumDeclaration) n.getCommentedNode().get());
