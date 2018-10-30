@@ -57,9 +57,13 @@ public class AsciidocTreeHandler implements TreeHandler {
             buildGroup(group,section++);
         }
 
-        Path adoc = env.getOutPath().resolve(env.getId()+AsciiDoc.EXTENSION);
-        write(adoc, builder.getContent(), StandardCharsets.UTF_8);
-        log.info("Build {}",adoc);
+        try{
+            Path adoc = env.getOutPath().resolve(env.getId()+AsciiDoc.EXTENSION);
+            write(adoc, builder.getContent(), StandardCharsets.UTF_8);
+            log.info("Build {}",adoc);
+        }finally {
+            builder.clean();
+        }
     }
 
 

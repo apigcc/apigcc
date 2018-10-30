@@ -148,8 +148,16 @@ public class Environment {
             if(!value.isAbsolute()){
                 value = project.resolve(value);
             }
-            if (Files.exists(value)) {
+            if (!Files.exists(value)) {
+                continue;
+            }
+            if (!Files.isDirectory(value) && value.toString().endsWith("jar")){
                 this.jars.add(value);
+            }
+            try {
+                Files.list(value).forEach(this::jar);
+            } catch (IOException e) {
+                log.debug("read list of {} error", value);
             }
         }
         return this;

@@ -320,6 +320,11 @@ public class AsciiDocBuilder implements MarkupBuilder {
         return content.toString();
     }
 
+    @Override
+    public void clean() {
+        content = new StringBuilder();
+    }
+
     String nobr(String content) {
         if(Validate.isBlank(content)){
            return content;

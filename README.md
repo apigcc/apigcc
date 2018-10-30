@@ -16,8 +16,32 @@ Apiggs是一个**非侵入**的RestDoc文档生成工具。工具通过分析代
 
 ### 引入插件
 
-* [apiggs-gradle-plugin](https://github.com/apiggs/apiggs-gradle-plugin)
-* [apiggs-maven-plugin](https://github.com/apiggs/apiggs-maven-plugin)
+[gradle](https://github.com/apiggs/apiggs-gradle-plugin)
+```groovy
+buildscript {
+    dependencies {
+        classpath 'com.github.apiggs:apiggs-gradle-plugin:替换为上方版本号'
+    }
+}
+
+apply plugin: 'com.github.apiggs'
+```
+[maven](https://github.com/apiggs/apiggs-maven-plugin)
+```xml
+<plugin>
+    <groupId>com.github.apiggs</groupId>
+    <artifactId>apiggs-maven-plugin</artifactId>
+    <version><!-- 替换为上方版本号 --></version>
+    <executions>
+        <execution>
+            <phase>compile</phase>
+            <goals>
+                <goal>apiggs</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
 
 ### 有这样一段代码
 
@@ -47,7 +71,7 @@ public class GreetingController {
 
 ### 运行插件
 
-* gradle 运行 task: 
+* gradle 运行 
 ```
 Tasks/documentation/apiggs
 ```
@@ -68,6 +92,12 @@ compile
 想了解更多，请查看[Wiki](https://github.com/apiggs/apiggs/wiki)
 
 ### Versions
+
+#### 1.5
+
+* 支持字段别名
+* 外部依赖jar支持目录
+* 修复插件不退出，内容重复创建的Bug
 
 #### 1.3
 * 自实现asciidoc构建器，移除对swagger2markup:markup-document-builder的依赖

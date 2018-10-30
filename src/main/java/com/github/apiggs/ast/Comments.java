@@ -85,7 +85,7 @@ public class Comments {
             Tag tag = new Tag();
             tag.name = blockTag.getTagName();
             tag.key = blockTag.getName().isPresent()?blockTag.getName().get():null;
-            builder = new StringBuilder();
+            StringBuilder tagDescription = new StringBuilder();
             for (JavadocDescriptionElement element : blockTag.getContent().getElements()) {
                 if(element instanceof  JavadocInlineTag){
                     JavadocInlineTag inlineTag = (JavadocInlineTag) element;
@@ -95,10 +95,10 @@ public class Comments {
                         tag.inline.put(inlineTag.getName(), inlineTag.getContent());
                     }
                 }else{
-                    builder.append(element.toText());
+                    tagDescription.append(element.toText());
                 }
             }
-            tag.content = builder.toString();
+            tag.content = tagDescription.toString();
             tags.add(tag);
 
             if("return".equals(tag.name)){
@@ -125,7 +125,7 @@ public class Comments {
         if(optionalComments.isPresent()){
             Comments comments = optionalComments.get();
             for (Tag tag : comments.tags) {
-                if (Objects.equals(tag.name, "param")) {
+                if (Objects.equals(tag.name, "param") && Objects.equals(tag.key, name)) {
                     return Optional.of(tag);
                 }
             }

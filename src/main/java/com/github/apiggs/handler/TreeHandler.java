@@ -28,6 +28,7 @@ public interface TreeHandler {
 
         try (BufferedWriter writer = Files.newBufferedWriter(file, charset, openOptions)) {
             writer.write(content);
+            writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("Failed to write file", e);
         }

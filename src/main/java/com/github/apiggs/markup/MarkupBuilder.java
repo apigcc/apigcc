@@ -208,5 +208,10 @@ public interface MarkupBuilder {
      */
     String getContent();
 
+    /**
+     * 清空content
+     */
+    void clean();
+
 }
 

@@ -190,7 +190,7 @@ public class ResolvedTypes {
         if (typeDeclaration.isEnum()) {
             //枚举类型
             primitive = true;
-            value = Enums.getNames(typeDeclaration.asEnum());
+            value = "";
         } else if (Collections.isAssignableBy(typeDeclaration)) {
             resolveCollection(typeParametersMap);
         } else if (Maps.isAssignableBy(typeDeclaration)) {
@@ -291,17 +291,20 @@ public class ResolvedTypes {
             if(next.isStatic() || typeDeclaration.equals(next.getType())){
                 continue;
             }
+            String name = next.getName();
+
             ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
-            resolvedTypes.prefix(next.getName() + ".");
+            resolvedTypes.prefix(name + ".");
             //处理类字段的默认值
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
                 Fields.getInitializer(field).ifPresent(value -> resolvedTypes.value = value);
+                name = Fields.getName(field);
             }
 
             String comment = Comments.getCommentAsString(next);
 
-            put(next.getName(), resolvedTypes, comment);
+            put(name, resolvedTypes, comment);
         }
     }
 
