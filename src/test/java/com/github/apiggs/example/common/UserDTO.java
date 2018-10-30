@@ -24,6 +24,8 @@ public class UserDTO {
      * 用户标签
      */
     List<String> tags;
+
+    List<?> data;
     /**
      * 用户图标
      */
@@ -87,5 +89,13 @@ public class UserDTO {
 
     public void setAttrs(Map<String, String> attrs) {
         this.attrs = attrs;
+    }
+
+    public List<?> getData() {
+        return data;
+    }
+
+    public void setData(List<?> data) {
+        this.data = data;
     }
 }

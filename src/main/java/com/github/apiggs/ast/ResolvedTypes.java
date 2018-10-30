@@ -248,13 +248,15 @@ public class ResolvedTypes {
     private void resolveCollection(List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
         if (typeParametersMap!=null && typeParametersMap.size() == 1) {
             ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
-            ResolvedTypes componentType = ResolvedTypes.of(typeParametersMap.get(0).b);
-            componentType.prefix("[].");
-            if (componentType.resolved) {
-                arrayNode.addPOJO(componentType.getValue());
-                value = arrayNode;
-                cells.addAll(componentType.cells);
+            if(!"?".equals(typeParametersMap.get(0).b.describe())){
+                ResolvedTypes componentType = ResolvedTypes.of(typeParametersMap.get(0).b);
+                componentType.prefix("[].");
+                if (componentType.resolved) {
+                    arrayNode.addPOJO(componentType.getValue());
+                    cells.addAll(componentType.cells);
+                }
             }
+            value = arrayNode;
         }
     }
 

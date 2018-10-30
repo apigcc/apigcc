@@ -28,11 +28,12 @@ public class PageController extends BaseController {
 
     /**
      * Hello with ResponseBody
+     *  *********
      * 由于带有@ResponseBody，restdoc将解析该Endpoint
      * <p>
-     * *********
      * hhh
      * \*********
+     *  *********
      * hhhh
      * *********
      * <p>

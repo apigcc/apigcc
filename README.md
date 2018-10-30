@@ -73,7 +73,7 @@ compile
 * 自实现asciidoc构建器，移除对swagger2markup:markup-document-builder的依赖
 * 实现自己的日志工具，移除对slf4j的依赖
 * 支持@readme
-* 支持@responseCode
+* 支持@code
 
 #### 1.1
 * 增加注释Tag @return的支持，只支持类的全限定名
