@@ -1,0 +1,815 @@
+= Apiggs示例文档
+:doctype: book
+:toc: left
+
+[%hardbreaks]
+通过javadoc设置文档描述信息
+优先级大于通过Environment.description()设置的值
+
+
+== 1 文档说明
+[%hardbreaks]
+所有接口均使用Https调用
+/app路径下的接口为app专用
+/mini路径下的接口为小程序专用
+
+
+== 2 响应码
+[options="header"]
+|===
+|+NAME+|+VALUE+|+DESCRIPTION+
+|+OK+|+0+|+ok+
+|+ERROR+|+-1+|+error+
+|+NoAuth+|+1+|+no auth+
+|===
+
+
+== 3 欢迎使用Apiggs
+
+=== 3.1 示例接口
+[source,REQUEST ]
+----
+GET /greeting?name=apiggs HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+name+|+String+|+apiggs+|+名称+
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "content" : ""
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+id+|+long+|+0+|+编号+
+|+content+|+String+||+内容+
+|===
+
+
+== 4 用户模块（标题）
+[%hardbreaks]
+用户示例模块文字描述（详情）
+支持多行文字
+
+
+=== 4.1 用户详情信息
+[%hardbreaks]
+主动根据id获取用户的信息
+
+[source,REQUEST ]
+----
+GET /users/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+id+|+String+||+用户编号+
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : "",
+  "data" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : "",
+    "users" : [ ]
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|+data+|+User+||
+|+data.id+|+int+|+0+|
+|+data.name+|+String+||
+|+data.age+|+Integer+|+0+|
+|+data.createAt+|+Date+||
+|+data.Sex+|+String+||
+|+data.users+|+List+||
+|===
+
+
+=== 4.2 用户详情信息（根据email或电话号码）
+[%hardbreaks]
+多路径适配
+
+[source,REQUEST ]
+----
+GET /users/detail?email=&phone= HTTP/1.1
+GET /users/info?email=&phone= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+email+|+String+||
+|+phone+|+String+||
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : "",
+  "data" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : "",
+    "users" : [ ]
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|+data+|+User+||
+|+data.id+|+int+|+0+|
+|+data.name+|+String+||
+|+data.age+|+Integer+|+0+|
+|+data.createAt+|+Date+||
+|+data.Sex+|+String+||
+|+data.users+|+List+||
+|===
+
+
+=== 4.3 用户信息新增
+[source,REQUEST ]
+----
+POST /users HTTP/1.1
+Content-Type: application/json
+
+{
+  "id" : 0,
+  "name" : "",
+  "age" : 0,
+  "birthday" : "",
+  "tags" : [ "" ],
+  "data" : [ ],
+  "icons" : [ "" ],
+  "attrs" : { },
+  "user" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : "",
+    "users" : [ ]
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+id+|+Integer+|+0+|+编号+
+|+name+|+String+||+姓名+
+|+age+|+int+|+0+|+年龄+
+|+birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+tags+|+List+||+用户标签+
+|+data+|+List+||
+|+icons+|+java.lang.String[]+||+用户图标+
+|+attrs+|+Map+||
+|+user+|+User+||
+|+user.id+|+int+|+0+|
+|+user.name+|+String+||
+|+user.age+|+Integer+|+0+|
+|+user.createAt+|+Date+||
+|+user.Sex+|+String+||
+|+user.users+|+List+||
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : ""
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|===
+
+
+=== 4.4 用户信息更新
+[source,REQUEST ]
+----
+PATCH /users HTTP/1.1
+Content-Type: application/json
+
+{
+  "id" : 0,
+  "name" : "",
+  "age" : 0,
+  "birthday" : "",
+  "tags" : [ "" ],
+  "data" : [ ],
+  "icons" : [ "" ],
+  "attrs" : { },
+  "user" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : "",
+    "users" : [ ]
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+id+|+Integer+|+0+|+编号+
+|+name+|+String+||+姓名+
+|+age+|+int+|+0+|+年龄+
+|+birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+tags+|+List+||+用户标签+
+|+data+|+List+||
+|+icons+|+java.lang.String[]+||+用户图标+
+|+attrs+|+Map+||
+|+user+|+User+||
+|+user.id+|+int+|+0+|
+|+user.name+|+String+||
+|+user.age+|+Integer+|+0+|
+|+user.createAt+|+Date+||
+|+user.Sex+|+String+||
+|+user.users+|+List+||
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : ""
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|===
+
+
+=== 4.5 用户列表信息查询
+[%hardbreaks]
+默认展示GET方法查询
+返回集合类的结果
+
+[source,REQUEST ]
+----
+GET /users/list?page=1&size=20 HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+page+|+int+|+1+|+页码+
+|+size+|+int+|+20+|+每页条数+
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : "",
+  "data" : [ ]
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|+data+|+List+||
+|===
+
+
+=== 4.6 用户列表信息搜索
+[%hardbreaks]
+POST搜索时，请求参数将放在请求体中
+
+[source,REQUEST ]
+----
+POST /users/search HTTP/1.1
+
+q=&page=1&limit=20&totalPage=0&max=0&name=
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+q+|+String+||+查询关键字+
+|+page+|+int+|+1+|+第几页+
+|+limit+|+int+|+20+|+每页条数+
+|+totalPage+|+int+|+0+|
+|+max+|+int+|+0+|
+|+name+|+String+||
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : "",
+  "data" : [ ]
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|+data+|+List+||
+|===
+
+
+=== 4.7 用户信息删除
+[%hardbreaks]
+ResponseEntity、Model以及未知类型将忽略
+
+[source,REQUEST ]
+----
+DELETE /users/{id} HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+id+|+String+||
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "?" : {
+    "code" : 0,
+    "msg" : ""
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+?.code+|+int+|+0+|+返回码+
+|+?.msg+|+String+||+返回信息+
+|===
+
+
+=== 4.8 用户禁用
+[%hardbreaks]
+某些项目使用自定义的ArgumentResolver，让spring自动注入一些信息
+restdoc在解析时，可通过env.ignoreTypes("UserDtails")来忽略这些
+
+[source,REQUEST ]
+----
+PUT /users/{id}/disable HTTP/1.1
+
+----
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : ""
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|===
+
+
+=== 4.9 查询角色下的用户总数
+[source,REQUEST ]
+----
+GET /users/role?role= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+role+|+Role+||+枚举类型+
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|+data+|+Integer+|+0+|
+|===
+
+
+=== 4.10 批量上传用户信息
+[source,REQUEST ]
+----
+POST /users/batch HTTP/1.1
+Content-Type: application/json
+
+[ {
+  "id" : 0,
+  "name" : "",
+  "age" : 0,
+  "birthday" : "",
+  "tags" : [ "" ],
+  "data" : [ ],
+  "icons" : [ "" ],
+  "attrs" : { },
+  "user" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : "",
+    "users" : [ ]
+  }
+} ]
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+[].id+|+Integer+|+0+|+编号+
+|+[].name+|+String+||+姓名+
+|+[].age+|+int+|+0+|+年龄+
+|+[].birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+[].tags+|+List+||+用户标签+
+|+[].data+|+List+||
+|+[].icons+|+java.lang.String[]+||+用户图标+
+|+[].attrs+|+Map+||
+|+[].user+|+User+||
+|+[].user.id+|+int+|+0+|
+|+[].user.name+|+String+||
+|+[].user.age+|+Integer+|+0+|
+|+[].user.createAt+|+Date+||
+|+[].user.Sex+|+String+||
+|+[].user.users+|+List+||
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "age" : 0,
+  "birthday" : "",
+  "tags" : [ "" ],
+  "data" : [ ],
+  "icons" : [ "" ],
+  "attrs" : { },
+  "user" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : "",
+    "users" : [ ]
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+id+|+Integer+|+0+|+编号+
+|+name+|+String+||+姓名+
+|+age+|+int+|+0+|+年龄+
+|+birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+tags+|+List+||+用户标签+
+|+data+|+List+||
+|+icons+|+java.lang.String[]+||+用户图标+
+|+attrs+|+Map+||
+|+user+|+User+||
+|+user.id+|+int+|+0+|
+|+user.name+|+String+||
+|+user.age+|+Integer+|+0+|
+|+user.createAt+|+Date+||
+|+user.Sex+|+String+||
+|+user.users+|+List+||
+|===
+
+
+== 5 PageController
+
+=== 5.1 Hello with ResponseBody
+[%hardbreaks]
+*********
+由于带有@ResponseBody，restdoc将解析该Endpoint
+<p>
+hhh
+\*********
+ *********
+hhhh
+*********
+<p>
+class ************** {
+<p>
+}
+
+[source,REQUEST ]
+----
+GET /page/hello HTTP/1.1
+
+----
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "content" : ""
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+id+|+long+|+0+|+编号+
+|+content+|+String+||+内容+
+|===
+
+
+=== 5.2 未知的多泛型的tuple 演示
+[source,REQUEST ]
+----
+GET /page/tuple HTTP/1.1
+
+----
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "?" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "birthday" : "",
+    "tags" : [ "" ],
+    "data" : [ ],
+    "icons" : [ "" ],
+    "attrs" : { },
+    "user" : {
+      "id" : 0,
+      "name" : "",
+      "age" : 0,
+      "createAt" : "",
+      "Sex" : "",
+      "users" : [ ]
+    }
+  },
+  "?1" : {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : "",
+    "users" : [ ]
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+?.id+|+Integer+|+0+|+编号+
+|+?.name+|+String+||+姓名+
+|+?.age+|+int+|+0+|+年龄+
+|+?.birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+?.tags+|+List+||+用户标签+
+|+?.data+|+List+||
+|+?.icons+|+java.lang.String[]+||+用户图标+
+|+?.attrs+|+Map+||
+|+?.user+|+User+||
+|+?.user.id+|+int+|+0+|
+|+?.user.name+|+String+||
+|+?.user.age+|+Integer+|+0+|
+|+?.user.createAt+|+Date+||
+|+?.user.Sex+|+String+||
+|+?.user.users+|+List+||
+|+?1.id+|+int+|+0+|
+|+?1.name+|+String+||
+|+?1.age+|+Integer+|+0+|
+|+?1.createAt+|+Date+||
+|+?1.Sex+|+String+||
+|+?1.users+|+List+||
+|===
+
+
+=== 5.3 多个RequestMethod
+[source,REQUEST ]
+----
+GET /page/multiMethod HTTP/1.1
+
+----
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : ""
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|===
+
+
+=== 5.4 multi
+[source,REQUEST ]
+----
+POST /page/multi HTTP/1.1
+Content-Type: application/json
+
+{
+  "code" : 0,
+  "msg" : "",
+  "data" : {
+    "wrapper" : "",
+    "data" : [ {
+      "id" : 0,
+      "name" : "",
+      "age" : 0,
+      "birthday" : "",
+      "tags" : [ "" ],
+      "data" : [ ],
+      "icons" : [ "" ],
+      "attrs" : { },
+      "user" : {
+        "id" : 0,
+        "name" : "",
+        "age" : 0,
+        "createAt" : "",
+        "Sex" : "",
+        "users" : [ ]
+      }
+    } ]
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|+data+|+Wrapper+||
+|+data.wrapper+|+String+||
+|+data.data+|+List+||
+|+data.data.[].id+|+Integer+|+0+|+编号+
+|+data.data.[].name+|+String+||+姓名+
+|+data.data.[].age+|+int+|+0+|+年龄+
+|+data.data.[].birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+data.data.[].tags+|+List+||+用户标签+
+|+data.data.[].data+|+List+||
+|+data.data.[].icons+|+java.lang.String[]+||+用户图标+
+|+data.data.[].attrs+|+Map+||
+|+data.data.[].user+|+User+||
+|+data.data.[].user.id+|+int+|+0+|
+|+data.data.[].user.name+|+String+||
+|+data.data.[].user.age+|+Integer+|+0+|
+|+data.data.[].user.createAt+|+Date+||
+|+data.data.[].user.Sex+|+String+||
+|+data.data.[].user.users+|+List+||
+|===
+
+[source,RESPONSE ]
+----
+HTTP/1.1 200 OK
+
+{
+  "code" : 0,
+  "msg" : "",
+  "data" : {
+    "wrapper" : "",
+    "data" : {
+      "id" : 0,
+      "name" : "",
+      "age" : 0,
+      "birthday" : "",
+      "tags" : [ "" ],
+      "data" : [ ],
+      "icons" : [ "" ],
+      "attrs" : { },
+      "user" : {
+        "id" : 0,
+        "name" : "",
+        "age" : 0,
+        "createAt" : "",
+        "Sex" : "",
+        "users" : [ ]
+      }
+    }
+  }
+}
+----
+
+[options="header"]
+|===
+|+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
+|+data+|+Wrapper+||
+|+data.wrapper+|+String+||
+|+data.data+|+UserDTO+||
+|+data.data.id+|+Integer+|+0+|+编号+
+|+data.data.name+|+String+||+姓名+
+|+data.data.age+|+int+|+0+|+年龄+
+|+data.data.birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+data.data.tags+|+List+||+用户标签+
+|+data.data.data+|+List+||
+|+data.data.icons+|+java.lang.String[]+||+用户图标+
+|+data.data.attrs+|+Map+||
+|+data.data.user+|+User+||
+|+data.data.user.id+|+int+|+0+|
+|+data.data.user.name+|+String+||
+|+data.data.user.age+|+Integer+|+0+|
+|+data.data.user.createAt+|+Date+||
+|+data.data.user.Sex+|+String+||
+|+data.data.user.users+|+List+||
+|===
+
+
+== 6 will be ignore
+
+=== 6.1 ignoreThis
+[source,REQUEST ]
+----
+GET /ignore HTTP/1.1
+
+----
+

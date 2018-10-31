@@ -1,8 +1,8 @@
 # 🐷 Apiggs - 非侵入的RestDoc文档生成工具
 
-![](https://img.shields.io/badge/language-java-yellow.svg)
-![](https://img.shields.io/badge/build-processing-green.svg)
+![](https://img.shields.io/badge/Language-Java-yellow.svg)
 [ ![Download](https://api.bintray.com/packages/apiggs/maven/apiggs/images/download.svg) ](https://bintray.com/apiggs/maven/apiggs/_latestVersion)
+[![Gitter](https://img.shields.io/badge/Chat-Gitter-ed1965.svg)](https://gitter.im/apiggs-chat/Lobby)
 
 ### 前言
 程序员一直以来都有一个烦恼，只想写代码，不想写文档。代码就表达了我的思想和灵魂。

@@ -2,14 +2,11 @@ package com.github.apiggs.example;
 
 import com.github.apiggs.Apiggs;
 import com.github.apiggs.Environment;
+import com.github.apiggs.example.diff.MatchUtil;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLOutput;
-import java.util.List;
 
 /**
  * @title Apiggs示例文档
@@ -24,15 +21,19 @@ public class ApiggsTest {
     @Test
     public void testApiggs() {
         Environment env = new Environment()
-                .source(Paths.get("src","test","java"))
+                .source(Paths.get("src", "test", "java"))
                 .id("example")
                 .title("示例接口文档")
                 .description("示例接口文档，使用默认模板");
         Apiggs apiggs = new Apiggs(env);
         apiggs.lookup().build();
 
+        Path buildAdoc = env.getOutPath().resolve("example.adoc");
+        Path template = env.getOutPath().resolve("../../src/test/resources/example.adoc");
 
-
+        MatchUtil.compare(template,buildAdoc);
     }
+
+
 
 }
