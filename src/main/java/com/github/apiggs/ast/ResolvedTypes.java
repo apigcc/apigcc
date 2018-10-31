@@ -137,19 +137,33 @@ public class ResolvedTypes {
         if (type instanceof ClassOrInterfaceType) {
             ClassOrInterfaceType classType = (ClassOrInterfaceType) type;
             if (classType.getTypeArguments().isPresent()) {
-                ObjectNode node = ObjectMappers.instance().createObjectNode();
+                List<ResolvedTypes> types = new ArrayList<>();
                 for (int i = 0; i < classType.getTypeArguments().get().size(); i++) {
                     Type typeArgument = classType.getTypeArguments().get().get(i);
                     ResolvedTypes argumentResolved = of(typeArgument);
                     if (argumentResolved.resolved) {
-                        String field = (i == 0) ? "?" : ("?" + i);
-                        argumentResolved.prefix(field+".");
-                        node.putPOJO(field, argumentResolved.getValue());
-                        typeArgumentResolvedTypes.cells.addAll(argumentResolved.cells);
+                        types.add(argumentResolved);
                     }
                 }
-                typeArgumentResolvedTypes.value = node;
-                typeArgumentResolvedTypes.resolved = true;
+
+                if(types.size()==1){
+                    ResolvedTypes resolvedTypes = types.get(0);
+                    typeArgumentResolvedTypes.value = resolvedTypes.getValue();
+                    typeArgumentResolvedTypes.resolved = true;
+                    typeArgumentResolvedTypes.cells.addAll(resolvedTypes.cells);
+                }else{
+                    ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
+                    int i = 0;
+                    for (ResolvedTypes resolvedTypes : types) {
+                        String field = "?" + i++;
+                        resolvedTypes.prefix(field+".");
+                        arrayNode.addPOJO(resolvedTypes.getValue());
+                        typeArgumentResolvedTypes.resolved = true;
+                        typeArgumentResolvedTypes.cells.addAll(resolvedTypes.cells);
+                    }
+                    typeArgumentResolvedTypes.value = arrayNode;
+                }
+
             }
         }
         return typeArgumentResolvedTypes;
@@ -291,20 +305,27 @@ public class ResolvedTypes {
             if(next.isStatic() || typeDeclaration.equals(next.getType())){
                 continue;
             }
-            String name = next.getName();
-
-            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
-            resolvedTypes.prefix(name + ".");
             //处理类字段的默认值
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
-                Fields.getInitializer(field).ifPresent(value -> resolvedTypes.value = value);
-                name = Fields.getName(field);
+                if(Comments.isIgnore(field.getWrappedNode())){
+                    continue;
+                }
+                String name = Fields.getName(field);
+
+                String comment = Comments.getCommentAsString(field);
+
+                ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
+                resolvedTypes.prefix(name + ".");
+
+                Object value = Fields.getInitializer(field);
+                if(value!=null){
+                    resolvedTypes.value = value;
+                }
+
+                put(name, resolvedTypes, comment);
             }
 
-            String comment = Comments.getCommentAsString(next);
-
-            put(name, resolvedTypes, comment);
         }
     }
 

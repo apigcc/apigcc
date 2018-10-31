@@ -1,13 +1,17 @@
 package com.github.apiggs.ast;
 
+import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Cell;
+import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.resolution.declarations.ResolvedEnumConstantDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedEnumDeclaration;
+import com.google.common.base.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Enums {
@@ -23,9 +27,17 @@ public class Enums {
         return sb.toString();
     }
 
-    public static List<Cell> toDetails(EnumDeclaration declaration){
-        List<Cell> list = new ArrayList<>();
-        list.addAll(declaration.asEnumDeclaration().getEntries().stream().map(constant -> {
+    public static Appendix toDetails(EnumDeclaration declaration){
+        Appendix appendix = new Appendix();
+        appendix.setName(declaration.getNameAsString());
+
+        Comments.of(declaration.getComment()).ifPresent(comments -> {
+            if(!Strings.isNullOrEmpty(comments.content)){
+                appendix.setName(comments.content);
+            }
+        });
+
+        for (EnumConstantDeclaration constant : declaration.getEntries()) {
             Cell cell = new Cell();
             cell.setName(constant.getNameAsString());
             for (Expression expression : constant.getArguments()) {
@@ -38,9 +50,9 @@ public class Enums {
                 }
                 cell.setDescription(stringBuilder.toString());
             }
-            return cell;
-        }).collect(Collectors.toList()));
-        return list;
+            appendix.getCells().add(cell);
+        }
+        return appendix;
     }
 
 }

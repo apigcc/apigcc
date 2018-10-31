@@ -14,19 +14,9 @@
 /mini路径下的接口为小程序专用
 
 
-== 2 响应码
-[options="header"]
-|===
-|+NAME+|+VALUE+|+DESCRIPTION+
-|+OK+|+0+|+ok+
-|+ERROR+|+-1+|+error+
-|+NoAuth+|+1+|+no auth+
-|===
+== 2 欢迎使用Apiggs
 
-
-== 3 欢迎使用Apiggs
-
-=== 3.1 示例接口
+=== 2.1 示例接口
 [source,REQUEST ]
 ----
 GET /greeting?name=apiggs HTTP/1.1
@@ -57,13 +47,13 @@ HTTP/1.1 200 OK
 |===
 
 
-== 4 用户模块（标题）
+== 3 用户模块（标题）
 [%hardbreaks]
 用户示例模块文字描述（详情）
 支持多行文字
 
 
-=== 4.1 用户详情信息
+=== 3.1 用户详情信息
 [%hardbreaks]
 主动根据id获取用户的信息
 
@@ -112,7 +102,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.2 用户详情信息（根据email或电话号码）
+=== 3.2 用户详情信息（根据email或电话号码）
 [%hardbreaks]
 多路径适配
 
@@ -163,7 +153,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.3 用户信息新增
+=== 3.3 用户信息新增
 [source,REQUEST ]
 ----
 POST /users HTTP/1.1
@@ -227,7 +217,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.4 用户信息更新
+=== 3.4 用户信息更新
 [source,REQUEST ]
 ----
 PATCH /users HTTP/1.1
@@ -291,7 +281,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.5 用户列表信息查询
+=== 3.5 用户列表信息查询
 [%hardbreaks]
 默认展示GET方法查询
 返回集合类的结果
@@ -329,7 +319,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.6 用户列表信息搜索
+=== 3.6 用户列表信息搜索
 [%hardbreaks]
 POST搜索时，请求参数将放在请求体中
 
@@ -371,7 +361,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.7 用户信息删除
+=== 3.7 用户信息删除
 [%hardbreaks]
 ResponseEntity、Model以及未知类型将忽略
 
@@ -392,22 +382,20 @@ DELETE /users/{id} HTTP/1.1
 HTTP/1.1 200 OK
 
 {
-  "?" : {
-    "code" : 0,
-    "msg" : ""
-  }
+  "code" : 0,
+  "msg" : ""
 }
 ----
 
 [options="header"]
 |===
 |+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
-|+?.code+|+int+|+0+|+返回码+
-|+?.msg+|+String+||+返回信息+
+|+code+|+int+|+0+|+返回码+
+|+msg+|+String+||+返回信息+
 |===
 
 
-=== 4.8 用户禁用
+=== 3.8 用户禁用
 [%hardbreaks]
 某些项目使用自定义的ArgumentResolver，让spring自动注入一些信息
 restdoc在解析时，可通过env.ignoreTypes("UserDtails")来忽略这些
@@ -436,7 +424,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.9 查询角色下的用户总数
+=== 3.9 查询角色下的用户总数
 [source,REQUEST ]
 ----
 GET /users/role?role= HTTP/1.1
@@ -464,7 +452,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 4.10 批量上传用户信息
+=== 3.10 批量上传用户信息
 [source,REQUEST ]
 ----
 POST /users/batch HTTP/1.1
@@ -555,9 +543,9 @@ HTTP/1.1 200 OK
 |===
 
 
-== 5 PageController
+== 4 PageController
 
-=== 5.1 Hello with ResponseBody
+=== 4.1 Hello with ResponseBody
 [%hardbreaks]
 *********
 由于带有@ResponseBody，restdoc将解析该Endpoint
@@ -596,7 +584,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 5.2 未知的多泛型的tuple 演示
+=== 4.2 未知的多泛型的tuple 演示
 [source,REQUEST ]
 ----
 GET /page/tuple HTTP/1.1
@@ -607,26 +595,16 @@ GET /page/tuple HTTP/1.1
 ----
 HTTP/1.1 200 OK
 
-{
-  "?" : {
-    "id" : 0,
-    "name" : "",
-    "age" : 0,
-    "birthday" : "",
-    "tags" : [ "" ],
-    "data" : [ ],
-    "icons" : [ "" ],
-    "attrs" : { },
-    "user" : {
-      "id" : 0,
-      "name" : "",
-      "age" : 0,
-      "createAt" : "",
-      "Sex" : "",
-      "users" : [ ]
-    }
-  },
-  "?1" : {
+[ {
+  "id" : 0,
+  "name" : "",
+  "age" : 0,
+  "birthday" : "",
+  "tags" : [ "" ],
+  "data" : [ ],
+  "icons" : [ "" ],
+  "attrs" : { },
+  "user" : {
     "id" : 0,
     "name" : "",
     "age" : 0,
@@ -634,27 +612,34 @@ HTTP/1.1 200 OK
     "Sex" : "",
     "users" : [ ]
   }
-}
+}, {
+  "id" : 0,
+  "name" : "",
+  "age" : 0,
+  "createAt" : "",
+  "Sex" : "",
+  "users" : [ ]
+} ]
 ----
 
 [options="header"]
 |===
 |+NAME+|+TYPE+|+DEFAULT+|+DESCRIPTION+
-|+?.id+|+Integer+|+0+|+编号+
-|+?.name+|+String+||+姓名+
-|+?.age+|+int+|+0+|+年龄+
-|+?.birthday+|+Date+||+生日，还是推荐使用javadoc+
-|+?.tags+|+List+||+用户标签+
-|+?.data+|+List+||
-|+?.icons+|+java.lang.String[]+||+用户图标+
-|+?.attrs+|+Map+||
-|+?.user+|+User+||
-|+?.user.id+|+int+|+0+|
-|+?.user.name+|+String+||
-|+?.user.age+|+Integer+|+0+|
-|+?.user.createAt+|+Date+||
-|+?.user.Sex+|+String+||
-|+?.user.users+|+List+||
+|+?0.id+|+Integer+|+0+|+编号+
+|+?0.name+|+String+||+姓名+
+|+?0.age+|+int+|+0+|+年龄+
+|+?0.birthday+|+Date+||+生日，还是推荐使用javadoc+
+|+?0.tags+|+List+||+用户标签+
+|+?0.data+|+List+||
+|+?0.icons+|+java.lang.String[]+||+用户图标+
+|+?0.attrs+|+Map+||
+|+?0.user+|+User+||
+|+?0.user.id+|+int+|+0+|
+|+?0.user.name+|+String+||
+|+?0.user.age+|+Integer+|+0+|
+|+?0.user.createAt+|+Date+||
+|+?0.user.Sex+|+String+||
+|+?0.user.users+|+List+||
 |+?1.id+|+int+|+0+|
 |+?1.name+|+String+||
 |+?1.age+|+Integer+|+0+|
@@ -664,7 +649,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 5.3 多个RequestMethod
+=== 4.3 多个RequestMethod
 [source,REQUEST ]
 ----
 GET /page/multiMethod HTTP/1.1
@@ -689,7 +674,7 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 5.4 multi
+=== 4.4 multi
 [source,REQUEST ]
 ----
 POST /page/multi HTTP/1.1
@@ -804,12 +789,30 @@ HTTP/1.1 200 OK
 |===
 
 
-== 6 will be ignore
+== 5 附录
 
-=== 6.1 ignoreThis
-[source,REQUEST ]
-----
-GET /ignore HTTP/1.1
+=== 5.1 StaticFinalCode
+[options=""]
+|===
+|+SUCCESS+|+1+|+成功+
+|+ERROR+|+-1+|+失败+
+|===
 
-----
+
+=== 5.2 用户角色
+[options=""]
+|===
+|+ADMIN+|+管理员+|
+|+USER+|+用户+|
+|+VIP+|+会员+|
+|===
+
+
+=== 5.3 Code
+[options=""]
+|===
+|+OK+|+0+|+ok+
+|+ERROR+|+-1+|+error+
+|+NoAuth+|+1+|+no auth+
+|===
 

@@ -1,8 +1,9 @@
 # 🐷 Apiggs - 非侵入的RestDoc文档生成工具
 
 ![](https://img.shields.io/badge/Language-Java-yellow.svg)
-[ ![Download](https://api.bintray.com/packages/apiggs/maven/apiggs/images/download.svg) ](https://bintray.com/apiggs/maven/apiggs/_latestVersion)
 [![Gitter](https://img.shields.io/badge/Chat-Gitter-ed1965.svg)](https://gitter.im/apiggs-chat/Lobby)
+[![Download](https://api.bintray.com/packages/apiggs/maven/apiggs/images/download.svg)](https://bintray.com/apiggs/maven/apiggs/_latestVersion)
+
 
 ### 前言
 程序员一直以来都有一个烦恼，只想写代码，不想写文档。代码就表达了我的思想和灵魂。
@@ -98,6 +99,8 @@ compile
 * 支持字段别名
 * 外部依赖jar支持目录
 * 修复插件不退出，内容重复创建的Bug
+* code修改为附录，增加enum
+* @ignore 作用于controller、method、field
 
 #### 1.3
 * 自实现asciidoc构建器，移除对swagger2markup:markup-document-builder的依赖

@@ -49,7 +49,6 @@ public class UserController extends BaseController {
      *
      * @param user 用户信息
      * @return
-     * @ignore user.id 忽略UserDTO中的id
      */
     @PostMapping
     public ResultData add(@RequestBody UserDTO user) {

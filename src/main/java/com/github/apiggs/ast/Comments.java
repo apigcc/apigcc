@@ -3,6 +3,7 @@ package com.github.apiggs.ast;
 import com.github.apiggs.ast.extend.DocTag;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.Comment;
@@ -159,11 +160,8 @@ public class Comments {
         }
     }
 
-    public static String getCommentAsString(ResolvedFieldDeclaration declaration) {
-        if (!(declaration instanceof JavaParserFieldDeclaration)) {
-            return null;
-        }
-        Optional<Comment> optional = ((JavaParserFieldDeclaration) declaration).getWrappedNode().getComment();
+    public static String getCommentAsString(JavaParserFieldDeclaration declaration) {
+        Optional<Comment> optional = declaration.getWrappedNode().getComment();
         return of(optional).map(comments -> comments.content).orElse(null);
     }
 
@@ -176,6 +174,24 @@ public class Comments {
             }
         }
         return null;
+    }
+
+    /**
+     * 判断该节点是否应该忽略
+     * 是否在注释中有 @ignore 标签
+     * @param node
+     * @return
+     */
+    public static boolean isIgnore(Node node){
+        Optional<Comments> optional = of(node.getComment());
+        if(optional.isPresent()){
+            for (Tag tag : optional.get().tags) {
+                if(Objects.equals(DocTag.ignore.name(),tag.name)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

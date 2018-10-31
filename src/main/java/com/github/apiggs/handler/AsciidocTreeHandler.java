@@ -1,13 +1,12 @@
 package com.github.apiggs.handler;
 
 import com.github.apiggs.Environment;
-import com.github.apiggs.handler.postman.schema.Method;
 import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
 import com.github.apiggs.http.HttpResponse;
 import com.github.apiggs.markup.MarkupBuilder;
 import com.github.apiggs.markup.asciidoc.AsciiDoc;
-import com.github.apiggs.markup.asciidoc.Color;
+import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
@@ -32,49 +31,59 @@ public class AsciidocTreeHandler implements TreeHandler {
 
     @Override
     public void handle(Tree tree, Environment env) {
-        builder.header(tree.getName(),AsciiDoc.DOCTYPE_BOOK,AsciiDoc.TOC_LEFT);
-        if (Objects.nonNull(tree.getVersion())){
-            builder.paragraph("version:"+tree.getVersion());
+        builder.header(tree.getName(), AsciiDoc.DOCTYPE_BOOK, AsciiDoc.TOC_LEFT);
+        if (Objects.nonNull(tree.getVersion())) {
+            builder.paragraph("version:" + tree.getVersion());
         }
-        if(Objects.nonNull(tree.getDescription())){
+        if (Objects.nonNull(tree.getDescription())) {
             builder.paragraph(tree.getDescription());
         }
 
         int section = 1;
 
-        if(!Strings.isNullOrEmpty(tree.getReadme())){
+        if (!Strings.isNullOrEmpty(tree.getReadme())) {
             builder.title(1, section + " 文档说明");
             builder.paragraph(tree.getReadme());
-            section ++;
-        }
-        if(!tree.getCodes().isEmpty()){
-            builder.title(1, section + " 响应码");
-            nvd(tree.getCodes());
             section++;
         }
 
         for (Group group : tree.getGroups()) {
-            buildGroup(group,section++);
+            buildGroup(group, section++);
         }
 
-        try{
-            Path adoc = env.getOutPath().resolve(env.getId()+AsciiDoc.EXTENSION);
+        if (!tree.getAppendices().isEmpty()) {
+            builder.title(1, section + " 附录");
+
+            for (int i = 0; i < tree.getAppendices().size(); i++) {
+                Appendix appendix = tree.getAppendices().get(i);
+                if (!appendix.getCells().isEmpty()) {
+                    builder.title(2, section + "." + (i + 1) + " " + appendix.getName());
+
+                    nvd(appendix.getCells());
+                }
+            }
+
+            section++;
+        }
+
+        try {
+            Path adoc = env.getOutPath().resolve(env.getId() + AsciiDoc.EXTENSION);
             write(adoc, builder.getContent(), StandardCharsets.UTF_8);
-            log.info("Build {}",adoc);
-        }finally {
+            log.info("Build {}", adoc);
+        } finally {
             builder.clean();
         }
     }
 
 
     private void buildGroup(Group group, int num) {
-        builder.title(1,  num + " " + group.getName());
+        builder.title(1, num + " " + group.getName());
         if (Objects.nonNull(group.getDescription())) {
             builder.paragraph(group.getDescription());
         }
         for (int i = 0; i < group.getNodes().size(); i++) {
             HttpMessage httpMessage = group.getNodes().get(i);
-            buildHttpMessage(httpMessage,  num + ".", i + 1);
+            buildHttpMessage(httpMessage, num + ".", i + 1);
         }
     }
 
@@ -94,8 +103,8 @@ public class AsciidocTreeHandler implements TreeHandler {
                         + " "
                         + message.getVersion());
             }
-            request.getHeaders().forEach((k,v) -> builder.textLine(k+": "+v));
-            if(request.hasBody()){
+            request.getHeaders().forEach((k, v) -> builder.textLine(k + ": " + v));
+            if (request.hasBody()) {
                 builder.br();
                 builder.text(request.bodyString());
             }
@@ -106,9 +115,9 @@ public class AsciidocTreeHandler implements TreeHandler {
         HttpResponse response = message.getResponse();
         if (!response.isEmpty()) {
             builder.listing(builder -> {
-                builder.textLine(message.getVersion()+" " + response.getStatus());
-                response.getHeaders().forEach((k,v) -> builder.textLine(k + ": "+v));
-                if(response.hasBody()){
+                builder.textLine(message.getVersion() + " " + response.getStatus());
+                response.getHeaders().forEach((k, v) -> builder.textLine(k + ": " + v));
+                if (response.hasBody()) {
                     builder.br();
                     builder.text(response.bodyString());
                 }
@@ -118,7 +127,7 @@ public class AsciidocTreeHandler implements TreeHandler {
 
     }
 
-    private void ntdd(List<Cell> cells){
+    private void ntdd(List<Cell> cells) {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
             responseTable.add(Arrays.asList("NAME", "TYPE", "DEFAULT", "DESCRIPTION"));
@@ -127,12 +136,11 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
     }
 
-    private void nvd(List<Cell> cells){
+    private void nvd(List<Cell> cells) {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
-            responseTable.add(Arrays.asList("NAME", "VALUE", "DESCRIPTION"));
             cells.forEach(parameter -> responseTable.add(parameter.nameValueList()));
-            builder.table(responseTable);
+            builder.table(responseTable,false,false);
         }
     }
 

@@ -37,7 +37,7 @@ public class SpringVisitor extends NodeVisitor {
      */
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Node arg) {
-        if (arg != null && arg instanceof Tree) {
+        if (!Comments.isIgnore(n) && arg instanceof Tree) {
             Tree tree = (Tree) arg;
             if (Controllers.accept(n.getAnnotations())) {
                 String name = Classes.getNameInScope(n);
@@ -80,7 +80,7 @@ public class SpringVisitor extends NodeVisitor {
      */
     @Override
     public void visit(MethodDeclaration n, Node arg) {
-        if (arg != null && arg instanceof Group && RequestMappings.accept(n.getAnnotations())) {
+        if (!Comments.isIgnore(n) && arg instanceof Group && RequestMappings.accept(n.getAnnotations())) {
             Group group = (Group) arg;
             if(group.isRest() || RequestMappings.isRequestBody(n)){
                 //请求方法处理成HttpMessage

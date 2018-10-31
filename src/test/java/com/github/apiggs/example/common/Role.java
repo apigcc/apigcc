@@ -2,6 +2,7 @@ package com.github.apiggs.example.common;
 
 /**
  * 用户角色
+ * @code
  */
 public enum Role {
 

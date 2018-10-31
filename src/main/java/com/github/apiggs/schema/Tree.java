@@ -2,6 +2,7 @@ package com.github.apiggs.schema;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Rest api Tree
@@ -20,7 +21,7 @@ public class Tree extends Node {
     String version;
     List<Group> groups = new ArrayList<>();
     String readme;
-    List<Cell> codes = new ArrayList<>();
+    List<Appendix> appendices = new ArrayList<>();
 
     public String getRealm() {
         return realm;
@@ -42,8 +43,8 @@ public class Tree extends Node {
         return groups;
     }
 
-    public List<Cell> getCodes() {
-        return codes;
+    public List<Appendix> getAppendices() {
+        return appendices;
     }
 
     public String getReadme() {

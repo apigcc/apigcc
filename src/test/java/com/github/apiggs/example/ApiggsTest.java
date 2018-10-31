@@ -22,6 +22,7 @@ public class ApiggsTest {
     public void testApiggs() {
         Environment env = new Environment()
                 .source(Paths.get("src", "test", "java"))
+                .ignore("ResponseEntity")
                 .id("example")
                 .title("示例接口文档")
                 .description("示例接口文档，使用默认模板");
@@ -29,7 +30,7 @@ public class ApiggsTest {
         apiggs.lookup().build();
 
         Path buildAdoc = env.getOutPath().resolve("example.adoc");
-        Path template = env.getOutPath().resolve("../../src/test/resources/example.adoc");
+        Path template = env.getOutPath().resolve("../../src/test/resources/template.adoc");
 
         MatchUtil.compare(template,buildAdoc);
     }
