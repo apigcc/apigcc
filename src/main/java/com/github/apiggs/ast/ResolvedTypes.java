@@ -15,6 +15,7 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedTypeVariable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+import com.github.javaparser.symbolsolver.javassistmodel.JavassistFieldDeclaration;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.utils.Pair;
 
@@ -305,15 +306,16 @@ public class ResolvedTypes {
             if(next.isStatic() || typeDeclaration.equals(next.getType())){
                 continue;
             }
+            String description = null;
+            String name = Fields.getName(next);
             //处理类字段的默认值
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
                 if(Comments.isIgnore(field.getWrappedNode())){
                     continue;
                 }
-                String name = Fields.getName(field);
 
-                String comment = Comments.getCommentAsString(field);
+                description = Comments.getCommentAsString(field);
 
                 ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
                 resolvedTypes.prefix(name + ".");
@@ -322,9 +324,12 @@ public class ResolvedTypes {
                 if(value!=null){
                     resolvedTypes.value = value;
                 }
-
-                put(name, resolvedTypes, comment);
             }
+
+            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
+            resolvedTypes.prefix(name + ".");
+
+            put(name, resolvedTypes, description);
 
         }
     }
@@ -360,7 +365,9 @@ public class ResolvedTypes {
             if (other.primitive) {
                 cell.setValue(String.valueOf(other.getValue()));
             }
-            cell.setDescription(description);
+            if(description!=null){
+                cell.setDescription(description);
+            }
             cells.add(cell);
             cells.addAll(other.cells);
         }

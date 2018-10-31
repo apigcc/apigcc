@@ -33,27 +33,31 @@ public class Fields {
     }
 
 
-    public static String getName(JavaParserFieldDeclaration field) {
-        FieldDeclaration declaration = field.getWrappedNode();
-        if(declaration.getAnnotationByName(ANNOTATION_ALIAS_JACKSON).isPresent()){
-            Object value = Annotations.getAttr(declaration.getAnnotationByName(ANNOTATION_ALIAS_JACKSON),"value");
-            if(value!=null){
-                return String.valueOf(value);
+    public static String getName(ResolvedFieldDeclaration n) {
+        if(n instanceof JavaParserFieldDeclaration){
+            JavaParserFieldDeclaration field = (JavaParserFieldDeclaration)n;
+            FieldDeclaration declaration = field.getWrappedNode();
+            if(declaration.getAnnotationByName(ANNOTATION_ALIAS_JACKSON).isPresent()){
+                Object value = Annotations.getAttr(declaration.getAnnotationByName(ANNOTATION_ALIAS_JACKSON),"value");
+                if(value!=null){
+                    return String.valueOf(value);
+                }
             }
-        }
-        if(declaration.getAnnotationByName(ANNOTATION_ALIAS_GSON).isPresent()){
-            Object value = Annotations.getAttr(declaration.getAnnotationByName(ANNOTATION_ALIAS_GSON),"value");
-            if(value!=null){
-                return String.valueOf(value);
+            if(declaration.getAnnotationByName(ANNOTATION_ALIAS_GSON).isPresent()){
+                Object value = Annotations.getAttr(declaration.getAnnotationByName(ANNOTATION_ALIAS_GSON),"value");
+                if(value!=null){
+                    return String.valueOf(value);
+                }
             }
-        }
-        if(declaration.getAnnotationByName(ANNOTATION_ALIAS_FASTJSON).isPresent()){
-            Object value = Annotations.getAttr(declaration.getAnnotationByName(ANNOTATION_ALIAS_FASTJSON),"name");
-            if(value!=null){
-                return String.valueOf(value);
+            if(declaration.getAnnotationByName(ANNOTATION_ALIAS_FASTJSON).isPresent()){
+                Object value = Annotations.getAttr(declaration.getAnnotationByName(ANNOTATION_ALIAS_FASTJSON),"name");
+                if(value!=null){
+                    return String.valueOf(value);
+                }
             }
+
         }
-        return field.getName();
+        return n.getName();
     }
 
     public static Appendix getConstants(ClassOrInterfaceDeclaration declaration) {
