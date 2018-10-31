@@ -309,6 +309,10 @@ public class ResolvedTypes {
             String description = null;
             String name = Fields.getName(next);
             //处理类字段的默认值
+
+            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
+            resolvedTypes.prefix(name + ".");
+
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
                 if(Comments.isIgnore(field.getWrappedNode())){
@@ -317,17 +321,11 @@ public class ResolvedTypes {
 
                 description = Comments.getCommentAsString(field);
 
-                ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
-                resolvedTypes.prefix(name + ".");
-
                 Object value = Fields.getInitializer(field);
                 if(value!=null){
                     resolvedTypes.value = value;
                 }
             }
-
-            ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
-            resolvedTypes.prefix(name + ".");
 
             put(name, resolvedTypes, description);
 
