@@ -91,32 +91,3 @@ compile
 ![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/WX20181025-202423.png)
 
 想了解更多，请查看[Wiki](https://github.com/apiggs/apiggs/wiki)
-
-### Versions
-
-#### 1.5
-
-* 支持字段别名
-* 外部依赖jar支持目录
-* 修复插件不退出，内容重复创建的Bug
-* code修改为附录，增加enum
-* @ignore 作用于controller、method、field
-
-#### 1.3
-* 自实现asciidoc构建器，移除对swagger2markup:markup-document-builder的依赖
-* 实现自己的日志工具，移除对slf4j的依赖
-* 支持@readme
-* 支持@code
-
-#### 1.1
-* 增加注释Tag @return的支持，只支持类的全限定名
-* 插件支持子项目解析
-
-#### 1.0
-* 解析spring mvc源代码，构建Restful Api树
-* 生成postman v2.1格式的json文件
-* 生成Asciidoc文件
-* 渲染Asciidoc文件，生成html文件
-* 支持泛型的参数
-* 自定义注释Tag @index，定义文档顺序
-
