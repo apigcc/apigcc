@@ -1,10 +1,15 @@
 package com.github.apiggs.example.diff;
 
+import com.google.common.base.Charsets;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -12,54 +17,59 @@ import java.util.regex.Pattern;
 
 public class MatchUtil {
 
-    public static void compare(Path template, Path build){
-        compare(readFile(template),readFile(build));
+    public Path templateHtml;
+    public Path resultHtml;
+
+    public MatchUtil(Path templateHtml, Path resultHtml) {
+        this.templateHtml = templateHtml;
+        this.resultHtml = resultHtml;
     }
-    public static void compare(String templateText, String buildText){
+
+    public void compare(Path template, Path build) {
+        compare(readFile(template), readFile(build));
+    }
+
+    public void compare(String templateText, String buildText) {
         MatchPatcher matchPatcher = new MatchPatcher();
         matchPatcher.Patch_Margin = 20;
-        LinkedList<MatchPatcher.Diff> diffs = matchPatcher.diff_main(templateText,buildText, true);
+        LinkedList<MatchPatcher.Diff> diffs = matchPatcher.diff_main(templateText, buildText, true);
         boolean changed = hasChange(diffs);
         if(changed){
-            StringBuilder msg = new StringBuilder();
-            matchPatcher.diff_cleanupSemantic(diffs);
-            LinkedList<MatchPatcher.Patch> patches = matchPatcher.patch_make(templateText, diffs);
-            patches.forEach(patch->{
-                msg.append("----------------------").append("\r\n");
-                patch.diffs.forEach(diff -> {
-                    switch (diff.operation) {
-                        case DELETE:
-                            msg.append("-("+br(diff.text)+")");
-                            break;
-                        case INSERT:
-                            msg.append("+("+br(diff.text)+")");
-                            break;
-                        case EQUAL:
-                            msg.append(br(diff.text));
-                            break;
-                    }
-                });
-                msg.append("\r\n");
-
-            });
-            System.err.print(msg.toString());
+            rederHtml(matchPatcher.diff_prettyHtml(diffs));
         }
-
         Assert.assertFalse(changed);
         System.out.println("BUILD SUCCESS");
     }
 
-    private static boolean hasChange(LinkedList<MatchPatcher.Diff> diffs){
+    private void rederHtml(String results) {
+        String[] lines = br(results).replaceAll("<span>|</span>","").split("<br>");
+        String html = readFile(templateHtml);
+        html = html.replace("${content}", lines(lines));
+        writeFile(resultHtml, html, Charsets.UTF_8);
+        System.out.println("see result at " + resultHtml);
+    }
+
+    private String lines(String[] lines) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            stringBuilder.append("<tr><td class=\"line-numbers\">").append(i)
+                    .append("</td><td>")
+                    .append(lines[i]).append("</td></tr>");
+        }
+        return stringBuilder.toString();
+    }
+
+    private static boolean hasChange(LinkedList<MatchPatcher.Diff> diffs) {
         for (MatchPatcher.Diff diff : diffs) {
-            if(!diff.operation.equals(MatchPatcher.Operation.EQUAL)){
+            if (!diff.operation.equals(MatchPatcher.Operation.EQUAL)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static String br(String text){
-        return text.replaceAll("¶","\r\n");
+    private static String br(String text) {
+        return text.replaceAll("&para;", " ");
     }
 
 
@@ -74,18 +84,34 @@ public class MatchUtil {
         // Read a file from disk and return the text contents.
         StringBuilder sb = new StringBuilder();
         try (FileReader input = new FileReader(path.toFile());
-            BufferedReader bufRead = new BufferedReader(input)){
+             BufferedReader bufRead = new BufferedReader(input)) {
             String line = bufRead.readLine();
             while (line != null) {
                 sb.append(line).append('\n');
                 line = bufRead.readLine();
             }
-        }catch (Exception e){
-            throw new IllegalArgumentException(e.getMessage(),e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
         return sb.toString();
     }
 
+    public void writeFile(Path file, String content, Charset charset, OpenOption... openOptions) {
+        if (file.getParent() != null) {
+            try {
+                Files.createDirectories(file.getParent());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed create directory", e);
+            }
+        }
+
+        try (BufferedWriter writer = Files.newBufferedWriter(file, charset, openOptions)) {
+            writer.write(content);
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write file", e);
+        }
+    }
 
     public static int lineNumber(String text) {
         Matcher m = Pattern.compile("(\r\n)|(\r)|(\n)").matcher(text);
@@ -98,45 +124,6 @@ public class MatchUtil {
 
     public static int lineNumber(String text, int index) {
         return lineNumber(text.substring(0, index));
-    }
-
-    public static int previousLine(String text, int index, int margin) {
-        if (index < text.length() && margin > 0) {
-            for (int i = index; i >= 0; i--) {
-                if (i == 0) {
-                    return i;
-                }
-                char c = text.charAt(i);
-                if (('\r' == c && '\n' != text.charAt(i + 1)) || '\n' == c) {
-                    margin--;
-                }
-                if (margin == 0) {
-                    if(i == index){
-                        return i;
-                    }
-                    return i+1;
-                }
-            }
-        }
-        return index;
-    }
-
-    public static int nextLine(String text, int index, int margin) {
-        if (index < text.length() && margin > 0) {
-            for (int i = index; i < text.length(); i++) {
-                if (i == text.length() - 1) {
-                    return i;
-                }
-                char c = text.charAt(i);
-                if (('\r' == c && '\n' != text.charAt(i + 1)) || '\n' == c) {
-                    margin--;
-                }
-                if (margin == 0) {
-                    return i;
-                }
-            }
-        }
-        return index;
     }
 
 }

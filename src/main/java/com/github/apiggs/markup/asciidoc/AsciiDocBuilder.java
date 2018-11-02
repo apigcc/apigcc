@@ -1,7 +1,7 @@
 package com.github.apiggs.markup.asciidoc;
 
 import com.github.apiggs.markup.MarkupBuilder;
-import com.github.apiggs.util.Validate;
+import com.github.apiggs.util.Assert;
 import com.google.common.base.Strings;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder header(String text, CharSequence... attrs) {
-        Validate.notBlank(text, "header must not be blank");
+        Assert.notBlank(text, "header must not be blank");
         content.append(HEADER);
         content.append(nobr(text.trim()));
         br();
@@ -33,8 +33,8 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder title(int level, String text) {
-        Validate.notBlank(text, "header must not be blank");
-        Validate.between(level, 1, MAX_TITLE, "title level can not be " + level);
+        Assert.notBlank(text, "header must not be blank");
+        Assert.between(level, 1, MAX_TITLE, "title level can not be " + level);
         br();
         content.append(Strings.repeat(TITLE.toString(), level + 1)).append(WHITESPACE)
                 .append(nobr(text.trim()));
@@ -44,7 +44,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder text(String text) {
-        if(Validate.isBlank(text)){
+        if(Assert.isBlank(text)){
             return this;
         }
         content.append(text.trim());
@@ -53,7 +53,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder textLine(String text) {
-        if(Validate.isBlank(text)){
+        if(Assert.isBlank(text)){
             return this;
         }
         text(nobr(text));
@@ -63,7 +63,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder paragraph(String text, CharSequence... attrs) {
-        if(Validate.isBlank(text)){
+        if(Assert.isBlank(text)){
             return this;
         }
         content.append(HARDBREAKS);
@@ -173,7 +173,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder list(String text, CharSequence flag) {
-        if (!Validate.isBlank(text)) {
+        if (!Assert.isBlank(text)) {
             content.append(flag).append(nobr(text));
         }
         return this;
@@ -181,7 +181,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder url(String text, String url) {
-        if (!Validate.isBlank(text) && !!Validate.isBlank(url)) {
+        if (!Assert.isBlank(text) && !!Assert.isBlank(url)) {
             content.append(url).append("[").append(nobr(text)).append("]");
             br();
         }
@@ -190,7 +190,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder image(String text, String url) {
-        if (!Validate.isBlank(text) && !Validate.isBlank(url)) {
+        if (!Assert.isBlank(text) && !Assert.isBlank(url)) {
             text("image:");
             url(text, url);
         }
@@ -242,7 +242,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
 
     public MarkupBuilder style(CharSequence flag, String text, CharSequence... textStyle) {
-        if (Validate.isBlank(text)) {
+        if (Assert.isBlank(text)) {
             return this;
         }
         if (Objects.nonNull(textStyle) && textStyle.length > 0) {
@@ -326,7 +326,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
     }
 
     String nobr(String content) {
-        if(Validate.isBlank(content)){
+        if(Assert.isBlank(content)){
            return content;
         }
         return content.replaceAll(BR.toString(),

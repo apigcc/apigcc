@@ -12,12 +12,12 @@ ext {
     DEVELOPER_NAME = 'ayz6uem'
     DEVELOPER_EMAIL = '360188606@qq.com'
 
-    IS_UPLOADING = project.getGradle().startParameter.taskNames.any{it.contains('bintrayUpload')}
+    IS_UPLOADING = project.getGradle().startParameter.taskNames.any { it.contains('bintrayUpload') }
 }
 
 buildscript {
     repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
     }
     dependencies {
         classpath 'com.novoda:bintray-release:0.8.1'
@@ -31,10 +31,10 @@ apply plugin: 'maven'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-[compileJava,compileTestJava,javadoc]*.options*.encoding = 'UTF-8'
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
 repositories {
-    maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
 }
 
 dependencies {
@@ -47,6 +47,7 @@ dependencies {
     testCompile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     testCompile group: 'com.alibaba', name: 'fastjson', version: '1.2.51'
     testCompile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+    testCompile fileTree(dir: "src/test/resources/lib/", includes: ["*.jar"])
 
 
 }

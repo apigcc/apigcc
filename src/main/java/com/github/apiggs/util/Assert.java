@@ -2,7 +2,7 @@ package com.github.apiggs.util;
 
 import com.google.common.base.Strings;
 
-public class Validate {
+public class Assert {
 
     public static boolean isBlank(String text) {
         return Strings.isNullOrEmpty(text) || Strings.isNullOrEmpty(text.trim());

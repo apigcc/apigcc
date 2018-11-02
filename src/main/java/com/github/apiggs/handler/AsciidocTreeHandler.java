@@ -7,7 +7,7 @@ import com.github.apiggs.http.HttpResponse;
 import com.github.apiggs.markup.MarkupBuilder;
 import com.github.apiggs.markup.asciidoc.AsciiDoc;
 import com.github.apiggs.schema.Appendix;
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.loging.Logger;
@@ -127,19 +127,19 @@ public class AsciidocTreeHandler implements TreeHandler {
 
     }
 
-    private void ntdd(List<Cell> cells) {
+    private void ntdd(List<Cell<String>> cells) {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
-            responseTable.add(Arrays.asList("NAME", "TYPE", "DEFAULT", "DESCRIPTION"));
-            cells.forEach(parameter -> responseTable.add(parameter.allList()));
+            responseTable.add(Arrays.asList("NAME", "TYPE", "CONDITION", "DEFAULT", "DESCRIPTION"));
+            cells.forEach(parameter -> responseTable.add(parameter.toList()));
             builder.table(responseTable);
         }
     }
 
-    private void nvd(List<Cell> cells) {
+    private void nvd(List<Cell<String>> cells) {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
-            cells.forEach(parameter -> responseTable.add(parameter.nameValueList()));
+            cells.forEach(parameter -> responseTable.add(parameter.toList()));
             builder.table(responseTable,false,false);
         }
     }

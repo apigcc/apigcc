@@ -2,6 +2,8 @@ package com.github.apiggs.example.advanced;
 
 import com.github.apiggs.example.common.*;
 import com.github.apiggs.example.hello.Greeting;
+import com.github.apiggs.model.Info;
+import com.github.apiggs.model.InfoQuery;
 import org.jruby.ir.Tuple;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -75,6 +77,20 @@ public class PageController extends BaseController {
     @PostMapping("/multi")
     @ResponseBody
     public ResultData<Wrapper<UserDTO>> multi(@RequestBody ResultData<Wrapper<List<UserDTO>>> resultData) {
+        return null;
+    }
+
+
+    /**
+     * 引用二方Jar
+     * 使用二方Jar的类时，代码解析器无法获取类上的注释，注解
+     * 只能获取属性的名称和类型
+     * @param infoQuery
+     * @return
+     */
+    @PostMapping("/jar")
+    @ResponseBody
+    public Info jar(@RequestBody InfoQuery infoQuery){
         return null;
     }
 }

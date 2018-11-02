@@ -1,4 +1,3 @@
-package com.github.apiggs.example.diff;
 /*
  * Diff Match and Patch
  * Copyright 2018 The diff-match-patch Authors.
@@ -16,14 +15,11 @@ package com.github.apiggs.example.diff;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.github.apiggs.example.diff;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1347,11 +1343,11 @@ public class MatchPatcher {
                     .replace(">", "&gt;").replace("\n", "&para;<br>");
             switch (aDiff.operation) {
                 case INSERT:
-                    html.append("<ins style=\"background:#e6ffe6;\">").append(text)
+                    html.append("<ins>").append(text)
                             .append("</ins>");
                     break;
                 case DELETE:
-                    html.append("<del style=\"background:#ffe6e6;\">").append(text)
+                    html.append("<del>").append(text)
                             .append("</del>");
                     break;
                 case EQUAL:

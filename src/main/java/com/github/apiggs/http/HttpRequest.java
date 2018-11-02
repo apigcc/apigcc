@@ -1,7 +1,7 @@
 package com.github.apiggs.http;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 import com.github.apiggs.util.ObjectMappers;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class HttpRequest {
 
     Object body;
 
-    List<Cell> cells = new ArrayList<>();
+    List<Cell<String>> cells = new ArrayList<>();
 
     public HttpRequestMethod getMethod() {
         return method;
@@ -52,17 +52,13 @@ public class HttpRequest {
         this.body = body;
     }
 
-    public List<Cell> getCells() {
+    public List<Cell<String>> getCells() {
         return cells;
-    }
-
-    public void setCells(List<Cell> cells) {
-        this.cells = cells;
     }
 
     public Object queryString() {
         if (HttpRequestMethod.GET.equals(method)) {
-            return cells.size() > 0 ? "?" + Cell.join(cells) : "";
+            return cells.size() > 0 ? "?" + join(cells) : "";
         }
         return "";
     }
@@ -75,13 +71,13 @@ public class HttpRequest {
         if (getBody() != null && getBody() instanceof JsonNode) {
             return ObjectMappers.toPretty(getBody());
         } else {
-            return Cell.join(cells);
+            return join(cells);
         }
     }
 
     public boolean hasParameter() {
         for (Cell cell : cells) {
-            if (!cell.isDisabled()) {
+            if (cell.isEnable()) {
                 return true;
             }
         }
@@ -99,4 +95,22 @@ public class HttpRequest {
             headers.setContentType(HttpHeaders.ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
         }
     }
+
+    private String join(List<Cell<String>> cells){
+        StringBuilder sb = new StringBuilder();
+        for (Cell<String> cell : cells) {
+            if(!cell.isEnable()){
+                continue;
+            }
+            if(cell.size()<3){
+                continue;
+            }
+            if(sb.length()>0){
+                sb.append("&");
+            }
+            sb.append(cell.get(0)).append("=").append(cell.get(3));
+        }
+        return sb.toString();
+    }
+
 }

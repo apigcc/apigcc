@@ -3,7 +3,7 @@ package com.github.apiggs.ast;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.apiggs.Environment;
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 import com.github.apiggs.util.ObjectMappers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
@@ -15,9 +15,9 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedTypeVariable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
-import com.github.javaparser.symbolsolver.javassistmodel.JavassistFieldDeclaration;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.utils.Pair;
+import com.google.common.base.Strings;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +31,7 @@ public class ResolvedTypes {
     /**
      * 已解析类型结果池，防止循环递归
      */
-    private static Map<Object,ResolvedTypes> POOL = new ConcurrentHashMap<>();
+    private static Map<Object, ResolvedTypes> POOL = new ConcurrentHashMap<>();
 
     /**
      * 获取解析结果前，应判断是否已解析
@@ -44,7 +44,7 @@ public class ResolvedTypes {
     public String name;
     public Object value;
     public ObjectNode objectNode;
-    public List<Cell> cells = new ArrayList<>();
+    public List<Cell<String>> cells = new ArrayList<>();
 
     public Object getValue() {
         return value == null ? objectNode : value;
@@ -73,11 +73,11 @@ public class ResolvedTypes {
      * @return
      */
     public static ResolvedTypes of(ResolvedType resolvedType) {
-        if(POOL.containsKey(resolvedType)){
+        if (POOL.containsKey(resolvedType)) {
             return POOL.get(resolvedType).duplicate();
         }
         ResolvedTypes resolvedTypes = new ResolvedTypes();
-        POOL.put(resolvedType,resolvedTypes);
+        POOL.put(resolvedType, resolvedTypes);
         if (!resolvedType.isTypeVariable()) {
             resolvedTypes.resolve(resolvedType);
             resolvedTypes.resolved = true;
@@ -87,15 +87,16 @@ public class ResolvedTypes {
 
     /**
      * 只解析类型的定义，用于解析字符串类名时，只能获取到定义
+     *
      * @param typeDeclaration
      * @return
      */
-    public static ResolvedTypes of(ResolvedReferenceTypeDeclaration typeDeclaration){
-        if(POOL.containsKey(typeDeclaration)){
+    public static ResolvedTypes of(ResolvedReferenceTypeDeclaration typeDeclaration) {
+        if (POOL.containsKey(typeDeclaration)) {
             return POOL.get(typeDeclaration).duplicate();
         }
         ResolvedTypes resolvedTypes = new ResolvedTypes();
-        POOL.put(typeDeclaration,resolvedTypes);
+        POOL.put(typeDeclaration, resolvedTypes);
         resolvedTypes.name = typeDeclaration.getName();
         resolvedTypes.resolved = true;
         resolvedTypes.resolve(typeDeclaration, null);
@@ -116,7 +117,7 @@ public class ResolvedTypes {
         }
         //泛型解析
         ResolvedTypeVariable resolvedType = type.asTypeVariable();
-        if(typeParametersMap!=null){
+        if (typeParametersMap != null) {
             for (int i = 0; i < typeParametersMap.size(); i++) {
                 Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair = typeParametersMap.get(i);
                 if (Objects.equals(resolvedType.asTypeParameter(), pair.a)) {
@@ -147,17 +148,17 @@ public class ResolvedTypes {
                     }
                 }
 
-                if(types.size()==1){
+                if (types.size() == 1) {
                     ResolvedTypes resolvedTypes = types.get(0);
                     typeArgumentResolvedTypes.value = resolvedTypes.getValue();
                     typeArgumentResolvedTypes.resolved = true;
                     typeArgumentResolvedTypes.cells.addAll(resolvedTypes.cells);
-                }else{
+                } else {
                     ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
                     int i = 0;
                     for (ResolvedTypes resolvedTypes : types) {
                         String field = "?" + i++;
-                        resolvedTypes.prefix(field+".");
+                        resolvedTypes.prefix(field + ".");
                         arrayNode.addPOJO(resolvedTypes.getValue());
                         typeArgumentResolvedTypes.resolved = true;
                         typeArgumentResolvedTypes.cells.addAll(resolvedTypes.cells);
@@ -180,14 +181,14 @@ public class ResolvedTypes {
         resolveName(resolvedType);
 
         //忽略的类型
-        if(Environment.getIgnoreTypes().contains(this.name)){
+        if (Environment.getIgnoreTypes().contains(this.name)) {
             return;
         }
 
-        if (resolvedType.isPrimitive() || Numbers.isAssignableBy(resolvedType)) {
+        if (resolvedType.isPrimitive() || Types.Numbers.isAssignableBy(resolvedType)) {
             primitive = true;
             value = Defaults.DEFAULT_INTEGER;
-        } else if (CharSequences.isAssignableBy(resolvedType)) {
+        } else if (Types.CharSequences.isAssignableBy(resolvedType)) {
             primitive = true;
             value = Defaults.DEFAULT_STRING;
         } else if (resolvedType.isArray()) {
@@ -201,20 +202,20 @@ public class ResolvedTypes {
 
     }
 
-    private void resolve(ResolvedReferenceTypeDeclaration typeDeclaration, List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap){
+    private void resolve(ResolvedReferenceTypeDeclaration typeDeclaration, List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
         if (typeDeclaration.isEnum()) {
             //枚举类型
             primitive = true;
             value = "";
-        } else if (Collections.isAssignableBy(typeDeclaration)) {
+        } else if (Types.Collections.isAssignableBy(typeDeclaration)) {
             resolveCollection(typeParametersMap);
-        } else if (Maps.isAssignableBy(typeDeclaration)) {
+        } else if (Types.Maps.isAssignableBy(typeDeclaration)) {
             //Map类型，解析为一个object
             value = Defaults.DEFAULT_MAP;
-        } else if (Dates.isAssignableBy(typeDeclaration)) {
+        } else if (Types.Dates.isAssignableBy(typeDeclaration)) {
             //TODO 日期格式 从配置中 从注解中读取日期格式
             value = Defaults.DEFAULT_STRING;
-        } else if (Langs.isAssignableBy(typeDeclaration)) {
+        } else if (Types.Langs.isAssignableBy(typeDeclaration)) {
             //java包中的类型，不处理
         } else {
             resolvePojo(typeDeclaration, typeParametersMap);
@@ -261,9 +262,9 @@ public class ResolvedTypes {
      * @param typeParametersMap
      */
     private void resolveCollection(List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
-        if (typeParametersMap!=null && typeParametersMap.size() == 1) {
+        if (typeParametersMap != null && typeParametersMap.size() == 1) {
             ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
-            if(!"?".equals(typeParametersMap.get(0).b.describe())){
+            if (!"?".equals(typeParametersMap.get(0).b.describe())) {
                 ResolvedTypes componentType = ResolvedTypes.of(typeParametersMap.get(0).b);
                 componentType.prefix("[].");
                 if (componentType.resolved) {
@@ -303,31 +304,36 @@ public class ResolvedTypes {
         Iterator<ResolvedFieldDeclaration> iterator = typeDeclaration.getDeclaredFields().iterator();
         while (iterator.hasNext()) {
             ResolvedFieldDeclaration next = iterator.next();
-            if(next.isStatic() || typeDeclaration.equals(next.getType())){
+            if (next.isStatic() || typeDeclaration.equals(next.getType())) {
                 continue;
             }
             String description = null;
             String name = Fields.getName(next);
             //处理类字段的默认值
 
+
+
             ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
             resolvedTypes.prefix(name + ".");
 
+            String condition = "";
+
             if (next instanceof JavaParserFieldDeclaration) {
                 JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) next;
-                if(Comments.isIgnore(field.getWrappedNode())){
+                if (Comments.isIgnore(field.getWrappedNode())) {
                     continue;
                 }
+                condition = Validations.of(field.getWrappedNode().getAnnotations()).getResults();
 
                 description = Comments.getCommentAsString(field);
 
                 Object value = Fields.getInitializer(field);
-                if(value!=null){
+                if (value != null) {
                     resolvedTypes.value = value;
                 }
             }
 
-            put(name, resolvedTypes, description);
+            put(name, resolvedTypes, condition, description);
 
         }
     }
@@ -354,17 +360,28 @@ public class ResolvedTypes {
      * @param other
      * @param description
      */
-    private void put(String key, ResolvedTypes other, String description) {
+    private void put(String key, ResolvedTypes other, String condition, String description) {
         if (other.resolved) {
             if (Objects.nonNull(other.getValue())) {
                 objectNode.putPOJO(key, other.getValue());
             }
-            Cell cell = new Cell(key, other.name);
-            if (other.primitive) {
-                cell.setValue(String.valueOf(other.getValue()));
+            Cell<String> cell = new Cell<>(key, other.name);
+
+            if(Objects.nonNull(condition)){
+                cell.add(condition);
+            }else{
+                cell.add("");
             }
-            if(description!=null){
-                cell.setDescription(description);
+
+            if (other.primitive) {
+                cell.add(String.valueOf(other.getValue()));
+            } else {
+                cell.add("");
+            }
+            if (description != null) {
+                cell.add(description);
+            } else{
+                cell.add("");
             }
             cells.add(cell);
             cells.addAll(other.cells);
@@ -372,8 +389,8 @@ public class ResolvedTypes {
     }
 
     public void prefix(String prefix) {
-        for (Cell cell : cells) {
-            cell.setName(prefix + cell.getName());
+        for (Cell<String> cell : cells) {
+            cell.set(0, prefix + cell.get(0));
         }
     }
 
@@ -384,11 +401,8 @@ public class ResolvedTypes {
         resolvedTypes.primitive = this.primitive;
         resolvedTypes.value = this.value;
         resolvedTypes.objectNode = this.objectNode;
-        for (Cell cell : this.cells) {
-            Cell newCell = new Cell(cell.getName(),cell.getType(),cell.isDisabled());
-            newCell.setValue(cell.getValue());
-            newCell.setDescription(cell.getDescription());
-            resolvedTypes.cells.add(newCell);
+        for (Cell<String> cell : this.cells) {
+            resolvedTypes.cells.add(cell.duplicate());
         }
         return resolvedTypes;
     }

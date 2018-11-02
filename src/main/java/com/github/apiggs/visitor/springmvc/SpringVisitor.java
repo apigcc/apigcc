@@ -9,7 +9,7 @@ import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.URL;
 import com.github.apiggs.visitor.NodeVisitor;
-import com.github.apiggs.ast.Classes;
+import com.github.apiggs.ast.Types;
 import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpRequest;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -40,8 +40,8 @@ public class SpringVisitor extends NodeVisitor {
         if (!Comments.isIgnore(n) && arg instanceof Tree) {
             Tree tree = (Tree) arg;
             if (Controllers.accept(n.getAnnotations())) {
-                String name = Classes.getNameInScope(n);
-                String fullName = Classes.getFullName(n);
+                String name = Types.getNameInScope(n);
+                String fullName = Types.getFullName(n);
                 Group group = new Group();
                 group.setParent(tree);
                 group.setId(fullName);

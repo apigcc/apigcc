@@ -2,7 +2,7 @@ package com.github.apiggs.http;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.apiggs.util.ObjectMappers;
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class HttpResponse {
     HttpHeaders headers = new HttpHeaders();
     Object body;
 
-    List<Cell> cells = new ArrayList<>();
+    List<Cell<String>> cells = new ArrayList<>();
 
     public boolean isEmpty(){
         return cells.isEmpty() && Objects.isNull(body)  && headers.isEmpty();
@@ -45,12 +45,8 @@ public class HttpResponse {
         this.body = body;
     }
 
-    public List<Cell> getCells() {
+    public List<Cell<String>> getCells() {
         return cells;
-    }
-
-    public void setCells(List<Cell> cells) {
-        this.cells = cells;
     }
 
     public boolean hasBody(){

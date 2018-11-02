@@ -1,20 +1,15 @@
 package com.github.apiggs.ast;
 
 import com.github.apiggs.schema.Appendix;
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.google.common.base.Strings;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class Fields {
@@ -72,19 +67,17 @@ public class Fields {
 
         for (FieldDeclaration field : declaration.getFields()) {
             if(field.isStatic() && field.isPublic() && field.isFinal()){
-                Cell cell = new Cell();
                 VariableDeclarator variable = field.getVariable(0);
-                cell.setName(variable.getNameAsString());
+                String value = null;
+                String description = null;
                 if(variable.getInitializer().isPresent()){
-                    Object value = Expressions.getValue(variable.getInitializer().get());
-                    cell.setValue(value);
+                    value = String.valueOf(Expressions.getValue(variable.getInitializer().get()));
                 }
                 Optional<Comments> optional = Comments.of(field.getComment());
                 if(optional.isPresent()){
-                    String content = optional.get().content;
-                    cell.setDescription(content);
+                    description = optional.get().content;
                 }
-                appendix.getCells().add(cell);
+                appendix.getCells().add(new Cell<>(variable.getNameAsString(),value,description));
             }
         }
 

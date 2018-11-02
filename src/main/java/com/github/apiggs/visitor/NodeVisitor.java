@@ -4,18 +4,15 @@ import com.github.apiggs.Apiggs;
 import com.github.apiggs.ast.Comments;
 import com.github.apiggs.ast.Enums;
 import com.github.apiggs.ast.Fields;
-import com.github.apiggs.ast.extend.DocTag;
+import com.github.apiggs.ast.Tags;
 import com.github.apiggs.schema.Appendix;
-import com.github.apiggs.schema.Cell;
 import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.google.common.collect.Lists;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -36,16 +33,16 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
             Comments javadoc = Comments.of(n);
             //解析部分自定义标签
             for (Comments.Tag tag : javadoc.tags) {
-                if (Objects.equals(tag.name, DocTag.readme.name())) {
+                if (Objects.equals(tag.name, Tags.readme.name())) {
                     tree.setReadme(tag.content);
                 }
-                if (Objects.equals(tag.name, DocTag.title.name())) {
+                if (Objects.equals(tag.name, Tags.title.name())) {
                     tree.setName(tag.content);
                 }
-                if (Objects.equals(tag.name, DocTag.description.name())) {
+                if (Objects.equals(tag.name, Tags.description.name())) {
                     tree.setDescription(tag.content);
                 }
-                if (Objects.equals(tag.name, DocTag.code.name())) {
+                if (Objects.equals(tag.name, Tags.code.name())) {
                     Appendix appendix = parseCode(n);
                     if(appendix!=null){
                         tree.getAppendices().add(appendix);

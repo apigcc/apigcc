@@ -4,7 +4,7 @@ import com.github.apiggs.ast.Annotations;
 import com.github.apiggs.ast.Comments;
 import com.github.apiggs.ast.Defaults;
 import com.github.apiggs.ast.ResolvedTypes;
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.body.Parameter;
@@ -61,7 +61,7 @@ public class Parameters {
     String type;
     Object value;
     String description;
-    List<Cell> cells = new ArrayList<>();
+    List<Cell<String>> cells = new ArrayList<>();
 
     public static Parameters of(Parameter expr) {
         Parameters parameters = new Parameters();
@@ -86,9 +86,9 @@ public class Parameters {
     }
 
     private void resolvePath(Parameter expr){
-        Cell cell = new Cell(expr.getNameAsString(), expr.getTypeAsString(), true);
-        cell.setDescription(Comments.getCommentFromMethod(expr));
-        cell.setValue(Defaults.get(cell.getType()));
+        Cell<String> cell = new Cell<>(expr.getNameAsString(), expr.getTypeAsString(),"",
+                String.valueOf(Defaults.get(expr.getTypeAsString())), Comments.getCommentFromMethod(expr));
+        cell.setEnable(false);
         cells.add(cell);
     }
     private void resolveHeader(Parameter expr){
@@ -104,9 +104,8 @@ public class Parameters {
         if (defaultValueAttr != null) {
             value = defaultValueAttr;
         }
-        Cell cell = new Cell(name, type, true);
-        cell.setDescription(Comments.getCommentFromMethod(expr));
-        cell.setValue(value);
+        Cell<String> cell = new Cell<>(name, type, "", String.valueOf(value), Comments.getCommentFromMethod(expr));
+        cell.setEnable(false);
         cells.add(cell);
     }
 
@@ -123,20 +122,18 @@ public class Parameters {
 
             if (astResolvedType.primitive) {
 
-                Cell cell = new Cell(expr.getNameAsString(), astResolvedType.name, astResolvedType.getValue());
-
+                String name = expr.getNameAsString();
+                String value = String.valueOf(astResolvedType.getValue());
                 //解析RequestParam 获取字段名和默认值
                 Object valueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_PARAM), "value");
-                Object defaultValueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_PARAM), "defaultValue");
                 if (valueAttr != null) {
-                    cell.setName(String.valueOf(valueAttr));
+                    name = String.valueOf(valueAttr);
                 }
+                Object defaultValueAttr = Annotations.getAttr(expr.getAnnotationByName(REQUEST_PARAM), "defaultValue");
                 if (defaultValueAttr != null) {
-                    cell.setValue(defaultValueAttr);
+                    value = String.valueOf(defaultValueAttr);
                 }
-
-                cell.setDescription(Comments.getCommentFromMethod(expr));
-                cells.add(cell);
+                cells.add(new Cell<>(name, astResolvedType.name, "", value, Comments.getCommentFromMethod(expr)));
             }
             cells.addAll(astResolvedType.cells);
 
@@ -218,12 +215,8 @@ public class Parameters {
         this.description = description;
     }
 
-    public List<Cell> getCells() {
+    public List<Cell<String>> getCells() {
         return cells;
-    }
-
-    public void setCells(List<Cell> cells) {
-        this.cells = cells;
     }
 
     public boolean isHeader() {

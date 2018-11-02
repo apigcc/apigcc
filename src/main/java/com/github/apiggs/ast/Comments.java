@@ -1,6 +1,5 @@
 package com.github.apiggs.ast;
 
-import com.github.apiggs.ast.extend.DocTag;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.Node;
@@ -12,7 +11,6 @@ import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
-import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 
 import java.util.*;
@@ -135,7 +133,7 @@ public class Comments {
     }
 
     public static Optional<Integer> getIndexTag(Optional<Comment> optional) {
-        String indexString = getTagContent(optional, DocTag.index.toString());
+        String indexString = getTagContent(optional, Tags.index.toString());
         if(indexString!=null){
             try{
                 return Optional.of(Integer.parseInt(indexString));
@@ -186,7 +184,7 @@ public class Comments {
         Optional<Comments> optional = of(node.getComment());
         if(optional.isPresent()){
             for (Tag tag : optional.get().tags) {
-                if(Objects.equals(DocTag.ignore.name(),tag.name)){
+                if(Objects.equals(Tags.ignore.name(),tag.name)){
                     return true;
                 }
             }

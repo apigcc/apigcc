@@ -1,7 +1,7 @@
 package com.github.apiggs.handler.postman.schema;
 
 
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 
 public class Parameter{
 
@@ -11,12 +11,12 @@ public class Parameter{
     String description;
     boolean disabled = false;
 
-    public static Parameter of(Cell cell) {
+    public static Parameter of(Cell<String> cell) {
         Parameter parameter = new Parameter();
-        parameter.setKey(cell.getName());
-        parameter.setType(cell.getType());
-        parameter.setValue(cell.getValue());
-        parameter.setDescription(cell.getDescription());
+        parameter.setKey(cell.get(0));
+        parameter.setType(cell.get(1));
+        parameter.setValue(cell.get(2));
+        parameter.setDescription(cell.get(3));
         return parameter;
     }
 

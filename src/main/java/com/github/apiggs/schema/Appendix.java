@@ -1,5 +1,7 @@
 package com.github.apiggs.schema;
 
+import com.github.apiggs.util.Cell;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +11,7 @@ import java.util.List;
 public class Appendix {
 
     String name;
-    List<Cell> cells = new ArrayList<>();
+    List<Cell<String>> cells = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -19,11 +21,7 @@ public class Appendix {
         this.name = name;
     }
 
-    public List<Cell> getCells() {
+    public List<Cell<String>> getCells() {
         return cells;
-    }
-
-    public void setCells(List<Cell> cells) {
-        this.cells = cells;
     }
 }

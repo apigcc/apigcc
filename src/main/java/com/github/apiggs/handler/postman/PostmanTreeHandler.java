@@ -5,7 +5,7 @@ import com.github.apiggs.handler.TreeHandler;
 import com.github.apiggs.handler.postman.schema.*;
 import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpMessage;
-import com.github.apiggs.schema.Cell;
+import com.github.apiggs.util.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.ObjectMappers;
@@ -62,7 +62,7 @@ public class PostmanTreeHandler implements TreeHandler {
         request.setMethod(Method.of(httpMessage.getRequest().getMethod()));
         httpMessage.getRequest().getHeaders().forEach((key, value) -> request.getHeader().add(new Header(key, value)));
         if (Method.GET.equals(request.getMethod())) {
-            for (Cell cell : httpMessage.getRequest().getCells()) {
+            for (Cell<String> cell : httpMessage.getRequest().getCells()) {
                 request.getUrl().getQuery().add(Parameter.of(cell));
             }
         } else if (HttpHeaders.ContentType.APPLICATION_JSON.equals(httpMessage.getRequest().getHeaders().getContentType())) {
@@ -70,12 +70,12 @@ public class PostmanTreeHandler implements TreeHandler {
             request.getBody().setRaw(ObjectMappers.toPretty(httpMessage.getRequest().getBody()));
         } else if (HttpHeaders.ContentType.APPLICATION_X_WWW_FORM_URLENCODED.equals(httpMessage.getRequest().getHeaders().getContentType())) {
             request.getBody().setMode(BodyMode.urlencoded);
-            for (Cell cell : httpMessage.getRequest().getCells()) {
+            for (Cell<String> cell : httpMessage.getRequest().getCells()) {
                 request.getBody().getUrlencoded().add(Parameter.of(cell));
             }
         } else if (HttpHeaders.ContentType.MULTIPART_FORM_DATA.equals(httpMessage.getRequest().getHeaders().getContentType())) {
             request.getBody().setMode(BodyMode.formdata);
-            for (Cell cell : httpMessage.getRequest().getCells()) {
+            for (Cell<String> cell : httpMessage.getRequest().getCells()) {
                 request.getBody().getFormdata().add(Parameter.of(cell));
             }
         }
