@@ -2,6 +2,7 @@ package com.github.apiggs.visitor.springmvc;
 
 import com.github.apiggs.ast.Comments;
 import com.github.apiggs.ast.ResolvedTypes;
+import com.github.apiggs.ast.Tag;
 import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequestMethod;
 import com.github.apiggs.schema.Group;
@@ -43,17 +44,17 @@ public class SpringVisitor extends NodeVisitor {
                 String name = Types.getNameInScope(n);
                 String fullName = Types.getFullName(n);
                 Group group = new Group();
-                group.setParent(tree);
+                group.setParent(tree.getBucket());
                 group.setId(fullName);
                 group.setName(name);
                 group.setRest(Controllers.isResponseBody(n));
                 if(n.getComment().isPresent()){
                     Comments comments = Comments.of(n.getComment().get());
-                    if(!Strings.isNullOrEmpty(comments.name)){
-                        group.setName(comments.name);
+                    if(!Strings.isNullOrEmpty(comments.getName())){
+                        group.setName(comments.getName());
                     }
-                    group.setDescription(comments.description);
-                    group.setIndex(Comments.getIndexTag(n.getComment()));
+                    group.setDescription(comments.getDescription());
+                    group.setIndex(Comments.getIndex(n.getComment()));
                 }
                 //path 和 method 影响方法的处理
                 Optional<RequestMappings> optional = RequestMappings.of(n);
@@ -65,7 +66,7 @@ public class SpringVisitor extends NodeVisitor {
                 super.visit(n, group);
 
                 if(!group.isEmpty()){
-                    tree.getGroups().add(group);
+                    tree.getBucket().getGroups().add(group);
                 }
             }
         }
@@ -171,23 +172,26 @@ public class SpringVisitor extends NodeVisitor {
      */
     private void visit(Comment n, HttpMessage message) {
         Comments comments = Comments.of(n);
-        if (!Strings.isNullOrEmpty(comments.name)) {
-            message.setName(comments.name);
+        if (!Strings.isNullOrEmpty(comments.getName())) {
+            message.setName(comments.getName());
         }
-        if (!Strings.isNullOrEmpty(comments.description)) {
-            message.setDescription(comments.description);
+        if (!Strings.isNullOrEmpty(comments.getDescription())) {
+            message.setDescription(comments.getDescription());
         }
 
         //解析@return标签
-        if (comments.returnTag!=null && !Strings.isNullOrEmpty(comments.returnTag.content)){
-            SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = context.getEnv().getTypeSolver().tryToSolveType(comments.returnTag.content);
-            if(symbolReference.isSolved()){
-                ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();
-                ResolvedTypes resolvedTypes = ResolvedTypes.of(typeDeclaration);
-                if (resolvedTypes.resolved) {
-                    message.getResponse().setBody(resolvedTypes.getValue());
-                    message.getResponse().getCells().addAll(resolvedTypes.cells);
+        for (Tag tag : comments.getTags()) {
+            if("return".equals(tag.getName()) && !Strings.isNullOrEmpty(tag.getContent())){
+                SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = context.getEnv().getTypeSolver().tryToSolveType(tag.getContent());
+                if(symbolReference.isSolved()){
+                    ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();
+                    ResolvedTypes resolvedTypes = ResolvedTypes.of(typeDeclaration);
+                    if (resolvedTypes.resolved) {
+                        message.getResponse().setBody(resolvedTypes.getValue());
+                        message.getResponse().getCells().addAll(resolvedTypes.cells);
+                    }
                 }
+
             }
         }
     }

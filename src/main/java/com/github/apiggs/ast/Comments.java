@@ -1,5 +1,6 @@
 package com.github.apiggs.ast;
 
+import com.github.apiggs.Environment;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.Node;
@@ -9,15 +10,21 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
+import com.github.javaparser.javadoc.description.JavadocDescription;
 import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
 /**
  * java注释解析工具
  */
+@Setter
+@Getter
 public class Comments {
 
     static Logger log = LoggerFactory.getLogger(Comments.class);
@@ -25,31 +32,19 @@ public class Comments {
     /**
      * 注释第一行
      */
-    public String name;
+    String name;
     /**
      * 注释后几行
      */
-    public String description;
+    String description;
     /**
      * 全部注释
      */
-    public String content;
+    String content;
     /**
      * 标签集合
      */
-    public List<Tag> tags = new ArrayList<>();
-    /**
-     * return标签
-     */
-    public Tag returnTag;
-
-    public static class Tag{
-        public String name;
-        public String key;
-        public String content;
-        public String link;
-        public Map<String, String> inline = new HashMap<>();
-    }
+    List<Tag> tags = new ArrayList<>();
 
     public static Optional<Comments> of(Optional<Comment> optional) {
         return optional.map(Comments::of);
@@ -57,91 +52,28 @@ public class Comments {
 
     public static Comments of(Comment n) {
         Comments comments = new Comments();
-        comments.parse(n);
+        if(n.isJavadocComment()){
+            comments.parse(n.asJavadocComment());
+        }else{
+            comments.setContent(n.getContent());
+        }
         return comments;
     }
 
-    private void parse(Comment n){
-        if(n.isJavadocComment()){
-            parse(n.asJavadocComment());
-        }else{
-            this.setContent(n.getContent());
-        }
-    }
-
     private void parse(JavadocComment n){
-        //解析文字描述部分
-        StringBuilder builder = new StringBuilder();
         Javadoc javadoc = n.parse();
-        for (JavadocDescriptionElement element : javadoc.getDescription().getElements()) {
-            builder.append(element.toText());
-        }
-        this.setContent(builder.toString());
+
+        //解析文字描述部分
+        this.setContent(parseDescriptions(javadoc.getDescription()));
 
         //解析标签部分
         for (JavadocBlockTag blockTag : javadoc.getBlockTags()) {
-
             Tag tag = new Tag();
             tag.name = blockTag.getTagName();
             tag.key = blockTag.getName().isPresent()?blockTag.getName().get():null;
-            StringBuilder tagDescription = new StringBuilder();
-            for (JavadocDescriptionElement element : blockTag.getContent().getElements()) {
-                if(element instanceof  JavadocInlineTag){
-                    JavadocInlineTag inlineTag = (JavadocInlineTag) element;
-                    if(inlineTag.getType().equals(JavadocInlineTag.Type.LINK)){
-                        tag.link = inlineTag.getContent();
-                    }else{
-                        tag.inline.put(inlineTag.getName(), inlineTag.getContent());
-                    }
-                }else{
-                    tagDescription.append(element.toText());
-                }
-            }
-            tag.content = tagDescription.toString();
+            tag.content = parseDescriptions(blockTag.getContent());
             tags.add(tag);
-
-            if("return".equals(tag.name)){
-                returnTag = tag;
-            }
         }
-    }
-
-    public static String getTagContent(Optional<Comment> optional, String name) {
-        Optional<Comments> optionalComments = of(optional);
-        if(optionalComments.isPresent()){
-            Comments comments = optionalComments.get();
-            for (Tag tag : comments.tags) {
-                if (Objects.equals(tag.name, name)) {
-                    return tag.content;
-                }
-            }
-        }
-        return null;
-    }
-
-    public static Optional<Tag> getParamTag(Optional<Comment> optional, String name) {
-        Optional<Comments> optionalComments = of(optional);
-        if(optionalComments.isPresent()){
-            Comments comments = optionalComments.get();
-            for (Tag tag : comments.tags) {
-                if (Objects.equals(tag.name, "param") && Objects.equals(tag.key, name)) {
-                    return Optional.of(tag);
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    public static Optional<Integer> getIndexTag(Optional<Comment> optional) {
-        String indexString = getTagContent(optional, Tags.index.toString());
-        if(indexString!=null){
-            try{
-                return Optional.of(Integer.parseInt(indexString));
-            }catch (Exception e){
-                log.debug("read index fail:{}",indexString);
-            }
-        }
-        return Optional.empty();
     }
 
     private void setContent(String content) {
@@ -156,22 +88,6 @@ public class Comments {
         if (arr.length >= 2) {
             description = arr[1];
         }
-    }
-
-    public static String getCommentAsString(JavaParserFieldDeclaration declaration) {
-        Optional<Comment> optional = declaration.getWrappedNode().getComment();
-        return of(optional).map(comments -> comments.content).orElse(null);
-    }
-
-    public static String getCommentFromMethod(Parameter expr) {
-        if (expr.getParentNode().isPresent()) {
-            MethodDeclaration method = (MethodDeclaration) expr.getParentNode().get();
-            Optional<Tag> tagOptional = Comments.getParamTag(method.getComment(), expr.getNameAsString());
-            if(tagOptional.isPresent()){
-                return tagOptional.get().content;
-            }
-        }
-        return null;
     }
 
     /**
@@ -190,6 +106,65 @@ public class Comments {
             }
         }
         return false;
+    }
+
+    public static Integer getIndex(Optional<Comment> optional) {
+        String indexString = getTagContent(optional, Tags.index.toString());
+        if(!Strings.isNullOrEmpty(indexString)){
+            try{
+                return Integer.parseInt(indexString);
+            }catch (Exception e){
+                log.debug("read index fail:{}",indexString);
+            }
+        }
+        return Environment.DEFAULT_NODE_INDEX;
+    }
+
+    public static String getCommentFromMethod(Parameter expr) {
+        if (expr.getParentNode().isPresent() && expr.getParentNode().get() instanceof MethodDeclaration) {
+            MethodDeclaration method = (MethodDeclaration) expr.getParentNode().get();
+            Optional<Tag> tagOptional = Comments.getParamTag(method.getComment(), expr.getNameAsString());
+            if(tagOptional.isPresent()){
+                return tagOptional.get().content;
+            }
+        }
+        return "";
+    }
+
+    private static Optional<Tag> getParamTag(Optional<Comment> optional, String name) {
+        Optional<Comments> optionalComments = of(optional);
+        if(optionalComments.isPresent()){
+            Comments comments = optionalComments.get();
+            for (Tag tag : comments.tags) {
+                if (Objects.equals(tag.name, "param") && Objects.equals(tag.key, name)) {
+                    return Optional.of(tag);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static String getTagContent(Optional<Comment> optional, String name) {
+        Optional<Comments> optionalComments = of(optional);
+        if(optionalComments.isPresent()){
+            Comments comments = optionalComments.get();
+            for (Tag tag : comments.tags) {
+                if (Objects.equals(tag.name, name)) {
+                    return tag.content;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String parseDescriptions(JavadocDescription description){
+        StringBuilder builder = new StringBuilder();
+        for (JavadocDescriptionElement element : description.getElements()) {
+            if(!(element instanceof  JavadocInlineTag)){
+                builder.append(element.toText());
+            }
+        }
+        return builder.toString();
     }
 
 }

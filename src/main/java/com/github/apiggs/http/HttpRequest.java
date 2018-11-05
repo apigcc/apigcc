@@ -3,6 +3,8 @@ package com.github.apiggs.http;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.apiggs.util.Cell;
 import com.github.apiggs.util.ObjectMappers;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
 /**
  * a http request
  */
+@Setter
+@Getter
 public class HttpRequest {
 
     HttpRequestMethod method;
@@ -19,42 +23,6 @@ public class HttpRequest {
     Object body;
 
     List<Cell<String>> cells = new ArrayList<>();
-
-    public HttpRequestMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(HttpRequestMethod method) {
-        this.method = method;
-    }
-
-    public List<String> getUris() {
-        return uris;
-    }
-
-    public void setUris(List<String> uris) {
-        this.uris = uris;
-    }
-
-    public HttpHeaders getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(HttpHeaders headers) {
-        this.headers = headers;
-    }
-
-    public Object getBody() {
-        return body;
-    }
-
-    public void setBody(Object body) {
-        this.body = body;
-    }
-
-    public List<Cell<String>> getCells() {
-        return cells;
-    }
 
     public Object queryString() {
         if (HttpRequestMethod.GET.equals(method)) {

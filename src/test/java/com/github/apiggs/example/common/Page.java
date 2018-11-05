@@ -3,7 +3,11 @@ package com.github.apiggs.example.common;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class Page extends Query {
 
     /**
@@ -19,19 +23,4 @@ public class Page extends Query {
     @JsonProperty("max")
     int maxPage = 0;
 
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public int getSizs() {
-        return sizs;
-    }
-
-    public void setSizs(int sizs) {
-        this.sizs = sizs;
-    }
 }

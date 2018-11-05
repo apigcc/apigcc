@@ -56,13 +56,10 @@ public class Apiggs {
             root.tryToParseParallelized().forEach(result -> result.ifSuccessful(cu -> cu.accept(env.visitor(), this.getTree())));
         }
 
-        //对Group进行排序
-        tree.getGroups().sort(Group.COMPARATOR);
-
-        Integer totalNodes = tree.getGroups().stream()
+        Integer totalNodes = tree.getBucket().getGroups().stream()
                 .map(g -> g.getNodes().size())
                 .reduce(0, (sum, i) -> sum += i);
-        log.info("\r\nFound {} Controllers, {} Endpoints", tree.getGroups().size(), totalNodes);
+        log.info("\r\nFound {} Controllers, {} Endpoints", tree.getBucket().getGroups().size(), totalNodes);
 
         return this;
     }

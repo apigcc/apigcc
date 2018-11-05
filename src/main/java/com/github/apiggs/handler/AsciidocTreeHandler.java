@@ -47,7 +47,7 @@ public class AsciidocTreeHandler implements TreeHandler {
             section++;
         }
 
-        for (Group group : tree.getGroups()) {
+        for (Group group : tree.getBucket().getGroups()) {
             buildGroup(group, section++);
         }
 
@@ -59,7 +59,7 @@ public class AsciidocTreeHandler implements TreeHandler {
                 if (!appendix.getCells().isEmpty()) {
                     builder.title(2, section + "." + (i + 1) + " " + appendix.getName());
 
-                    nvd(appendix.getCells());
+                    table(appendix.getCells());
                 }
             }
 
@@ -81,10 +81,12 @@ public class AsciidocTreeHandler implements TreeHandler {
         if (Objects.nonNull(group.getDescription())) {
             builder.paragraph(group.getDescription());
         }
-        for (int i = 0; i < group.getNodes().size(); i++) {
-            HttpMessage httpMessage = group.getNodes().get(i);
-            buildHttpMessage(httpMessage, num + ".", i + 1);
+
+        int index = 0;
+        for (HttpMessage httpMessage : group.getNodes()) {
+            buildHttpMessage(httpMessage, num + ".", ++index);
         }
+
     }
 
     private void buildHttpMessage(HttpMessage message, String prefix, int num) {
@@ -110,7 +112,7 @@ public class AsciidocTreeHandler implements TreeHandler {
             }
         }, "source,REQUEST");
 
-        ntdd(request.getCells());
+        ntcdd(request.getCells());
 
         HttpResponse response = message.getResponse();
         if (!response.isEmpty()) {
@@ -122,12 +124,12 @@ public class AsciidocTreeHandler implements TreeHandler {
                     builder.text(response.bodyString());
                 }
             }, "source,RESPONSE");
-            ntdd(response.getCells());
+            ntcdd(response.getCells());
         }
 
     }
 
-    private void ntdd(List<Cell<String>> cells) {
+    private void ntcdd(List<Cell<String>> cells) {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
             responseTable.add(Arrays.asList("NAME", "TYPE", "CONDITION", "DEFAULT", "DESCRIPTION"));
@@ -136,7 +138,7 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
     }
 
-    private void nvd(List<Cell<String>> cells) {
+    private void table(List<Cell<String>> cells) {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
             cells.forEach(parameter -> responseTable.add(parameter.toList()));

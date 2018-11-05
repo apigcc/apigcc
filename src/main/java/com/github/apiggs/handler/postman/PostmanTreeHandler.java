@@ -38,7 +38,7 @@ public class PostmanTreeHandler implements TreeHandler {
         info.setDescription(tree.getDescription());
         postman.setInfo(info);
 
-        for (Group group : tree.getGroups()) {
+        for (Group group : tree.getBucket().getGroups()) {
             Folder folder = new Folder();
             folder.setName(group.getName());
             folder.setDescription(group.getDescription());

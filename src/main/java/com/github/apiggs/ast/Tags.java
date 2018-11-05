@@ -23,8 +23,13 @@ public enum Tags {
      */
     ignore,
     /**
-     * controller分组，将生成分组的文档
+     * 一个项目可以有多个桶(bucket)
+     * 默认桶的名字为 ''
      */
-    group
+    bucket,
+    /**
+     * 属性的模拟值
+     */
+    value
 
 }

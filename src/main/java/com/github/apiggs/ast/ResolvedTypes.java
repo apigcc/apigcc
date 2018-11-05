@@ -311,8 +311,6 @@ public class ResolvedTypes {
             String name = Fields.getName(next);
             //处理类字段的默认值
 
-
-
             ResolvedTypes resolvedTypes = ResolvedTypes.ofTypeVariable(next.getType(), typeParametersMap);
             resolvedTypes.prefix(name + ".");
 
@@ -325,12 +323,21 @@ public class ResolvedTypes {
                 }
                 condition = Validations.of(field.getWrappedNode().getAnnotations()).getResults();
 
-                description = Comments.getCommentAsString(field);
-
                 Object value = Fields.getInitializer(field);
                 if (value != null) {
                     resolvedTypes.value = value;
                 }
+
+                Optional<Comments> comments = Comments.of(field.getWrappedNode().getComment());
+                if(comments.isPresent()){
+                    description = comments.get().content;
+                    for (Tag tag : comments.get().tags) {
+                        if(tag.name.equals(Tags.value.name())){
+                            resolvedTypes.value = tag.content;
+                        }
+                    }
+                }
+
             }
 
             put(name, resolvedTypes, condition, description);

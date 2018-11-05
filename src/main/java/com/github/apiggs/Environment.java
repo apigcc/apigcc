@@ -34,6 +34,8 @@ public class Environment {
     public static final Path DEFAULT_PROJECT_PATH = Paths.get(System.getProperty("user.dir"));
     public static final Path DEFAULT_OUT = Paths.get("build");
 
+    public static final Integer DEFAULT_NODE_INDEX = 99;
+
     /**
      * 默认的文档构建器
      */

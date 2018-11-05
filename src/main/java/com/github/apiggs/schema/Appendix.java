@@ -1,6 +1,8 @@
 package com.github.apiggs.schema;
 
 import com.github.apiggs.util.Cell;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,20 +10,14 @@ import java.util.List;
 /**
  * 附录
  */
-public class Appendix {
+@Setter
+@Getter
+public class Appendix extends Node{
 
-    String name;
     List<Cell<String>> cells = new ArrayList<>();
 
-    public String getName() {
-        return name;
+    public boolean isEmpty() {
+        return cells.isEmpty();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Cell<String>> getCells() {
-        return cells;
-    }
 }

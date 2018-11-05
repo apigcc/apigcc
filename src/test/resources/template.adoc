@@ -327,7 +327,7 @@ POST搜索时，请求参数将放在请求体中
 ----
 POST /users/search HTTP/1.1
 
-q=&page=1&limit=20&totalPage=0&max=0&name=
+q=&page=1&limit=20&totalPage=0&max=0&name=apiggs
 ----
 
 [options="header"]
@@ -338,7 +338,7 @@ q=&page=1&limit=20&totalPage=0&max=0&name=
 |+limit+|+int+||+20+|+每页条数+
 |+totalPage+|+int+||+0+|
 |+max+|+int+||+0+|
-|+name+|+String+|||
+|+name+|+String+||+apiggs+|+名称+
 |===
 
 [source,RESPONSE ]

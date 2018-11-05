@@ -3,11 +3,15 @@ package com.github.apiggs.http;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.apiggs.util.ObjectMappers;
 import com.github.apiggs.util.Cell;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Setter
+@Getter
 public class HttpResponse {
 
     HttpResponseStatus status = HttpResponseStatus.DEFAULT;
@@ -18,35 +22,6 @@ public class HttpResponse {
 
     public boolean isEmpty(){
         return cells.isEmpty() && Objects.isNull(body)  && headers.isEmpty();
-    }
-
-
-    public HttpResponseStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(HttpResponseStatus status) {
-        this.status = status;
-    }
-
-    public HttpHeaders getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(HttpHeaders headers) {
-        this.headers = headers;
-    }
-
-    public Object getBody() {
-        return body;
-    }
-
-    public void setBody(Object body) {
-        this.body = body;
-    }
-
-    public List<Cell<String>> getCells() {
-        return cells;
     }
 
     public boolean hasBody(){

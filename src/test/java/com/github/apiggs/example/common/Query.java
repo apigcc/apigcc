@@ -1,5 +1,10 @@
 package com.github.apiggs.example.common;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Query {
 
     /**
@@ -12,11 +17,4 @@ public class Query {
      */
     String q = "";
 
-    public String getQ() {
-        return q;
-    }
-
-    public void setQ(String q) {
-        this.q = q;
-    }
 }

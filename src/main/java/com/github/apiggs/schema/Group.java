@@ -2,71 +2,34 @@ package com.github.apiggs.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.apiggs.http.HttpMessage;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 请求组，如一个folder，一个Controller
  */
+@Setter
+@Getter
 public class Group extends Node {
 
-    public static Comparator<Group> COMPARATOR = Comparator.comparingInt(o -> o.index);
-
     boolean rest;
-
     @JsonIgnore
-    Tree parent;
+    Bucket parent;
 
-    List<HttpMessage> nodes = new ArrayList<>();
-    /**
-     * 扩展属性
-     * 如：Spring在Controller的RequestMapping，可以存在扩展属性中
-     */
-    Map<String, Object> ext = new HashMap<>();
+    List<HttpMessage> nodes = Lists.newLinkedList();
 
-    int index = 99;
+    public List<HttpMessage> getNodes(){
+        nodes.sort(Node.COMPARATOR);
+        return nodes;
+    }
 
     public boolean isEmpty() {
         return nodes.isEmpty();
     }
 
-    public List<HttpMessage> getNodes() {
-        return nodes;
-    }
-
-    public void setNodes(List<HttpMessage> nodes) {
-        this.nodes = nodes;
-    }
-
-    public Map<String, Object> getExt() {
-        return ext;
-    }
-
-    public void setExt(Map<String, Object> ext) {
-        this.ext = ext;
-    }
-
-    public Tree getParent() {
-        return parent;
-    }
-
-    public void setParent(Tree parent) {
-        this.parent = parent;
-    }
-
-    public void setIndex(Optional<Integer> index) {
-        index.ifPresent(integer -> this.index = integer);
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public boolean isRest() {
-        return rest;
-    }
-
-    public void setRest(boolean rest) {
-        this.rest = rest;
-    }
 }

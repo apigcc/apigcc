@@ -1,14 +1,16 @@
 package com.github.apiggs.example.common;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class UserQuery extends Page {
 
+    /**
+     * 名称
+     * @value apiggs
+     */
     String name;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

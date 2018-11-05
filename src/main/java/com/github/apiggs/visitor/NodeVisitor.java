@@ -1,10 +1,7 @@
 package com.github.apiggs.visitor;
 
 import com.github.apiggs.Apiggs;
-import com.github.apiggs.ast.Comments;
-import com.github.apiggs.ast.Enums;
-import com.github.apiggs.ast.Fields;
-import com.github.apiggs.ast.Tags;
+import com.github.apiggs.ast.*;
 import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
@@ -32,17 +29,17 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
             Tree tree = (Tree) arg;
             Comments javadoc = Comments.of(n);
             //解析部分自定义标签
-            for (Comments.Tag tag : javadoc.tags) {
-                if (Objects.equals(tag.name, Tags.readme.name())) {
-                    tree.setReadme(tag.content);
+            for (Tag tag : javadoc.getTags()) {
+                if (Objects.equals(tag.getName(), Tags.readme.name())) {
+                    tree.setReadme(tag.getContent());
                 }
-                if (Objects.equals(tag.name, Tags.title.name())) {
-                    tree.setName(tag.content);
+                if (Objects.equals(tag.getName(), Tags.title.name())) {
+                    tree.setName(tag.getContent());
                 }
-                if (Objects.equals(tag.name, Tags.description.name())) {
-                    tree.setDescription(tag.content);
+                if (Objects.equals(tag.getName(), Tags.description.name())) {
+                    tree.setDescription(tag.getContent());
                 }
-                if (Objects.equals(tag.name, Tags.code.name())) {
+                if (Objects.equals(tag.getName(), Tags.code.name())) {
                     Appendix appendix = parseCode(n);
                     if(appendix!=null){
                         tree.getAppendices().add(appendix);

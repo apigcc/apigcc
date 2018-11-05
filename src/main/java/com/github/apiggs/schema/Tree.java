@@ -1,6 +1,10 @@
 package com.github.apiggs.schema;
 
-import java.util.ArrayList;
+import com.google.common.collect.Maps;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,43 +19,25 @@ import java.util.Map;
  * description:'接口描述'
  * }
  */
+@Getter
+@Setter
 public class Tree extends Node {
 
-    String realm;
     String version;
-    List<Group> groups = new ArrayList<>();
     String readme;
-    List<Appendix> appendices = new ArrayList<>();
+    /**
+     * 默认的桶
+     */
+    Bucket bucket = new Bucket(Bucket.DEFAULT_BUCKET);
+    /**
+     * 其他的桶
+     */
+    Map<String,Bucket> buckets = Maps.newTreeMap(String::compareTo);
+    List<Appendix> appendices = new LinkedList<>();
 
-    public String getRealm() {
-        return realm;
-    }
-
-    public void setRealm(String realm) {
-        this.realm = realm;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public List<Appendix> getAppendices() {
+    public List<Appendix> getAppendices(){
+        appendices.sort(Node.COMPARATOR);
         return appendices;
     }
 
-    public String getReadme() {
-        return readme;
-    }
-
-    public void setReadme(String readme) {
-        this.readme = readme;
-    }
 }

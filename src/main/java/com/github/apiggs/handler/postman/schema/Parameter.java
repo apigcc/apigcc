@@ -2,7 +2,11 @@ package com.github.apiggs.handler.postman.schema;
 
 
 import com.github.apiggs.util.Cell;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class Parameter{
 
     String key;
@@ -20,43 +24,4 @@ public class Parameter{
         return parameter;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
 }
