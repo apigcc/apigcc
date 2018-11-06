@@ -30,6 +30,10 @@ public enum Tags {
     /**
      * 属性的模拟值
      */
-    value
+    value;
+
+    public boolean equals(Tag tag){
+        return name().equals(tag.getName());
+    }
 
 }

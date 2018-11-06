@@ -1,6 +1,8 @@
 = Apiggs示例文档
 :doctype: book
 :toc: left
+:toclevels: 3
+:source-highlighter: prettify
 
 [%hardbreaks]
 通过javadoc设置文档描述信息

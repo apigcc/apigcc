@@ -7,9 +7,10 @@ import com.github.apiggs.http.HttpResponse;
 import com.github.apiggs.markup.MarkupBuilder;
 import com.github.apiggs.markup.asciidoc.AsciiDoc;
 import com.github.apiggs.schema.Appendix;
-import com.github.apiggs.util.Cell;
+import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
+import com.github.apiggs.util.Cell;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.google.common.base.Strings;
@@ -29,9 +30,10 @@ public class AsciidocTreeHandler implements TreeHandler {
     Logger log = LoggerFactory.getLogger(this.getClass());
     MarkupBuilder builder = MarkupBuilder.getInstance();
 
+
     @Override
     public void handle(Tree tree, Environment env) {
-        builder.header(tree.getName(), AsciiDoc.DOCTYPE_BOOK, AsciiDoc.TOC_LEFT);
+        builder.header(tree.getName(), AsciiDoc.DOCTYPE_BOOK, AsciiDoc.TOC_LEFT, AsciiDoc.TOC_LEVEL_3, AsciiDoc.SOURCE_HIGHLIGHTER_PRETTIFY);
         if (Objects.nonNull(tree.getVersion())) {
             builder.paragraph("version:" + tree.getVersion());
         }
@@ -47,23 +49,32 @@ public class AsciidocTreeHandler implements TreeHandler {
             section++;
         }
 
-        for (Group group : tree.getBucket().getGroups()) {
-            buildGroup(group, section++);
+        if (tree.getBuckets().isEmpty()) {
+            for (Group group : tree.getBucket().getGroups()) {
+                buildGroup(group, 1, "", section);
+                section++;
+            }
+        } else {
+            if (buildBucket(tree.getBucket(), 1, section)) {
+                section++;
+            }
+            for (Bucket bucket : tree.getBuckets().values()) {
+                if (buildBucket(bucket, 1, section)) {
+                    section++;
+                }
+            }
         }
 
         if (!tree.getAppendices().isEmpty()) {
             builder.title(1, section + " 附录");
+            int index = 1;
+            for (Appendix appendix : tree.getAppendices()) {
 
-            for (int i = 0; i < tree.getAppendices().size(); i++) {
-                Appendix appendix = tree.getAppendices().get(i);
                 if (!appendix.getCells().isEmpty()) {
-                    builder.title(2, section + "." + (i + 1) + " " + appendix.getName());
-
+                    builder.title(2, section + "." + (index++) + " " + appendix.getName());
                     table(appendix.getCells());
                 }
             }
-
-            section++;
         }
 
         try {
@@ -75,22 +86,34 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
     }
 
+    private boolean buildBucket(Bucket bucket, int level, int section) {
+        if (!bucket.isEmpty()) {
+            builder.title(level, section + " " + bucket.getName());
+            int index = 1;
+            for (Group group : bucket.getGroups()) {
+                buildGroup(group, level + 1, section + ".", index++);
+            }
+            return true;
+        }
+        return false;
+    }
 
-    private void buildGroup(Group group, int num) {
-        builder.title(1, num + " " + group.getName());
+
+    private void buildGroup(Group group, int level, String prefix, int num) {
+        builder.title(level, prefix + num + " " + group.getName());
         if (Objects.nonNull(group.getDescription())) {
             builder.paragraph(group.getDescription());
         }
 
-        int index = 0;
+        int index = 1;
         for (HttpMessage httpMessage : group.getNodes()) {
-            buildHttpMessage(httpMessage, num + ".", ++index);
+            buildHttpMessage(httpMessage, level + 1, prefix + num + ".", index++);
         }
 
     }
 
-    private void buildHttpMessage(HttpMessage message, String prefix, int num) {
-        builder.title(2, prefix + num + " " + message.getName());
+    private void buildHttpMessage(HttpMessage message, int level, String prefix, int num) {
+        builder.title(level, prefix + num + " " + message.getName());
         if (Objects.nonNull(message.getDescription())) {
             builder.paragraph(message.getDescription());
         }
@@ -142,7 +165,7 @@ public class AsciidocTreeHandler implements TreeHandler {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
             cells.forEach(parameter -> responseTable.add(parameter.toList()));
-            builder.table(responseTable,false,false);
+            builder.table(responseTable, false, false);
         }
     }
 

@@ -28,7 +28,7 @@ public class Tree extends Node {
     /**
      * 默认的桶
      */
-    Bucket bucket = new Bucket(Bucket.DEFAULT_BUCKET);
+    Bucket bucket;
     /**
      * 其他的桶
      */

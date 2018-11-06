@@ -11,9 +11,8 @@ import java.util.List;
 @Getter
 public class Bucket extends Node {
 
-    public static final String DEFAULT_BUCKET = "";
-
     public Bucket(String name) {
+        this.id = name;
         this.name = name;
     }
 

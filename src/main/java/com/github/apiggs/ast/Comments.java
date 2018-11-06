@@ -1,6 +1,7 @@
 package com.github.apiggs.ast;
 
 import com.github.apiggs.Environment;
+import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.Node;
@@ -60,6 +61,15 @@ public class Comments {
         return comments;
     }
 
+    public static String getBucketName(Comments comments) {
+        for (Tag tag : comments.getTags()) {
+            if(Tags.bucket.equals(tag)){
+                return tag.getContent();
+            }
+        }
+        return null;
+    }
+
     private void parse(JavadocComment n){
         Javadoc javadoc = n.parse();
 
@@ -108,14 +118,17 @@ public class Comments {
         return false;
     }
 
-    public static Integer getIndex(Optional<Comment> optional) {
-        String indexString = getTagContent(optional, Tags.index.toString());
-        if(!Strings.isNullOrEmpty(indexString)){
-            try{
-                return Integer.parseInt(indexString);
-            }catch (Exception e){
-                log.debug("read index fail:{}",indexString);
+    public static Integer getIndex(Comments comments) {
+        try{
+            for (Tag tag : comments.getTags()) {
+                if(Tags.index.equals(tag)){
+                    String indexString = tag.getContent();
+                    if(!Strings.isNullOrEmpty(indexString)){
+                        return Integer.parseInt(indexString);
+                    }
+                }
             }
+        }catch (Exception ignored){
         }
         return Environment.DEFAULT_NODE_INDEX;
     }

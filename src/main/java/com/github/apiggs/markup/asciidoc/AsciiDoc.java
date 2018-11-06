@@ -40,7 +40,9 @@ public enum AsciiDoc implements CharSequence {
      * 文档属性
      */
     TOC_LEFT(":toc: left"),
+    TOC_LEVEL_3(":toclevels: 3"),
     DOCTYPE_BOOK(":doctype: book"),
+    SOURCE_HIGHLIGHTER_PRETTIFY(":source-highlighter: prettify"),
     /**
      * 文字样式
      */

@@ -1,18 +1,16 @@
 package com.github.apiggs.visitor.springmvc;
 
-import com.github.apiggs.ast.Comments;
-import com.github.apiggs.ast.ResolvedTypes;
-import com.github.apiggs.ast.Tag;
+import com.github.apiggs.ast.*;
+import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpMessage;
+import com.github.apiggs.http.HttpRequest;
 import com.github.apiggs.http.HttpRequestMethod;
+import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.URL;
 import com.github.apiggs.visitor.NodeVisitor;
-import com.github.apiggs.ast.Types;
-import com.github.apiggs.http.HttpHeaders;
-import com.github.apiggs.http.HttpRequest;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
@@ -41,32 +39,45 @@ public class SpringVisitor extends NodeVisitor {
         if (!Comments.isIgnore(n) && arg instanceof Tree) {
             Tree tree = (Tree) arg;
             if (Controllers.accept(n.getAnnotations())) {
+
+                Bucket bucket = tree.getBucket();
+
                 String name = Types.getNameInScope(n);
                 String fullName = Types.getFullName(n);
                 Group group = new Group();
-                group.setParent(tree.getBucket());
                 group.setId(fullName);
                 group.setName(name);
                 group.setRest(Controllers.isResponseBody(n));
-                if(n.getComment().isPresent()){
-                    Comments comments = Comments.of(n.getComment().get());
-                    if(!Strings.isNullOrEmpty(comments.getName())){
+                Optional<Comments> oComments = Comments.of(n.getComment());
+                if (oComments.isPresent()) {
+                    Comments comments = oComments.get();
+                    if (!Strings.isNullOrEmpty(comments.getName())) {
                         group.setName(comments.getName());
                     }
                     group.setDescription(comments.getDescription());
-                    group.setIndex(Comments.getIndex(n.getComment()));
+                    group.setIndex(Comments.getIndex(comments));
+
+                    String bucketName = Comments.getBucketName(comments);
+
+                    if (!Strings.isNullOrEmpty(bucketName)) {
+                        if (!tree.getBuckets().containsKey(bucketName)) {
+                            tree.getBuckets().put(bucketName, new Bucket(bucketName));
+                        }
+                        bucket = tree.getBuckets().get(bucketName);
+                    }
+
                 }
+                group.setParent(bucket);
                 //path 和 method 影响方法的处理
-                Optional<RequestMappings> optional = RequestMappings.of(n);
-                if (optional.isPresent()) {
-                    group.getExt().put("path", optional.get().getPath().get(0));
-                    group.getExt().put("method", optional.get().getMethod());
-                }
+                RequestMappings.of(n).ifPresent(requestMappings -> {
+                    group.getExt().put("path", requestMappings.getPath().get(0));
+                    group.getExt().put("method", requestMappings.getMethod());
+                });
 
                 super.visit(n, group);
 
-                if(!group.isEmpty()){
-                    tree.getBucket().getGroups().add(group);
+                if (!group.isEmpty()) {
+                    bucket.getGroups().add(group);
                 }
             }
         }
@@ -83,7 +94,7 @@ public class SpringVisitor extends NodeVisitor {
     public void visit(MethodDeclaration n, Node arg) {
         if (!Comments.isIgnore(n) && arg instanceof Group && RequestMappings.accept(n.getAnnotations())) {
             Group group = (Group) arg;
-            if(group.isRest() || RequestMappings.isRequestBody(n)){
+            if (group.isRest() || RequestMappings.isRequestBody(n)) {
                 //请求方法处理成HttpMessage
                 HttpMessage message = new HttpMessage();
                 message.setParent(group);
@@ -132,9 +143,9 @@ public class SpringVisitor extends NodeVisitor {
                 request.setMethod(HttpRequestMethod.POST);
             }
             request.getHeaders().setContentType(HttpHeaders.ContentType.MULTIPART_FORM_DATA);
-        }else if(parameters.isHeader()){
-            request.getHeaders().put(parameters.getName(),String.valueOf(parameters.getValue()));
-        }else if (parameters.isRequestBody()) {
+        } else if (parameters.isHeader()) {
+            request.getHeaders().put(parameters.getName(), String.valueOf(parameters.getValue()));
+        } else if (parameters.isRequestBody()) {
             //RequestBody 修改请求头为json
             if (HttpRequestMethod.GET.equals(request.getMethod())) {
                 request.setMethod(HttpRequestMethod.POST);
@@ -181,9 +192,9 @@ public class SpringVisitor extends NodeVisitor {
 
         //解析@return标签
         for (Tag tag : comments.getTags()) {
-            if("return".equals(tag.getName()) && !Strings.isNullOrEmpty(tag.getContent())){
+            if ("return".equals(tag.getName()) && !Strings.isNullOrEmpty(tag.getContent())) {
                 SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = context.getEnv().getTypeSolver().tryToSolveType(tag.getContent());
-                if(symbolReference.isSolved()){
+                if (symbolReference.isSolved()) {
                     ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();
                     ResolvedTypes resolvedTypes = ResolvedTypes.of(typeDeclaration);
                     if (resolvedTypes.resolved) {

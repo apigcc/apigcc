@@ -1,6 +1,7 @@
 package com.github.apiggs;
 
 import com.github.apiggs.handler.TreeHandler;
+import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
 import com.github.apiggs.util.loging.Logger;
@@ -33,6 +34,7 @@ public class Apiggs {
         this.tree.setName(env.getTitle());
         this.tree.setDescription(env.getDescription());
         this.tree.setVersion(env.getVersion());
+        this.tree.setBucket(new Bucket(env.getId()));
 
         env.visitor().setContext(this);
     }

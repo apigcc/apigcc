@@ -33,20 +33,20 @@ public class MatchUtil {
         MatchPatcher matchPatcher = new MatchPatcher();
         matchPatcher.Patch_Margin = 20;
         LinkedList<MatchPatcher.Diff> diffs = matchPatcher.diff_main(templateText, buildText, true);
-        boolean changed = hasChange(diffs);
-        if(changed){
+        int changed = hasChange(diffs);
+        if (changed > 0) {
             rederHtml(matchPatcher.diff_prettyHtml(diffs));
         }
-        Assert.assertFalse(changed);
+        Assert.assertEquals(0, changed);
         System.out.println("BUILD SUCCESS");
     }
 
     private void rederHtml(String results) {
-        String[] lines = br(results).replaceAll("<span>|</span>","").split("<br>");
+        String[] lines = br(results).replaceAll("<span>|</span>", "").split("<br>");
         String html = readFile(templateHtml);
         html = html.replace("${content}", lines(lines));
         writeFile(resultHtml, html, Charsets.UTF_8);
-        System.out.println("see result at " + resultHtml);
+        FileSystem.open(resultHtml);
     }
 
     private String lines(String[] lines) {
@@ -59,13 +59,14 @@ public class MatchUtil {
         return stringBuilder.toString();
     }
 
-    private static boolean hasChange(LinkedList<MatchPatcher.Diff> diffs) {
+    private static int hasChange(LinkedList<MatchPatcher.Diff> diffs) {
+        int changed = 0;
         for (MatchPatcher.Diff diff : diffs) {
             if (!diff.operation.equals(MatchPatcher.Operation.EQUAL)) {
-                return true;
+                changed++;
             }
         }
-        return false;
+        return changed;
     }
 
     private static String br(String text) {
