@@ -838,7 +838,16 @@ HTTP/1.1 200 OK
 
 == 5 附录
 
-=== 5.1 StaticFinalCode
+=== 5.1 Code
+[options=""]
+|===
+|+OK+|+0+|+ok+
+|+ERROR+|+-1+|+error+
+|+NoAuth+|+1+|+no auth+
+|===
+
+
+=== 5.2 StaticFinalCode
 [options=""]
 |===
 |+SUCCESS+|+1+|+成功+
@@ -846,20 +855,11 @@ HTTP/1.1 200 OK
 |===
 
 
-=== 5.2 用户角色
+=== 5.3 用户角色
 [options=""]
 |===
 |+ADMIN+|+管理员+
 |+USER+|+用户+
 |+VIP+|+会员+
-|===
-
-
-=== 5.3 Code
-[options=""]
-|===
-|+OK+|+0+|+ok+
-|+ERROR+|+-1+|+error+
-|+NoAuth+|+1+|+no auth+
 |===
 

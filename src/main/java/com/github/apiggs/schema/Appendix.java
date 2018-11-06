@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -19,5 +20,18 @@ public class Appendix extends Node{
     public boolean isEmpty() {
         return cells.isEmpty();
     }
+
+    public static Comparator<Appendix> COMPARATOR = (o1, o2) -> {
+        if(o1.index!=o2.index){
+            return o1.index - o2.index;
+        }
+        if(o1.id!=null && o2.id!=null){
+            return o1.id.compareTo(o2.id);
+        }
+        if(o1.name!=null && o2.name!=null){
+            return o1.name.compareTo(o2.name);
+        }
+        return 0;
+    };
 
 }

@@ -42,7 +42,7 @@ public class MatchUtil {
     }
 
     private void rederHtml(String results) {
-        String[] lines = br(results).replaceAll("<span>|</span>", "").split("<br>");
+        String[] lines = br(results).replaceAll("<span>|</span>", "").split("\n");
         String html = readFile(templateHtml);
         html = html.replace("${content}", lines(lines));
         writeFile(resultHtml, html, Charsets.UTF_8);
@@ -70,7 +70,7 @@ public class MatchUtil {
     }
 
     private static String br(String text) {
-        return text.replaceAll("&para;", " ");
+        return text.replaceAll("&para;", "");
     }
 
 

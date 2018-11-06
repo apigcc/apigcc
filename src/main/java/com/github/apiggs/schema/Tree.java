@@ -36,7 +36,7 @@ public class Tree extends Node {
     List<Appendix> appendices = new LinkedList<>();
 
     public List<Appendix> getAppendices(){
-        appendices.sort(Node.COMPARATOR);
+        appendices.sort(Appendix.COMPARATOR);
         return appendices;
     }
 

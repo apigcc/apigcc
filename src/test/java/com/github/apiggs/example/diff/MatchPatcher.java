@@ -1340,15 +1340,13 @@ public class MatchPatcher {
         StringBuilder html = new StringBuilder();
         for (Diff aDiff : diffs) {
             String text = aDiff.text.replace("&", "&amp;").replace("<", "&lt;")
-                    .replace(">", "&gt;").replace("\n", "&para;<br>");
+                    .replace(">", "&gt;");
             switch (aDiff.operation) {
                 case INSERT:
-                    html.append("<ins>").append(text)
-                            .append("</ins>");
+                    html.append("<ins>").append(text.replace("\n","</ins>\n<ins>")).append("</ins>");
                     break;
                 case DELETE:
-                    html.append("<del>").append(text)
-                            .append("</del>");
+                    html.append("<del>").append(text.replace("\n","</del>\n<del>")).append("</del>");
                     break;
                 case EQUAL:
                     html.append("<span>").append(text).append("</span>");
