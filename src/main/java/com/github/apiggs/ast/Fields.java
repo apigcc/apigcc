@@ -58,12 +58,7 @@ public class Fields {
     public static Appendix getConstants(ClassOrInterfaceDeclaration declaration) {
         Appendix appendix = new Appendix();
         appendix.setName(declaration.getNameAsString());
-
-        Comments.of(declaration.getComment()).ifPresent(comments -> {
-            if(!Strings.isNullOrEmpty(comments.content)){
-                appendix.setName(comments.content);
-            }
-        });
+        appendix.accept(declaration.getComment());
 
         for (FieldDeclaration field : declaration.getFields()) {
             if(field.isStatic() && field.isPublic() && field.isFinal()){

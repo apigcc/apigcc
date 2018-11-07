@@ -26,11 +26,7 @@ public class Enums {
         Appendix appendix = new Appendix();
         appendix.setName(declaration.getNameAsString());
 
-        Comments.of(declaration.getComment()).ifPresent(comments -> {
-            if(!Strings.isNullOrEmpty(comments.content)){
-                appendix.setName(comments.content);
-            }
-        });
+        appendix.accept(declaration.getComment());
 
         for (EnumConstantDeclaration constant : declaration.getEntries()) {
             Cell<String> cell = new Cell<>();

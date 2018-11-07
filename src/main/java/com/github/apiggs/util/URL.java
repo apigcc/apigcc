@@ -9,7 +9,7 @@ public class URL {
      * @return
      */
     public static String normalize(Object parent, String sub) {
-        if(parent!=null && parent instanceof String){
+        if(parent instanceof String){
             return normalize((String)parent,sub);
         }
         return normalize(null,sub);

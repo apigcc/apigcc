@@ -37,6 +37,4 @@ public class Controllers {
     public static boolean isResponseBody(ClassOrInterfaceDeclaration n){
         return n.isAnnotationPresent(REST_CONTROLLER) || n.isAnnotationPresent(RESPONSE_BODY);
     }
-
-    private Controllers(){}
 }

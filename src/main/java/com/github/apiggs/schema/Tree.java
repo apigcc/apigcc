@@ -1,5 +1,8 @@
 package com.github.apiggs.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.apiggs.Apiggs;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +41,16 @@ public class Tree extends Node {
     public List<Appendix> getAppendices(){
         appendices.sort(COMPARATOR);
         return appendices;
+    }
+
+    public Bucket getBucket(String name){
+        if (Strings.isNullOrEmpty(name)) {
+            return bucket;
+        }
+        if (!buckets.containsKey(name)) {
+            buckets.put(name, new Bucket(name));
+        }
+        return buckets.get(name);
     }
 
 }

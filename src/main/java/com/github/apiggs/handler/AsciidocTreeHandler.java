@@ -29,8 +29,8 @@ import static com.github.apiggs.markup.asciidoc.AsciiDoc.*;
  */
 public class AsciidocTreeHandler implements TreeHandler {
 
-    Logger log = LoggerFactory.getLogger(this.getClass());
-    MarkupBuilder builder = MarkupBuilder.getInstance();
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private MarkupBuilder builder = MarkupBuilder.getInstance();
 
 
     @Override
@@ -49,37 +49,28 @@ public class AsciidocTreeHandler implements TreeHandler {
             builder.paragraph(tree.getDescription());
         }
 
-        int section = 1;
-
         if (!Strings.isNullOrEmpty(tree.getReadme())) {
-            builder.title(1, section + " 文档说明");
+            builder.title(1, "文档说明");
             builder.paragraph(tree.getReadme());
-            section++;
         }
 
         if (tree.getBuckets().isEmpty()) {
             for (Group group : tree.getBucket().getGroups()) {
-                buildGroup(group, 1, "", section);
-                section++;
+                //build 成功时，章节号往后加1，否则加0
+                buildGroup(group, 1);
             }
         } else {
-            if (buildBucket(tree.getBucket(), 1, section)) {
-                section++;
-            }
+            buildBucket(tree.getBucket());
             for (Bucket bucket : tree.getBuckets().values()) {
-                if (buildBucket(bucket, 1, section)) {
-                    section++;
-                }
+                buildBucket(bucket);
             }
         }
 
         if (!tree.getAppendices().isEmpty()) {
-            builder.title(1, section + " 附录");
-            int index = 1;
+            builder.title(1, "附录");
             for (Appendix appendix : tree.getAppendices()) {
-
-                if (!appendix.getCells().isEmpty()) {
-                    builder.title(2, section + "." + (index++) + " " + appendix.getName());
+                if (!appendix.isEmpty()) {
+                    builder.title(2, appendix.getName());
                     table(appendix.getCells());
                 }
             }
@@ -94,34 +85,30 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
     }
 
-    private boolean buildBucket(Bucket bucket, int level, int section) {
+    private void buildBucket(Bucket bucket) {
         if (!bucket.isEmpty()) {
-            builder.title(level, section + " " + bucket.getName());
-            int index = 1;
+            builder.title(1, bucket.getName());
             for (Group group : bucket.getGroups()) {
-                buildGroup(group, level + 1, section + ".", index++);
+                buildGroup(group, 2);
             }
-            return true;
         }
-        return false;
     }
 
 
-    private void buildGroup(Group group, int level, String prefix, int num) {
-        builder.title(level, prefix + num + " " + group.getName());
-        if (Objects.nonNull(group.getDescription())) {
-            builder.paragraph(group.getDescription());
+    private void buildGroup(Group group, int level) {
+        if (!group.isEmpty()) {
+            builder.title(level, group.getName());
+            if (Objects.nonNull(group.getDescription())) {
+                builder.paragraph(group.getDescription());
+            }
+            for (HttpMessage httpMessage : group.getNodes()) {
+                buildHttpMessage(httpMessage, level + 1);
+            }
         }
-
-        int index = 1;
-        for (HttpMessage httpMessage : group.getNodes()) {
-            buildHttpMessage(httpMessage, level + 1, prefix + num + ".", index++);
-        }
-
     }
 
-    private void buildHttpMessage(HttpMessage message, int level, String prefix, int num) {
-        builder.title(level, prefix + num + " " + message.getName());
+    private void buildHttpMessage(HttpMessage message, int level) {
+        builder.title(level, message.getName());
         if (Objects.nonNull(message.getDescription())) {
             builder.paragraph(message.getDescription());
         }

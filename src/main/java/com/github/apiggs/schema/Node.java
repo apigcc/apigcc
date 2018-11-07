@@ -1,13 +1,17 @@
 package com.github.apiggs.schema;
 
 import com.github.apiggs.Environment;
+import com.github.apiggs.ast.Comments;
 import com.github.apiggs.http.HttpMessage;
+import com.github.javaparser.ast.comments.Comment;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Tree Group HttpMessage继承Node，已方便在visit中传播
@@ -42,5 +46,20 @@ public class Node {
      * 如：Spring在Controller的RequestMapping，可以存在扩展属性中
      */
     Map<String, Object> ext = new HashMap<>();
+
+    public void accept(Optional<Comment> comment){
+        Comments.of(comment).ifPresent(this::accept);
+    }
+
+    public void accept(Comments comments){
+        if (!Strings.isNullOrEmpty(comments.getName())) {
+            setName(comments.getName());
+        }
+        if(!Strings.isNullOrEmpty(comments.getDescription())){
+            setDescription(comments.getDescription());
+        }
+        setIndex(Comments.getIndex(comments,Environment.DEFAULT_NODE_INDEX));
+
+    }
 
 }

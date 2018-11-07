@@ -1,7 +1,5 @@
 package com.github.apiggs.ast;
 
-import com.github.apiggs.Environment;
-import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.github.javaparser.ast.Node;
@@ -14,12 +12,14 @@ import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
-import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * java注释解析工具
@@ -117,8 +117,11 @@ public class Comments {
         }
         return false;
     }
+    public static boolean notIgnore(Node node){
+        return !isIgnore(node);
+    }
 
-    public static Integer getIndex(Comments comments) {
+    public static Integer getIndex(Comments comments, int def) {
         try{
             for (Tag tag : comments.getTags()) {
                 if(Tags.index.equals(tag)){
@@ -130,7 +133,7 @@ public class Comments {
             }
         }catch (Exception ignored){
         }
-        return Environment.DEFAULT_NODE_INDEX;
+        return def;
     }
 
     public static String getCommentFromMethod(Parameter expr) {

@@ -14,15 +14,19 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserClassDeclaration;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
 /**
  * Spring @RequestMapping 解析工具
  */
+@Setter
+@Getter
 public class RequestMappings {
 
-    static Logger log = LoggerFactory.getLogger(RequestMappings.class);
+    private static Logger log = LoggerFactory.getLogger(RequestMappings.class);
 
     public static final String GET_MAPPING = "GetMapping";
     public static final String POST_MAPPING = "PostMapping";
@@ -66,8 +70,8 @@ public class RequestMappings {
     }
 
     public static boolean accept(NodeList<AnnotationExpr> nodes) {
-        for (int i = 0; i < nodes.size(); i++) {
-            if (accept(nodes.get(i))) {
+        for (AnnotationExpr node : nodes) {
+            if (accept(node)) {
                 return true;
             }
         }
@@ -75,10 +79,7 @@ public class RequestMappings {
     }
 
     public static boolean accept(AnnotationExpr n) {
-        if (!ANNOTATIONS.contains(n.getNameAsString())) {
-            return false;
-        }
-        return true;
+        return ANNOTATIONS.contains(n.getNameAsString());
     }
 
     HttpRequestMethod method;
@@ -168,33 +169,6 @@ public class RequestMappings {
         for (int i = 0; i < getPath().size(); i++) {
             getPath().set(i, URL.normalize(parent,getPath().get(i)));
         }
-    }
-
-    private RequestMappings() {
-    }
-
-    public HttpRequestMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(HttpRequestMethod method) {
-        this.method = method;
-    }
-
-    public List<String> getPath() {
-        return path;
-    }
-
-    public void setPath(List<String> path) {
-        this.path = path;
-    }
-
-    public HttpHeaders getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(HttpHeaders headers) {
-        this.headers = headers;
     }
 
     public static boolean isRequestBody(MethodDeclaration n) {

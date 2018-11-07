@@ -15,7 +15,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     public static final int MAX_TITLE = 6;
 
-    StringBuilder content = new StringBuilder();
+    private StringBuilder content = new StringBuilder();
 
     @Override
     public MarkupBuilder header(String text, CharSequence... attrs) {

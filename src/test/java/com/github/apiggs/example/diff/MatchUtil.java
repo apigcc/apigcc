@@ -114,17 +114,4 @@ public class MatchUtil {
         }
     }
 
-    public static int lineNumber(String text) {
-        Matcher m = Pattern.compile("(\r\n)|(\r)|(\n)").matcher(text);
-        int count = 0;
-        while (m.find()) {
-            count++;
-        }
-        return count;
-    }
-
-    public static int lineNumber(String text, int index) {
-        return lineNumber(text.substring(0, index));
-    }
-
 }

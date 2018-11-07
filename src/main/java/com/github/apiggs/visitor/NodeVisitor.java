@@ -1,10 +1,10 @@
 package com.github.apiggs.visitor;
 
-import com.github.apiggs.Apiggs;
 import com.github.apiggs.ast.*;
 import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.comments.JavadocComment;
@@ -17,10 +17,28 @@ import java.util.Objects;
  */
 public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
 
-    protected Apiggs context;
+    @Override
+    public void visit(final CompilationUnit n, final Node arg) {
+        n.getTypes().forEach(p -> {
+            if(Comments.notIgnore(p)){
+                p.accept(this, arg);
+            }
+        });
+    }
 
-    public void setContext(Apiggs context) {
-        this.context = context;
+    @Override
+    public void visit(final ClassOrInterfaceDeclaration n, final Node arg) {
+        n.getExtendedTypes().forEach(p -> p.accept(this, arg));
+        n.getImplementedTypes().forEach(p -> p.accept(this, arg));
+        n.getTypeParameters().forEach(p -> p.accept(this, arg));
+        n.getMembers().forEach(p -> {
+            if(Comments.notIgnore(p)){
+                p.accept(this, arg);
+            }
+        });
+        n.getName().accept(this, arg);
+        n.getAnnotations().forEach(p -> p.accept(this, arg));
+        n.getComment().ifPresent(l -> l.accept(this, arg));
     }
 
     @Override
@@ -42,7 +60,6 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
                 if (Objects.equals(tag.getName(), Tags.code.name())) {
                     Appendix appendix = parseCode(n);
                     if(appendix!=null){
-                        appendix.setIndex(Comments.getIndex(javadoc));
                         tree.getAppendices().add(appendix);
                     }
                 }

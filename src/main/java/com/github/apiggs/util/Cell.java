@@ -13,10 +13,12 @@ public class Cell<T> {
 
     private boolean enable;
 
+    @SafeVarargs
     public Cell(T ... values) {
         this(true,values);
     }
 
+    @SafeVarargs
     public Cell(boolean enable, T ... values) {
         this(enable,Lists.newArrayList(values));
     }

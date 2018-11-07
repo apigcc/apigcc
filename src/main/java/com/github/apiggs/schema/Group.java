@@ -1,14 +1,13 @@
 package com.github.apiggs.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.apiggs.ast.Comments;
 import com.github.apiggs.http.HttpMessage;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 请求组，如一个folder，一个Controller
@@ -18,10 +17,12 @@ import java.util.Set;
 public class Group extends Node {
 
     boolean rest;
-    @JsonIgnore
-    Bucket parent;
+    String bucketName;
 
     List<HttpMessage> nodes = Lists.newLinkedList();
+
+    @JsonIgnore
+    Bucket parent;
 
     public List<HttpMessage> getNodes(){
         nodes.sort(COMPARATOR);
@@ -32,4 +33,9 @@ public class Group extends Node {
         return nodes.isEmpty();
     }
 
+    @Override
+    public void accept(Comments comments) {
+        super.accept(comments);
+        bucketName = Comments.getBucketName(comments);
+    }
 }

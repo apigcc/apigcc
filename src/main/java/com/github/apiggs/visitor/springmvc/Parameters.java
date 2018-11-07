@@ -11,6 +11,8 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ import java.util.Set;
 /**
  * Spring Mvc 参数类型解析
  */
+@Setter
+@Getter
 public class Parameters {
 
     static Logger log = LoggerFactory.getLogger(Parameters.class);
@@ -142,88 +146,4 @@ public class Parameters {
         }
     }
 
-
-    public boolean isPrimitive() {
-        return primitive;
-    }
-
-    public void setPrimitive(boolean primitive) {
-        this.primitive = primitive;
-    }
-
-    public boolean isPathVariable() {
-        return pathVariable;
-    }
-
-    public void setPathVariable(boolean pathVariable) {
-        this.pathVariable = pathVariable;
-    }
-
-    public boolean isRequestBody() {
-        return requestBody;
-    }
-
-    public void setRequestBody(boolean requestBody) {
-        this.requestBody = requestBody;
-    }
-
-    public boolean isFile() {
-        return file;
-    }
-
-    public void setFile(boolean file) {
-        this.file = file;
-    }
-
-    public boolean isMvc() {
-        return mvc;
-    }
-
-    public void setMvc(boolean mvc) {
-        this.mvc = mvc;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<Cell<String>> getCells() {
-        return cells;
-    }
-
-    public boolean isHeader() {
-        return header;
-    }
-
-    public void setHeader(boolean header) {
-        this.header = header;
-    }
 }

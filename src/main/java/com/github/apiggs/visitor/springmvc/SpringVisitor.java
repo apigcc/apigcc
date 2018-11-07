@@ -36,50 +36,27 @@ public class SpringVisitor extends NodeVisitor {
      */
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Node arg) {
-        if (!Comments.isIgnore(n) && arg instanceof Tree) {
+        if(arg instanceof Tree && Controllers.accept(n.getAnnotations())){
             Tree tree = (Tree) arg;
-            if (Controllers.accept(n.getAnnotations())) {
+            Group group = new Group();
+            group.setId(Types.getFullName(n));
+            group.setName(Types.getNameInScope(n));
+            group.setRest(Controllers.isResponseBody(n));
+            //解析注释
+            group.accept(n.getComment());
+            //获取往哪个桶里放
+            Bucket bucket = tree.getBucket(group.getBucketName());
+            group.setParent(bucket);
+            bucket.getGroups().add(group);
 
-                Bucket bucket = tree.getBucket();
+            //path 和 method 影响方法的处理
+            RequestMappings.of(n).ifPresent(requestMappings -> {
+                group.getExt().put("path", requestMappings.getPath().get(0));
+                group.getExt().put("method", requestMappings.getMethod());
+            });
 
-                String name = Types.getNameInScope(n);
-                String fullName = Types.getFullName(n);
-                Group group = new Group();
-                group.setId(fullName);
-                group.setName(name);
-                group.setRest(Controllers.isResponseBody(n));
-                Optional<Comments> oComments = Comments.of(n.getComment());
-                if (oComments.isPresent()) {
-                    Comments comments = oComments.get();
-                    if (!Strings.isNullOrEmpty(comments.getName())) {
-                        group.setName(comments.getName());
-                    }
-                    group.setDescription(comments.getDescription());
-                    group.setIndex(Comments.getIndex(comments));
+            arg = group;
 
-                    String bucketName = Comments.getBucketName(comments);
-
-                    if (!Strings.isNullOrEmpty(bucketName)) {
-                        if (!tree.getBuckets().containsKey(bucketName)) {
-                            tree.getBuckets().put(bucketName, new Bucket(bucketName));
-                        }
-                        bucket = tree.getBuckets().get(bucketName);
-                    }
-
-                }
-                group.setParent(bucket);
-                //path 和 method 影响方法的处理
-                RequestMappings.of(n).ifPresent(requestMappings -> {
-                    group.getExt().put("path", requestMappings.getPath().get(0));
-                    group.getExt().put("method", requestMappings.getMethod());
-                });
-
-                super.visit(n, group);
-
-                if (!group.isEmpty()) {
-                    bucket.getGroups().add(group);
-                }
-            }
         }
         super.visit(n, arg);
     }
@@ -92,21 +69,25 @@ public class SpringVisitor extends NodeVisitor {
      */
     @Override
     public void visit(MethodDeclaration n, Node arg) {
-        if (!Comments.isIgnore(n) && arg instanceof Group && RequestMappings.accept(n.getAnnotations())) {
+        if (arg instanceof Group && RequestMappings.accept(n.getAnnotations())) {
             Group group = (Group) arg;
             if (group.isRest() || RequestMappings.isRequestBody(n)) {
                 //请求方法处理成HttpMessage
                 HttpMessage message = new HttpMessage();
                 message.setParent(group);
-                message.setIndex(group.getNodes().size());
                 message.setName(n.getNameAsString());
                 message.setId(group.getId() + "." + message.getName());
+
                 group.getNodes().add(message);
 
                 visit(n.getType(), message);
                 n.getAnnotations().forEach(p -> visit(p, message));
                 n.getParameters().forEach(p -> visit(p, message));
-                n.getComment().ifPresent(l -> visit(l, message));
+
+                //尝试从注释解析名称和描述
+                message.accept(n.getComment());
+                //设置为代码顺序
+                message.setIndex(group.getNodes().size());
             }
 
         }
@@ -176,36 +157,5 @@ public class SpringVisitor extends NodeVisitor {
         message.getRequest().getHeaders().add(requestMappings.getHeaders());
     }
 
-    /**
-     * 请求方法的注解处理
-     *
-     * @param n
-     * @param message
-     */
-    private void visit(Comment n, HttpMessage message) {
-        Comments comments = Comments.of(n);
-        if (!Strings.isNullOrEmpty(comments.getName())) {
-            message.setName(comments.getName());
-        }
-        if (!Strings.isNullOrEmpty(comments.getDescription())) {
-            message.setDescription(comments.getDescription());
-        }
-
-        //解析@return标签
-        for (Tag tag : comments.getTags()) {
-            if ("return".equals(tag.getName()) && !Strings.isNullOrEmpty(tag.getContent())) {
-                SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = context.getEnv().getTypeSolver().tryToSolveType(tag.getContent());
-                if (symbolReference.isSolved()) {
-                    ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();
-                    ResolvedTypes resolvedTypes = ResolvedTypes.of(typeDeclaration);
-                    if (resolvedTypes.resolved) {
-                        message.getResponse().setBody(resolvedTypes.getValue());
-                        message.getResponse().getCells().addAll(resolvedTypes.cells);
-                    }
-                }
-
-            }
-        }
-    }
 
 }

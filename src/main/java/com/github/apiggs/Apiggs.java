@@ -18,6 +18,12 @@ import java.util.Arrays;
  */
 public class Apiggs {
 
+    public static final ThreadLocal<Apiggs> context = new ThreadLocal<>();
+
+    public static Apiggs getContext(){
+        return context.get();
+    }
+
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     Environment env;
@@ -36,7 +42,7 @@ public class Apiggs {
         this.tree.setVersion(env.getVersion());
         this.tree.setBucket(new Bucket(env.getId()));
 
-        env.visitor().setContext(this);
+        context.set(this);
     }
 
     public Apiggs(String root) {
