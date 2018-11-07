@@ -1,7 +1,6 @@
 # 🐷 Apiggs - 非侵入的RestDoc文档生成工具
 
 ![](https://img.shields.io/badge/Language-Java-yellow.svg)
-[![Gitter](https://img.shields.io/badge/Chat-Gitter-ed1965.svg)](https://gitter.im/apiggs-chat/Lobby)
 [![Download](https://api.bintray.com/packages/apiggs/maven/apiggs/images/download.svg)](https://bintray.com/apiggs/maven/apiggs/_latestVersion)
 
 
