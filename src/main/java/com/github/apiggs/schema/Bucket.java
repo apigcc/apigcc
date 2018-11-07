@@ -26,7 +26,7 @@ public class Bucket extends Node {
     }
 
     public List<Group> getGroups(){
-        groups.sort(Node.COMPARATOR);
+        groups.sort(COMPARATOR);
         return groups;
     }
 

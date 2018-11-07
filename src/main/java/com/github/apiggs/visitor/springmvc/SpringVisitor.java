@@ -98,6 +98,7 @@ public class SpringVisitor extends NodeVisitor {
                 //请求方法处理成HttpMessage
                 HttpMessage message = new HttpMessage();
                 message.setParent(group);
+                message.setIndex(group.getNodes().size());
                 message.setName(n.getNameAsString());
                 message.setId(group.getId() + "." + message.getName());
                 group.getNodes().add(message);

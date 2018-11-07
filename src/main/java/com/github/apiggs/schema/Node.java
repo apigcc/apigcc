@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * Tree Group HttpMessage继承Node，已方便在visit中传播
+ *
  * @see Tree
  * @see Group
  * @see HttpMessage
@@ -19,7 +20,18 @@ import java.util.Map;
 @Setter
 public class Node {
 
-    public static Comparator<Node> COMPARATOR = Comparator.comparingInt(o -> o.index);
+    public static Comparator<Node> COMPARATOR = (o1, o2) -> {
+        if (o1.index != o2.index) {
+            return o1.index - o2.index;
+        }
+        if (o1.id != null && o2.id != null) {
+            return o1.id.compareTo(o2.id);
+        }
+        if (o1.name != null && o2.name != null) {
+            return o1.name.compareTo(o2.name);
+        }
+        return 0;
+    };
 
     String id;
     String name;

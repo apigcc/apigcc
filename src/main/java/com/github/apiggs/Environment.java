@@ -64,6 +64,25 @@ public class Environment {
     private Path project = DEFAULT_PROJECT_PATH;
 
     /**
+     * 项目名称 生成 index.json index.adoc index.html
+     */
+    private String id = "index";
+
+    /**
+     * 文档标题
+     */
+    private String title;
+
+    /**
+     * 文档描述
+     */
+    private String description;
+    /**
+     * 文档版本
+     */
+    private String version;
+
+    /**
      * source code folder wait for parse
      * or just some code
      * default: parse user.dir 's code
@@ -90,24 +109,8 @@ public class Environment {
      */
     private Path out = DEFAULT_OUT;
 
-    /**
-     * 项目名称 生成 index.json index.adoc index.html
-     */
-    private String id = "index";
+    private String css;
 
-    /**
-     * 文档标题
-     */
-    private String title;
-
-    /**
-     * 文档描述
-     */
-    private String description;
-    /**
-     * 文档版本
-     */
-    private String version;
     /**
      * 忽略哪些类型的参数、类解析
      */
@@ -205,6 +208,11 @@ public class Environment {
         return this;
     }
 
+    public Environment css(String css) {
+        this.css = css;
+        return this;
+    }
+
     public Iterable<TreeHandler> pipeline() {
         return DEFAULT_PIPELINE;
     }
@@ -293,5 +301,9 @@ public class Environment {
 
     public Path getProject() {
         return project;
+    }
+
+    public String getCss() {
+        return css;
     }
 }

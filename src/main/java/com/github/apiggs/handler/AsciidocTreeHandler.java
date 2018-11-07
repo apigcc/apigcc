@@ -5,7 +5,6 @@ import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
 import com.github.apiggs.http.HttpResponse;
 import com.github.apiggs.markup.MarkupBuilder;
-import com.github.apiggs.markup.asciidoc.AsciiDoc;
 import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.schema.Group;
@@ -14,6 +13,7 @@ import com.github.apiggs.util.Cell;
 import com.github.apiggs.util.loging.Logger;
 import com.github.apiggs.util.loging.LoggerFactory;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static com.github.apiggs.markup.asciidoc.AsciiDoc.*;
 
 /**
  * adoc文件构建器
@@ -33,7 +35,13 @@ public class AsciidocTreeHandler implements TreeHandler {
 
     @Override
     public void handle(Tree tree, Environment env) {
-        builder.header(tree.getName(), AsciiDoc.DOCTYPE_BOOK, AsciiDoc.TOC_LEFT, AsciiDoc.TOC_LEVEL_3, AsciiDoc.SOURCE_HIGHLIGHTER_PRETTIFY);
+
+        List<CharSequence> attrs = Lists.newArrayList(
+                attr(DOCTYPE, BOOK),
+                attr(TOC, LEFT), attr(TOC_LEVEL, 3),
+                attr(SOURCE_HIGHLIGHTER, PRETTIFY));
+
+        builder.header(tree.getName(), attrs.toArray(new CharSequence[0]));
         if (Objects.nonNull(tree.getVersion())) {
             builder.paragraph("version:" + tree.getVersion());
         }
@@ -78,7 +86,7 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
 
         try {
-            Path adoc = env.getOutPath().resolve(env.getId() + AsciiDoc.EXTENSION);
+            Path adoc = env.getOutPath().resolve(env.getId() + EXTENSION);
             write(adoc, builder.getContent(), StandardCharsets.UTF_8);
             log.info("Build {}", adoc);
         } finally {

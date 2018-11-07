@@ -24,7 +24,7 @@ public class Group extends Node {
     List<HttpMessage> nodes = Lists.newLinkedList();
 
     public List<HttpMessage> getNodes(){
-        nodes.sort(Node.COMPARATOR);
+        nodes.sort(COMPARATOR);
         return nodes;
     }
 

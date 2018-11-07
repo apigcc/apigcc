@@ -42,6 +42,7 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
                 if (Objects.equals(tag.getName(), Tags.code.name())) {
                     Appendix appendix = parseCode(n);
                     if(appendix!=null){
+                        appendix.setIndex(Comments.getIndex(javadoc));
                         tree.getAppendices().add(appendix);
                     }
                 }
