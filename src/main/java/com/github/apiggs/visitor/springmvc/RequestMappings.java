@@ -91,7 +91,7 @@ public class RequestMappings {
             throw new IllegalArgumentException("annotationExpr not accept:" + n.getNameAsString());
         }
         //解析注解各个属性
-        Map<String, Object> annotationAttrs = Annotations.parseAtts(n);
+        Map<String, Object> annotationAttrs = Annotations.getAttrs(n);
 
         RequestMappings requestMappings = new RequestMappings();
         //解析并设置http请求方法

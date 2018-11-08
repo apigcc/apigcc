@@ -5,6 +5,8 @@ import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
 import com.github.apiggs.http.HttpResponse;
 import com.github.apiggs.markup.MarkupBuilder;
+import com.github.apiggs.markup.asciidoc.AsciiDoc;
+import com.github.apiggs.markup.asciidoc.Color;
 import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.schema.Group;
@@ -38,8 +40,8 @@ public class AsciidocTreeHandler implements TreeHandler {
 
         List<CharSequence> attrs = Lists.newArrayList(
                 attr(DOCTYPE, BOOK),
-                attr(TOC, LEFT), attr(TOC_LEVEL, 3),
-                attr(SOURCE_HIGHLIGHTER, PRETTIFY));
+                attr(TOC, LEFT), attr(TOC_LEVEL, 3), attr(TOC_TITLE, "目录"),
+                attr(SOURCE_HIGHLIGHTER, HIGHLIGHTJS));
 
         builder.header(tree.getName(), attrs.toArray(new CharSequence[0]));
         if (Objects.nonNull(tree.getVersion())) {
@@ -114,6 +116,8 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
 
         HttpRequest request = message.getRequest();
+        builder.unquoted("请求", AsciiDoc.STYLE_SMALL);
+        builder.newLine();
         builder.listing(builder -> {
             for (String uri : request.getUris()) {
                 builder.textLine(request.getMethod()
@@ -128,12 +132,14 @@ public class AsciidocTreeHandler implements TreeHandler {
                 builder.br();
                 builder.text(request.bodyString());
             }
-        }, "source,REQUEST");
+        }, "source,HTTP");
 
         ntcdd(request.getCells());
 
         HttpResponse response = message.getResponse();
         if (!response.isEmpty()) {
+            builder.unquoted("响应", AsciiDoc.STYLE_SMALL);
+            builder.newLine();
             builder.listing(builder -> {
                 builder.textLine(message.getVersion() + " " + response.getStatus());
                 response.getHeaders().forEach((k, v) -> builder.textLine(k + ": " + v));
@@ -141,7 +147,7 @@ public class AsciidocTreeHandler implements TreeHandler {
                     builder.br();
                     builder.text(response.bodyString());
                 }
-            }, "source,RESPONSE");
+            }, "source,HTTP");
             ntcdd(response.getCells());
         }
 
@@ -150,7 +156,7 @@ public class AsciidocTreeHandler implements TreeHandler {
     private void ntcdd(List<Cell<String>> cells) {
         if (cells.size() > 0) {
             List<List<String>> responseTable = new ArrayList<>();
-            responseTable.add(Arrays.asList("NAME", "TYPE", "CONDITION", "DEFAULT", "DESCRIPTION"));
+            responseTable.add(Arrays.asList("名称", "类型", "校验", "默认", "描述"));
             cells.forEach(parameter -> responseTable.add(parameter.toList()));
             builder.table(responseTable);
         }

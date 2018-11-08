@@ -15,7 +15,7 @@ public class Annotations {
      * @param n
      * @return
      */
-    public static Map<String,Object> parseAtts(AnnotationExpr n){
+    public static Map<String,Object> getAttrs(AnnotationExpr n){
         Map<String,Object> attrs = new HashMap<>();
         if(n instanceof SingleMemberAnnotationExpr){
             SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) n;
@@ -34,10 +34,7 @@ public class Annotations {
      * @return
      */
     public static Object getAttr(Optional<AnnotationExpr> annotationExpr, String key) {
-        if(annotationExpr.isPresent()){
-            return parseAtts(annotationExpr.get()).get(key);
-        }
-        return null;
+        return annotationExpr.map(annotationExpr1 -> getAttrs(annotationExpr1).get(key)).orElse(null);
     }
 
 }

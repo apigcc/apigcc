@@ -28,16 +28,11 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
 
     @Override
     public void visit(final ClassOrInterfaceDeclaration n, final Node arg) {
-        n.getExtendedTypes().forEach(p -> p.accept(this, arg));
-        n.getImplementedTypes().forEach(p -> p.accept(this, arg));
-        n.getTypeParameters().forEach(p -> p.accept(this, arg));
         n.getMembers().forEach(p -> {
             if(Comments.notIgnore(p)){
                 p.accept(this, arg);
             }
         });
-        n.getName().accept(this, arg);
-        n.getAnnotations().forEach(p -> p.accept(this, arg));
         n.getComment().ifPresent(l -> l.accept(this, arg));
     }
 

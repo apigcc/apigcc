@@ -47,7 +47,7 @@ public class Validations {
 
     private void add(AnnotationExpr expr) {
         results.append(expr.getNameAsString());
-        Map<String, Object> attrs = Annotations.parseAtts(expr);
+        Map<String, Object> attrs = Annotations.getAttrs(expr);
         if(SIZE.equals(expr.getNameAsString())){
             results.append("(");
             if(attrs.containsKey("min")){

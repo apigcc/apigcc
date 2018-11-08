@@ -1,6 +1,7 @@
 package com.github.apiggs.visitor.springmvc;
 
-import com.github.apiggs.ast.*;
+import com.github.apiggs.ast.ResolvedTypes;
+import com.github.apiggs.ast.Types;
 import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
@@ -14,14 +15,8 @@ import com.github.apiggs.visitor.NodeVisitor;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
-import com.google.common.base.Strings;
-
-import java.util.Optional;
 
 /**
  * Spring endpoints解析
@@ -36,7 +31,7 @@ public class SpringVisitor extends NodeVisitor {
      */
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Node arg) {
-        if(arg instanceof Tree && Controllers.accept(n.getAnnotations())){
+        if (arg instanceof Tree && Controllers.accept(n.getAnnotations())) {
             Tree tree = (Tree) arg;
             Group group = new Group();
             group.setId(Types.getFullName(n));
@@ -74,11 +69,9 @@ public class SpringVisitor extends NodeVisitor {
             if (group.isRest() || RequestMappings.isRequestBody(n)) {
                 //请求方法处理成HttpMessage
                 HttpMessage message = new HttpMessage();
-                message.setParent(group);
-                message.setName(n.getNameAsString());
                 message.setId(group.getId() + "." + message.getName());
-
-                group.getNodes().add(message);
+                message.setName(n.getNameAsString());
+                message.setParent(group);
 
                 visit(n.getType(), message);
                 n.getAnnotations().forEach(p -> visit(p, message));
@@ -88,6 +81,8 @@ public class SpringVisitor extends NodeVisitor {
                 message.accept(n.getComment());
                 //设置为代码顺序
                 message.setIndex(group.getNodes().size());
+
+                group.getNodes().add(message);
             }
 
         }
@@ -116,8 +111,9 @@ public class SpringVisitor extends NodeVisitor {
      * @param message
      */
     private void visit(Parameter n, HttpMessage message) {
-        HttpRequest request = message.getRequest();
         Parameters parameters = Parameters.of(n);
+
+        HttpRequest request = message.getRequest();
         request.getCells().addAll(parameters.getCells());
         if (parameters.isFile()) {
             //File 修改请求头为 form data

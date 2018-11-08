@@ -42,10 +42,13 @@ public enum AsciiDoc implements CharSequence {
     TOC(":toc:"),
     LEFT("left"),
     TOC_LEVEL(":toclevels:"),
+    TOC_TITLE(":toc-title:"),
     DOCTYPE(":doctype:"),
     BOOK("book"),
     SOURCE_HIGHLIGHTER(":source-highlighter:"),
     PRETTIFY("prettify"),
+    HIGHLIGHTJS("highlightjs"),
+    CODERAY("coderay"),
     /**
      * 文字样式
      */

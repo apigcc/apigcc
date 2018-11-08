@@ -44,7 +44,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder text(String text) {
-        if(Assert.isBlank(text)){
+        if (Assert.isBlank(text)) {
             return this;
         }
         content.append(text.trim());
@@ -53,7 +53,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder textLine(String text) {
-        if(Assert.isBlank(text)){
+        if (Assert.isBlank(text)) {
             return this;
         }
         text(nobr(text));
@@ -63,12 +63,12 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder paragraph(String text, CharSequence... attrs) {
-        if(Assert.isBlank(text)){
+        if (Assert.isBlank(text)) {
             return this;
         }
         content.append(HARDBREAKS);
         br();
-        if(attrs.length>0){
+        if (attrs.length > 0) {
             content.append("[");
             for (CharSequence attr : attrs) {
                 content.append(attr).append(WHITESPACE);
@@ -231,7 +231,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
         for (List<String> rows : data) {
             for (String cell : rows) {
                 content.append(TABLE_CELL);
-                monospaced(cell);
+                monospaced(cell.replace(TABLE_CELL, "\\" + TABLE_CELL));
             }
             br();
         }
@@ -251,7 +251,6 @@ public class AsciiDocBuilder implements MarkupBuilder {
                 content.append(style).append(" ");
             }
             content.append("]");
-            br();
         }
         content.append(flag);
         text(text);
@@ -326,8 +325,8 @@ public class AsciiDocBuilder implements MarkupBuilder {
     }
 
     String nobr(String content) {
-        if(Assert.isBlank(content)){
-           return content;
+        if (Assert.isBlank(content)) {
+            return content;
         }
         return content.replaceAll(BR.toString(),
                 Matcher.quoteReplacement(WHITESPACE.toString()));

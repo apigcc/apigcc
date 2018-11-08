@@ -18,7 +18,7 @@ import java.util.Arrays;
  */
 public class Apiggs {
 
-    public static final ThreadLocal<Apiggs> context = new ThreadLocal<>();
+    private static final ThreadLocal<Apiggs> context = new ThreadLocal<>();
 
     public static Apiggs getContext(){
         return context.get();
