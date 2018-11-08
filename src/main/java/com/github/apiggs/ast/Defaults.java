@@ -1,13 +1,9 @@
 package com.github.apiggs.ast;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Defaults {
 
     public static final String DEFAULT_STRING = "";
     public static final Integer DEFAULT_INTEGER = 0;
-    public static final Map DEFAULT_MAP = new HashMap();
 
     public static Object get(String type){
         switch (type){

@@ -211,7 +211,7 @@ public class ResolvedTypes {
             resolveCollection(typeParametersMap);
         } else if (Types.Maps.isAssignableBy(typeDeclaration)) {
             //Map类型，解析为一个object
-            value = Defaults.DEFAULT_MAP;
+            resolveMap(typeParametersMap);
         } else if (Types.Dates.isAssignableBy(typeDeclaration)) {
             //TODO 日期格式 从配置中 从注解中读取日期格式
             value = Defaults.DEFAULT_STRING;
@@ -273,6 +273,35 @@ public class ResolvedTypes {
                 }
             }
             value = arrayNode;
+        }
+    }
+
+    /**
+     * 解析Map
+     *
+     * @param typeParametersMap
+     */
+    private void resolveMap(List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> typeParametersMap) {
+        if (typeParametersMap != null && typeParametersMap.size() == 2) {
+            ObjectNode objectNode = ObjectMappers.instance().createObjectNode();
+            Object key = null;
+            Object value = null;
+            if (!"?".equals(typeParametersMap.get(0).b.describe())) {
+                ResolvedTypes componentType = ResolvedTypes.of(typeParametersMap.get(0).b);
+                if (componentType.resolved) {
+                    key = componentType.getValue();
+                }
+            }
+            if (!"?".equals(typeParametersMap.get(1).b.describe())) {
+                ResolvedTypes componentType = ResolvedTypes.of(typeParametersMap.get(1).b);
+                if (componentType.resolved) {
+                    value = componentType.getValue();
+                }
+            }
+            if(key!=null && value!=null){
+                objectNode.putPOJO(String.valueOf(key),value);
+                this.value = objectNode;
+            }
         }
     }
 

@@ -116,8 +116,7 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
 
         HttpRequest request = message.getRequest();
-        builder.unquoted("请求", AsciiDoc.STYLE_SMALL);
-        builder.newLine();
+        builder.textLine("请求");
         builder.listing(builder -> {
             for (String uri : request.getUris()) {
                 builder.textLine(request.getMethod()
@@ -138,8 +137,7 @@ public class AsciidocTreeHandler implements TreeHandler {
 
         HttpResponse response = message.getResponse();
         if (!response.isEmpty()) {
-            builder.unquoted("响应", AsciiDoc.STYLE_SMALL);
-            builder.newLine();
+            builder.textLine("响应");
             builder.listing(builder -> {
                 builder.textLine(message.getVersion() + " " + response.getStatus());
                 response.getHeaders().forEach((k, v) -> builder.textLine(k + ": " + v));

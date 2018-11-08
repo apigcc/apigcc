@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @index 4
@@ -91,6 +92,37 @@ public class PageController extends BaseController {
     @PostMapping("/jar")
     @ResponseBody
     public Info jar(@RequestBody InfoQuery infoQuery){
+        return null;
+    }
+
+
+    /**
+     * 一个复杂的类型 List<Map<String,User>>
+     * @return
+     */
+    @GetMapping("/map")
+    @ResponseBody
+    public List<Map<String,User>> map(){
+        return null;
+    }
+
+    /**
+     * 一个更复杂的类型 List<Map<String,ResultData<Map<Integer,User>>>>
+     * @return
+     */
+    @GetMapping("/map")
+    @ResponseBody
+    public List<Map<String,ResultData<Map<Integer,User>>>> maps(){
+        return null;
+    }
+
+    /**
+     * 一个问号类型 List<Map<String,List<?>>>
+     * @return
+     */
+    @GetMapping("/map")
+    @ResponseBody
+    public List<Map<String,List<?>>> maps1(){
         return null;
     }
 }
