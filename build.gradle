@@ -61,8 +61,8 @@ publish {
     publishVersion = version
     desc = project.DESCRIPTION
     website = project.SITE_URL
-    bintrayUser = project.BINTRAYUSER
-    bintrayKey = project.BINTRAYKEY
+//    bintrayUser = project.BINTRAYUSER
+//    bintrayKey = project.BINTRAYKEY
     dryRun = false
 }
 
