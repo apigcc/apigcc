@@ -87,6 +87,6 @@ compile
 1. .adoc文件，Asciidoc源文件
 1. .html文件，源文件渲染结果，效果如下图
 
-![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/WX20181025-202423.png)
+![example](https://apiggy-1252473972.cos.ap-shanghai.myqcloud.com/20181109.jpg)
 
 想了解更多，请查看[Wiki](https://github.com/apiggs/apiggs/wiki)
