@@ -1,12 +1,12 @@
 package com.github.apiggs.visitor.springmvc;
 
-import com.github.apiggs.ast.Annotations;
-import com.github.apiggs.ast.Comments;
-import com.github.apiggs.ast.Defaults;
-import com.github.apiggs.ast.ResolvedTypes;
-import com.github.apiggs.util.Cell;
-import com.github.apiggs.util.loging.Logger;
-import com.github.apiggs.util.loging.LoggerFactory;
+import com.github.apiggs.resolver.ast.Annotations;
+import com.github.apiggs.resolver.ast.Comments;
+import com.github.apiggs.resolver.ast.Defaults;
+import com.github.apiggs.resolver.ResolvedTypes;
+import com.github.apiggs.common.Cell;
+import com.github.apiggs.common.loging.Logger;
+import com.github.apiggs.common.loging.LoggerFactory;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;

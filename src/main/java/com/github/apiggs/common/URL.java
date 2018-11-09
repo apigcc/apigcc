@@ -1,4 +1,4 @@
-package com.github.apiggs.util;
+package com.github.apiggs.common;
 
 public class URL {
 

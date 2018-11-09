@@ -1,9 +1,10 @@
 package com.github.apiggs.http;
 
 import com.github.apiggs.Apiggs;
-import com.github.apiggs.ast.Comments;
-import com.github.apiggs.ast.ResolvedTypes;
-import com.github.apiggs.ast.Tag;
+import com.github.apiggs.Context;
+import com.github.apiggs.resolver.ast.Comments;
+import com.github.apiggs.resolver.ResolvedTypes;
+import com.github.apiggs.resolver.ast.Tag;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Node;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -35,7 +36,7 @@ public class HttpMessage extends Node {
         //解析@return标签
         for (Tag tag : comments.getTags()) {
             if ("return".equals(tag.getName()) && !Strings.isNullOrEmpty(tag.getContent())) {
-                SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = Apiggs.getContext().getEnv().getTypeSolver().tryToSolveType(tag.getContent());
+                SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = Context.getContext().getTypeSolver().tryToSolveType(tag.getContent());
                 if (symbolReference.isSolved()) {
                     ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();
                     ResolvedTypes resolvedTypes = ResolvedTypes.of(typeDeclaration);

@@ -1,4 +1,4 @@
-package com.github.apiggs.markup.asciidoc;
+package com.github.apiggs.common.markup.asciidoc;
 
 /**
  * https://en.wikipedia.org/wiki/Web_colors#HTML_color_names

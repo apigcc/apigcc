@@ -1,15 +1,16 @@
-package com.github.apiggs.ast;
+package com.github.apiggs.resolver.ast;
 
 import com.github.apiggs.schema.Appendix;
-import com.github.apiggs.util.Cell;
+import com.github.apiggs.common.Cell;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
-import com.google.common.base.Strings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Fields {
@@ -55,11 +56,8 @@ public class Fields {
         return n.getName();
     }
 
-    public static Appendix getConstants(ClassOrInterfaceDeclaration declaration) {
-        Appendix appendix = new Appendix();
-        appendix.setName(declaration.getNameAsString());
-        appendix.accept(declaration.getComment());
-
+    public static List<Cell<String>> getConstants(ClassOrInterfaceDeclaration declaration) {
+        List<Cell<String>> cells = new ArrayList<>();
         for (FieldDeclaration field : declaration.getFields()) {
             if(field.isStatic() && field.isPublic() && field.isFinal()){
                 VariableDeclarator variable = field.getVariable(0);
@@ -72,10 +70,10 @@ public class Fields {
                 if(optional.isPresent()){
                     description = optional.get().content;
                 }
-                appendix.getCells().add(new Cell<>(variable.getNameAsString(),value,description));
+                cells.add(new Cell<>(variable.getNameAsString(),value,description));
             }
         }
 
-        return appendix;
+        return cells;
     }
 }

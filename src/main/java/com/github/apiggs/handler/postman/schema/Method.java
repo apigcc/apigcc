@@ -1,9 +1,9 @@
 package com.github.apiggs.handler.postman.schema;
 
 import com.github.apiggs.http.HttpRequestMethod;
-import com.github.apiggs.markup.asciidoc.Color;
-import com.github.apiggs.util.loging.Logger;
-import com.github.apiggs.util.loging.LoggerFactory;
+import com.github.apiggs.common.markup.asciidoc.Color;
+import com.github.apiggs.common.loging.Logger;
+import com.github.apiggs.common.loging.LoggerFactory;
 
 /**
  * 支持的http method

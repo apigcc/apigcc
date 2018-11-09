@@ -1,16 +1,16 @@
 package com.github.apiggs.handler.postman;
 
-import com.github.apiggs.Environment;
+import com.github.apiggs.Options;
+import com.github.apiggs.common.Cell;
+import com.github.apiggs.common.ObjectMappers;
+import com.github.apiggs.common.loging.Logger;
+import com.github.apiggs.common.loging.LoggerFactory;
 import com.github.apiggs.handler.TreeHandler;
 import com.github.apiggs.handler.postman.schema.*;
 import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpMessage;
-import com.github.apiggs.util.Cell;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
-import com.github.apiggs.util.ObjectMappers;
-import com.github.apiggs.util.loging.Logger;
-import com.github.apiggs.util.loging.LoggerFactory;
 import com.google.common.base.Charsets;
 
 import java.nio.file.Path;
@@ -23,11 +23,11 @@ public class PostmanTreeHandler implements TreeHandler {
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void handle(Tree tree, Environment env) {
+    public void handle(Tree tree, Options options) {
         Postman postman = buildPostman(tree);
-        Path file = env.getOutPath().resolve(env.getId() + ".json");
+        Path file = options.getOutPath().resolve(options.getId() + ".json");
         write(file, ObjectMappers.toPretty(postman), Charsets.UTF_8);
-        log.info("Build {}",file);
+        log.info("Build {}", file);
     }
 
     private Postman buildPostman(Tree tree) {

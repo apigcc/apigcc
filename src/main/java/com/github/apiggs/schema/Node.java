@@ -1,7 +1,7 @@
 package com.github.apiggs.schema;
 
-import com.github.apiggs.Environment;
-import com.github.apiggs.ast.Comments;
+import com.github.apiggs.Context;
+import com.github.apiggs.resolver.ast.Comments;
 import com.github.apiggs.http.HttpMessage;
 import com.github.javaparser.ast.comments.Comment;
 import com.google.common.base.Strings;
@@ -40,7 +40,7 @@ public class Node {
     String id;
     String name;
     String description;
-    int index = Environment.DEFAULT_NODE_INDEX;
+    int index = Context.DEFAULT_NODE_INDEX;
     /**
      * 扩展属性
      * 如：Spring在Controller的RequestMapping，可以存在扩展属性中
@@ -58,7 +58,7 @@ public class Node {
         if(!Strings.isNullOrEmpty(comments.getDescription())){
             setDescription(comments.getDescription());
         }
-        setIndex(Comments.getIndex(comments,Environment.DEFAULT_NODE_INDEX));
+        setIndex(Comments.getIndex(comments,Context.DEFAULT_NODE_INDEX));
 
     }
 

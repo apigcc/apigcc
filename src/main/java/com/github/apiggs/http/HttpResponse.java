@@ -1,8 +1,8 @@
 package com.github.apiggs.http;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.apiggs.util.ObjectMappers;
-import com.github.apiggs.util.Cell;
+import com.github.apiggs.common.ObjectMappers;
+import com.github.apiggs.common.Cell;
 import lombok.Getter;
 import lombok.Setter;
 

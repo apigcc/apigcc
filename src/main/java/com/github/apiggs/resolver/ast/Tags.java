@@ -1,4 +1,4 @@
-package com.github.apiggs.ast;
+package com.github.apiggs.resolver.ast;
 
 /**
  * 扩展java的注释标签

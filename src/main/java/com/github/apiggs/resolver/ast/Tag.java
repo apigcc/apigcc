@@ -1,4 +1,4 @@
-package com.github.apiggs.ast;
+package com.github.apiggs.resolver.ast;
 
 import lombok.Getter;
 import lombok.Setter;

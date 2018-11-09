@@ -1,7 +1,7 @@
 package com.github.apiggs.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.apiggs.ast.Comments;
+import com.github.apiggs.resolver.ast.Comments;
 import com.github.apiggs.http.HttpMessage;
 import com.google.common.collect.Lists;
 import lombok.Getter;

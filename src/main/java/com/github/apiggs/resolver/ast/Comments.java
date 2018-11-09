@@ -1,7 +1,7 @@
-package com.github.apiggs.ast;
+package com.github.apiggs.resolver.ast;
 
-import com.github.apiggs.util.loging.Logger;
-import com.github.apiggs.util.loging.LoggerFactory;
+import com.github.apiggs.common.loging.Logger;
+import com.github.apiggs.common.loging.LoggerFactory;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;

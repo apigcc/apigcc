@@ -1,7 +1,7 @@
-package com.github.apiggs.markup.asciidoc;
+package com.github.apiggs.common.markup.asciidoc;
 
-import com.github.apiggs.markup.MarkupBuilder;
-import com.github.apiggs.util.Assert;
+import com.github.apiggs.common.markup.MarkupBuilder;
+import com.github.apiggs.common.Assert;
 import com.google.common.base.Strings;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
-import static com.github.apiggs.markup.asciidoc.AsciiDoc.*;
+import static com.github.apiggs.common.markup.asciidoc.AsciiDoc.*;
 
 public class AsciiDocBuilder implements MarkupBuilder {
 

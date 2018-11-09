@@ -1,6 +1,6 @@
 package com.github.apiggs.handler;
 
-import com.github.apiggs.Environment;
+import com.github.apiggs.Options;
 import com.github.apiggs.schema.Tree;
 
 import java.io.BufferedWriter;
@@ -15,7 +15,7 @@ import java.nio.file.Path;
  */
 public interface TreeHandler {
 
-    void handle(Tree tree, Environment env);
+    void handle(Tree tree, Options options);
 
     default void write(Path file, String content, Charset charset, OpenOption... openOptions) {
         if (file.getParent() != null) {

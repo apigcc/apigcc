@@ -2,51 +2,74 @@ package com.github.apiggs;
 
 import com.github.apiggs.handler.TreeHandler;
 import com.github.apiggs.schema.Bucket;
-import com.github.apiggs.schema.Group;
-import com.github.apiggs.schema.Tree;
-import com.github.apiggs.util.loging.Logger;
-import com.github.apiggs.util.loging.LoggerFactory;
+import com.github.apiggs.common.loging.Logger;
+import com.github.apiggs.common.loging.LoggerFactory;
+import com.github.apiggs.visitor.Framework;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.SourceRoot;
+import com.google.common.collect.Lists;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 🐷 工具入口类、上下文
  */
-public class Apiggs {
+public class Apiggs extends Context {
 
-    private static final ThreadLocal<Apiggs> context = new ThreadLocal<>();
-
-    public static Apiggs getContext(){
-        return context.get();
-    }
-
-    Logger log = LoggerFactory.getLogger(this.getClass());
-
-    Environment env;
-    Tree tree;
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     public Apiggs() {
-        this(new Environment());
-    }
-
-    public Apiggs(Environment env) {
-        this.env = env;
-        this.tree = new Tree();
-        this.tree.setId(env.getId());
-        this.tree.setName(env.getTitle());
-        this.tree.setDescription(env.getDescription());
-        this.tree.setVersion(env.getVersion());
-        this.tree.setBucket(new Bucket(env.getId()));
-
-        context.set(this);
+        this(new Options());
     }
 
     public Apiggs(String root) {
-        this(new Environment().source(Paths.get(root)));
+        this(new Options().source(Paths.get(root)));
+    }
+
+    public Apiggs(Options options) {
+        super();
+        this.options = options;
+        this.tree.setId(options.getId());
+        this.tree.setName(options.getTitle());
+        this.tree.setDescription(options.getDescription());
+        this.tree.setVersion(options.getVersion());
+        this.tree.setBucket(new Bucket(options.getId()));
+        this.getIgnoreTypes().addAll(options.getIgnores());
+    }
+
+    /**
+     * 解析源代码
+     * @return
+     */
+    private List<CompilationUnit> parseSource(){
+
+        List<CompilationUnit> cus = Lists.newLinkedList();
+
+        ParserConfiguration parserConfiguration = buildParserConfiguration();
+        for (Path path : options.getSources()) {
+            SourceRoot root = new SourceRoot(path, parserConfiguration);
+            try {
+                for (ParseResult<CompilationUnit> result : root.tryToParse()) {
+                    if(result.isSuccessful() && result.getResult().isPresent()){
+                        cus.add(result.getResult().get());
+                    }
+                }
+            } catch (IOException e) {
+                log.warning("parse source error : {}", root.getRoot());
+            }
+        }
+
+        return cus;
     }
 
     /**
@@ -57,11 +80,12 @@ public class Apiggs {
      */
     public Apiggs lookup() {
 
-        ParserConfiguration configuration = env.buildParserConfiguration();
-        for (Path source : env.getSources()) {
-            log.info("Parsing source : {}", source);
-            SourceRoot root = new SourceRoot(source, configuration);
-            root.tryToParseParallelized().forEach(result -> result.ifSuccessful(cu -> cu.accept(env.visitor(), this.getTree())));
+        List<CompilationUnit> cus = parseSource();
+
+        Framework framework = Framework.getCurrent(cus);
+
+        for (CompilationUnit cu : cus) {
+            cu.accept(framework.getVisitor(),this.tree);
         }
 
         Integer totalNodes = tree.getBucket().getGroups().stream()
@@ -76,7 +100,7 @@ public class Apiggs {
      * 执行默认的构建任务
      */
     public void build() {
-        env.pipeline().forEach(this::build);
+        getPipeline().forEach(this::build);
     }
 
     public void build(TreeHandler... handlers) {
@@ -84,15 +108,33 @@ public class Apiggs {
     }
 
     public void build(TreeHandler handler) {
-        handler.handle(tree, env);
+        handler.handle(tree, options);
     }
 
-    public Tree getTree() {
-        return tree;
-    }
 
-    public Environment getEnv() {
-        return env;
+    /**
+     * 构建代码解析所需的环境
+     * @return
+     */
+    private ParserConfiguration buildParserConfiguration() {
+        if (options.getSources().isEmpty()) {
+            options.source(options.getProject().resolve(Options.DEFAULT_SOURCE_STRUCTURE));
+        }
+
+        getTypeSolver().add(new ReflectionTypeSolver());
+
+        options.getDependencies().forEach(value -> getTypeSolver().add(new JavaParserTypeSolver(value)));
+        options.getJars().forEach(value -> {
+            try {
+                getTypeSolver().add(new JarTypeSolver(value));
+            } catch (IOException e) {
+                log.debug("read jar fail:{}",value);
+            }
+        });
+
+        ParserConfiguration parserConfiguration = new ParserConfiguration();
+        parserConfiguration.setSymbolResolver(new JavaSymbolSolver(getTypeSolver()));
+        return parserConfiguration;
     }
 
 }

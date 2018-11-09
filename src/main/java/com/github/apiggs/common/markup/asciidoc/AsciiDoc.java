@@ -1,4 +1,4 @@
-package com.github.apiggs.markup.asciidoc;
+package com.github.apiggs.common.markup.asciidoc;
 
 public enum AsciiDoc implements CharSequence {
     EXTENSION(".adoc"),

@@ -1,9 +1,9 @@
 package com.github.apiggs.handler;
 
-import com.github.apiggs.Environment;
+import com.github.apiggs.Options;
+import com.github.apiggs.common.loging.Logger;
+import com.github.apiggs.common.loging.LoggerFactory;
 import com.github.apiggs.schema.Tree;
-import com.github.apiggs.util.loging.Logger;
-import com.github.apiggs.util.loging.LoggerFactory;
 import org.asciidoctor.*;
 
 import java.util.Objects;
@@ -16,23 +16,23 @@ public class HtmlTreeHandler implements TreeHandler {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void handle(Tree tree, Environment env) {
+    public void handle(Tree tree, Options options) {
         AttributesBuilder attributes = AttributesBuilder.attributes();
         attributes.sectionNumbers(true);
         attributes.noFooter(true);
-        if(Objects.nonNull(env.getCss())){
+        if (Objects.nonNull(options.getCss())) {
             attributes.linkCss(true);
-            attributes.styleSheetName(env.getCss());
+            attributes.styleSheetName(options.getCss());
         }
-        Options options = OptionsBuilder.options()
+        //asciidoctorj 的 options
+        OptionsBuilder builder = OptionsBuilder.options()
                 .mkDirs(true)
-                .toDir(env.getOutPath().toFile())
+                .toDir(options.getOutPath().toFile())
                 .safe(SafeMode.UNSAFE)
-                .attributes(attributes)
-                .get();
+                .attributes(attributes);
         Asciidoctor asciidoctor = Asciidoctor.Factory.create();
-        asciidoctor.convertDirectory(new AsciiDocDirectoryWalker(env.getOutPath().toString()),options);
-        log.info("Render {}",env.getOutPath());
+        asciidoctor.convertDirectory(new AsciiDocDirectoryWalker(options.getOutPath().toString()), builder.get());
+        log.info("Render {}", options.getOutPath());
     }
 
 }

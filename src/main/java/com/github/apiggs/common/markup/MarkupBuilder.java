@@ -1,6 +1,6 @@
-package com.github.apiggs.markup;
+package com.github.apiggs.common.markup;
 
-import com.github.apiggs.markup.asciidoc.AsciiDocBuilder;
+import com.github.apiggs.common.markup.asciidoc.AsciiDocBuilder;
 
 import java.util.List;
 import java.util.function.Consumer;

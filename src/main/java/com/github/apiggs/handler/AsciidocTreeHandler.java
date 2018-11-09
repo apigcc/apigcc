@@ -1,19 +1,17 @@
 package com.github.apiggs.handler;
 
-import com.github.apiggs.Environment;
+import com.github.apiggs.Options;
 import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
 import com.github.apiggs.http.HttpResponse;
-import com.github.apiggs.markup.MarkupBuilder;
-import com.github.apiggs.markup.asciidoc.AsciiDoc;
-import com.github.apiggs.markup.asciidoc.Color;
+import com.github.apiggs.common.markup.MarkupBuilder;
 import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Tree;
-import com.github.apiggs.util.Cell;
-import com.github.apiggs.util.loging.Logger;
-import com.github.apiggs.util.loging.LoggerFactory;
+import com.github.apiggs.common.Cell;
+import com.github.apiggs.common.loging.Logger;
+import com.github.apiggs.common.loging.LoggerFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -24,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static com.github.apiggs.markup.asciidoc.AsciiDoc.*;
+import static com.github.apiggs.common.markup.asciidoc.AsciiDoc.*;
 
 /**
  * adoc文件构建器
@@ -36,7 +34,7 @@ public class AsciidocTreeHandler implements TreeHandler {
 
 
     @Override
-    public void handle(Tree tree, Environment env) {
+    public void handle(Tree tree, Options options) {
 
         List<CharSequence> attrs = Lists.newArrayList(
                 attr(DOCTYPE, BOOK),
@@ -79,7 +77,7 @@ public class AsciidocTreeHandler implements TreeHandler {
         }
 
         try {
-            Path adoc = env.getOutPath().resolve(env.getId() + EXTENSION);
+            Path adoc = options.getOutPath().resolve(options.getId() + EXTENSION);
             write(adoc, builder.getContent(), StandardCharsets.UTF_8);
             log.info("Build {}", adoc);
         } finally {

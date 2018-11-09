@@ -1,4 +1,4 @@
-package com.github.apiggs.ast;
+package com.github.apiggs.resolver.ast;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;

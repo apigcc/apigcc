@@ -1,6 +1,6 @@
 package com.github.apiggs.visitor;
 
-import com.github.apiggs.ast.*;
+import com.github.apiggs.resolver.ast.*;
 import com.github.apiggs.schema.Appendix;
 import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
@@ -17,22 +17,39 @@ import java.util.Objects;
  */
 public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
 
+    /**
+     * 一个java文件是一个CompilationUnit
+     * 判断是否为一个Spring、JFinal环境
+     * @param cu
+     * @return
+     */
+    public abstract boolean accept(CompilationUnit cu);
+
     @Override
     public void visit(final CompilationUnit n, final Node arg) {
+        n.getImports().forEach(p -> p.accept(this, arg));
+        n.getModule().ifPresent(l -> l.accept(this, arg));
+        n.getPackageDeclaration().ifPresent(l -> l.accept(this, arg));
         n.getTypes().forEach(p -> {
             if(Comments.notIgnore(p)){
                 p.accept(this, arg);
             }
         });
+        n.getComment().ifPresent(l -> l.accept(this, arg));
     }
 
     @Override
     public void visit(final ClassOrInterfaceDeclaration n, final Node arg) {
+        n.getExtendedTypes().forEach(p -> p.accept(this, arg));
+        n.getImplementedTypes().forEach(p -> p.accept(this, arg));
+        n.getTypeParameters().forEach(p -> p.accept(this, arg));
         n.getMembers().forEach(p -> {
             if(Comments.notIgnore(p)){
                 p.accept(this, arg);
             }
         });
+        n.getName().accept(this, arg);
+        n.getAnnotations().forEach(p -> p.accept(this, arg));
         n.getComment().ifPresent(l -> l.accept(this, arg));
     }
 
@@ -53,7 +70,7 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
                     tree.setDescription(tag.getContent());
                 }
                 if (Objects.equals(tag.getName(), Tags.code.name())) {
-                    Appendix appendix = parseCode(n);
+                    Appendix appendix = Appendix.parse(n);
                     if(appendix!=null){
                         tree.getAppendices().add(appendix);
                     }
@@ -61,18 +78,6 @@ public abstract class NodeVisitor extends VoidVisitorAdapter<Node> {
             }
         }
         super.visit(n, arg);
-    }
-
-    private Appendix parseCode(JavadocComment n) {
-        if (n.getCommentedNode().isPresent()) {
-            if (n.getCommentedNode().get() instanceof EnumDeclaration) {
-                return Enums.toDetails((EnumDeclaration) n.getCommentedNode().get());
-            }
-            if (n.getCommentedNode().get() instanceof ClassOrInterfaceDeclaration) {
-                return Fields.getConstants((ClassOrInterfaceDeclaration)n.getCommentedNode().get());
-            }
-        }
-        return null;
     }
 
 }

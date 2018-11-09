@@ -1,4 +1,4 @@
-package com.github.apiggs.util.loging;
+package com.github.apiggs.common.loging;
 
 import java.util.Comparator;
 

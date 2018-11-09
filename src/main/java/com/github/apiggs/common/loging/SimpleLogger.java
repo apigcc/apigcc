@@ -1,7 +1,6 @@
-package com.github.apiggs.util.loging;
+package com.github.apiggs.common.loging;
 
 import java.io.PrintStream;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,10 +1,11 @@
-package com.github.apiggs.ast;
+package com.github.apiggs.resolver;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.apiggs.Environment;
-import com.github.apiggs.util.Cell;
-import com.github.apiggs.util.ObjectMappers;
+import com.github.apiggs.Context;
+import com.github.apiggs.resolver.ast.*;
+import com.github.apiggs.common.Cell;
+import com.github.apiggs.common.ObjectMappers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
@@ -17,7 +18,6 @@ import com.github.javaparser.resolution.types.ResolvedTypeVariable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.utils.Pair;
-import com.google.common.base.Strings;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 语法树中Symbol处理
  * 解析已知类的结构
+ * TODO 文件真大，得拆一下
  */
 public class ResolvedTypes {
 
@@ -181,7 +182,7 @@ public class ResolvedTypes {
         resolveName(resolvedType);
 
         //忽略的类型
-        if (Environment.getIgnoreTypes().contains(this.name)) {
+        if (Context.getContext().getIgnoreTypes().contains(this.name)) {
             return;
         }
 
@@ -359,10 +360,10 @@ public class ResolvedTypes {
 
                 Optional<Comments> comments = Comments.of(field.getWrappedNode().getComment());
                 if(comments.isPresent()){
-                    description = comments.get().content;
-                    for (Tag tag : comments.get().tags) {
-                        if(tag.name.equals(Tags.value.name())){
-                            resolvedTypes.value = tag.content;
+                    description = comments.get().getContent();
+                    for (Tag tag : comments.get().getTags()) {
+                        if(tag.getName().equals(Tags.value.name())){
+                            resolvedTypes.value = tag.getContent();
                         }
                     }
                 }

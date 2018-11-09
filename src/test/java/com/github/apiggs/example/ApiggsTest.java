@@ -1,7 +1,7 @@
 package com.github.apiggs.example;
 
 import com.github.apiggs.Apiggs;
-import com.github.apiggs.Environment;
+import com.github.apiggs.Options;
 import com.github.apiggs.example.diff.MatchUtil;
 import org.junit.Test;
 
@@ -20,20 +20,20 @@ public class ApiggsTest {
 
     @Test
     public void testApiggs() {
-        Environment env = new Environment()
+        Options options = new Options()
                 .source(Paths.get("src", "test", "java"))
                 .ignore("ResponseEntity")
                 .jar(Paths.get("src/test/resources/lib/apiggs-model-1.0-SNAPSHOT.jar"))
                 .id("apiggs")
                 .title("示例接口文档")
                 .description("示例接口文档，使用默认模板");
-        Apiggs apiggs = new Apiggs(env);
+        Apiggs apiggs = new Apiggs(options);
         apiggs.lookup().build();
 
-        Path buildAdoc = env.getOutPath().resolve(env.getId() + ".adoc");
-        Path template = env.getOutPath().resolve("../../src/test/resources/template.adoc");
-        Path templateHtml = env.getOutPath().resolve("../../src/test/resources/template.html");
-        Path resultHtml = env.getOutPath().resolve("result.html");
+        Path buildAdoc = options.getOutPath().resolve(options.getId() + ".adoc");
+        Path template = options.getOutPath().resolve("../../src/test/resources/template.adoc");
+        Path templateHtml = options.getOutPath().resolve("../../src/test/resources/template.html");
+        Path resultHtml = options.getOutPath().resolve("result.html");
 
         new MatchUtil(templateHtml, resultHtml).compare(template, buildAdoc);
     }

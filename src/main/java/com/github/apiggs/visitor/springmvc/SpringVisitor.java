@@ -1,7 +1,7 @@
 package com.github.apiggs.visitor.springmvc;
 
-import com.github.apiggs.ast.ResolvedTypes;
-import com.github.apiggs.ast.Types;
+import com.github.apiggs.resolver.ResolvedTypes;
+import com.github.apiggs.resolver.ast.Types;
 import com.github.apiggs.http.HttpHeaders;
 import com.github.apiggs.http.HttpMessage;
 import com.github.apiggs.http.HttpRequest;
@@ -10,8 +10,9 @@ import com.github.apiggs.schema.Bucket;
 import com.github.apiggs.schema.Group;
 import com.github.apiggs.schema.Node;
 import com.github.apiggs.schema.Tree;
-import com.github.apiggs.util.URL;
+import com.github.apiggs.common.URL;
 import com.github.apiggs.visitor.NodeVisitor;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
@@ -22,6 +23,14 @@ import com.github.javaparser.ast.type.Type;
  * Spring endpoints解析
  */
 public class SpringVisitor extends NodeVisitor {
+
+    public static final String PACKAGE = "org.springframework";
+
+    @Override
+    public boolean accept(CompilationUnit cu) {
+        return cu.getImports().stream()
+                .anyMatch(importDeclaration -> importDeclaration.getNameAsString().startsWith(PACKAGE));
+    }
 
     /**
      * 查找Endpoints接入类

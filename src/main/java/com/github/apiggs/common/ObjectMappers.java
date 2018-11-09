@@ -1,4 +1,4 @@
-package com.github.apiggs.util;
+package com.github.apiggs.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,4 +1,4 @@
-package com.github.apiggs.util;
+package com.github.apiggs.common;
 
 import com.google.common.base.Strings;
 

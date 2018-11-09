@@ -1,7 +1,7 @@
 package com.github.apiggs.handler.postman.schema;
 
 
-import com.github.apiggs.util.Cell;
+import com.github.apiggs.common.Cell;
 import lombok.Getter;
 import lombok.Setter;
 
