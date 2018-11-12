@@ -1,10 +1,10 @@
-group 'com.github.apiggs'
+group 'com.apigcc'
 version '1.6'
 
 ext {
     DESCRIPTION = 'A rest document generator with parse the source code.'
-    SITE_URL = 'https://github.com/apiggs/apiggs'
-    GIT_URL = 'https://github.com/apiggs/apiggs.git'
+    SITE_URL = 'https://github.com/apigcc/apigcc'
+    GIT_URL = 'https://github.com/apigcc/apigcc.git'
 
     LICENSE = 'MIT License'
 
