@@ -1,6 +1,7 @@
-package com.apigcc.example.advanced;
+package com.apigcc.example.spring.advanced;
 
 import com.apigcc.example.common.*;
+import com.apigcc.example.spring.BaseController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

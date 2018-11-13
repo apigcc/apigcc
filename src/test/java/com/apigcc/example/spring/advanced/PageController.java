@@ -1,7 +1,8 @@
-package com.apigcc.example.advanced;
+package com.apigcc.example.spring.advanced;
 
 import com.apigcc.example.common.*;
-import com.apigcc.example.hello.Greeting;
+import com.apigcc.example.spring.BaseController;
+import com.apigcc.example.spring.hello.Greeting;
 import com.apigcc.model.Info;
 import com.apigcc.model.InfoQuery;
 import org.jruby.ir.Tuple;

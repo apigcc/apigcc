@@ -1,7 +1,7 @@
-package com.apigcc.example.advanced;
+package com.apigcc.example.spring.advanced;
 
 import com.apigcc.example.common.ResultData;
-import com.apigcc.example.common.BaseController;
+import com.apigcc.example.spring.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 

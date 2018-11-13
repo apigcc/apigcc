@@ -2,6 +2,7 @@ package com.apigcc;
 
 import com.apigcc.common.loging.Logger;
 import com.apigcc.common.loging.LoggerFactory;
+import com.apigcc.visitor.Framework;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 
@@ -75,8 +76,6 @@ public class Options {
     private String css;
 
     private Set<String> ignores;
-
-
 
     public Options project(Path value) {
         this.project = value;
@@ -165,6 +164,11 @@ public class Options {
 
     public Options ignore(String... values) {
         ignores = Sets.newHashSet(values);
+        return this;
+    }
+
+    public Options framework(Framework framework){
+        Framework.current = framework;
         return this;
     }
 

@@ -3,6 +3,7 @@ package com.apigcc.example;
 import com.apigcc.Apigcc;
 import com.apigcc.Options;
 import com.apigcc.example.diff.MatchUtil;
+import com.apigcc.visitor.Framework;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -21,6 +22,7 @@ public class ApigccTest {
     @Test
     public void testApigcc() {
         Options options = new Options()
+                .framework(Framework.SPRINGMVC)
                 .source(Paths.get("src", "test", "java"))
                 .ignore("ResponseEntity")
                 .jar(Paths.get("src/test/resources/lib/apigcc-model-1.0-SNAPSHOT.jar"))

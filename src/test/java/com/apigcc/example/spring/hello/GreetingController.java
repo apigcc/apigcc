@@ -1,4 +1,4 @@
-package com.apigcc.example.hello;
+package com.apigcc.example.spring.hello;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
