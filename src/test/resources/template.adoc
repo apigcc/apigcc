@@ -1,4 +1,4 @@
-= Apiggs示例文档
+= Apigcc示例文档
 :doctype: book
 :toc: left
 :toclevels: 3
@@ -23,14 +23,14 @@
 请求
 [source,HTTP ]
 ----
-GET /greeting?name=apiggs HTTP/1.1
+GET /greeting?name=apigcc HTTP/1.1
 
 ----
 
 [options="header"]
 |===
 |+名称+|+类型+|+校验+|+默认+|+描述+
-|+name+|+String+||+apiggs+|+名称+
+|+name+|+String+||+apigcc+|+名称+
 |===
 
 响应
@@ -347,7 +347,7 @@ POST搜索时，请求参数将放在请求体中
 ----
 POST /users/search HTTP/1.1
 
-q=&page=1&limit=20&totalPage=0&max=0&name=apiggs
+q=&page=1&limit=20&totalPage=0&max=0&name=apigcc
 ----
 
 [options="header"]
@@ -358,7 +358,7 @@ q=&page=1&limit=20&totalPage=0&max=0&name=apiggs
 |+limit+|+int+||+20+|+每页条数+
 |+totalPage+|+int+||+0+|
 |+max+|+int+||+0+|
-|+name+|+String+||+apiggs+|+名称+
+|+name+|+String+||+apigcc+|+名称+
 |===
 
 响应

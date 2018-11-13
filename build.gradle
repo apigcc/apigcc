@@ -55,7 +55,7 @@ dependencies {
 }
 
 publish {
-    userOrg = name
+    userOrg = 'apiggs'
     groupId = group
     artifactId = name
     publishVersion = version
