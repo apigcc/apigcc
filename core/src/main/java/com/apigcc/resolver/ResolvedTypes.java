@@ -1,11 +1,11 @@
 package com.apigcc.resolver;
 
-import com.apigcc.resolver.ast.*;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.apigcc.Context;
 import com.apigcc.common.Cell;
 import com.apigcc.common.ObjectMappers;
+import com.apigcc.resolver.ast.*;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
@@ -18,6 +18,7 @@ import com.github.javaparser.resolution.types.ResolvedTypeVariable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.utils.Pair;
+import com.google.common.collect.Lists;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -233,9 +234,29 @@ public class ResolvedTypes {
      * @return
      */
     private void resolveName(ResolvedType resolvedType) {
-        name = resolvedType.describe();
         if (resolvedType instanceof ReferenceTypeImpl) {
-            name = ((ReferenceTypeImpl) resolvedType).getTypeDeclaration().getName();
+            StringBuilder sb = new StringBuilder();
+            ReferenceTypeImpl impl = (ReferenceTypeImpl) resolvedType;
+            ResolvedReferenceTypeDeclaration typeDeclaration = impl.getTypeDeclaration();
+            sb.append(typeDeclaration.getName());
+            if (!impl.getTypeParametersMap().isEmpty()) {
+                sb.append("<");
+
+                List<String> types = Lists.newArrayList();
+                for (Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair : impl.getTypeParametersMap()) {
+                    if (pair.b instanceof ReferenceTypeImpl) {
+                        ReferenceTypeImpl b = (ReferenceTypeImpl) pair.b;
+                        types.add(b.getTypeDeclaration().getName());
+                    }
+                }
+                sb.append(String.join(", ", types));
+
+                sb.append(">");
+            }
+            name = sb.toString();
+        } else {
+
+            name = resolvedType.describe();
         }
     }
 
@@ -299,8 +320,8 @@ public class ResolvedTypes {
                     value = componentType.getValue();
                 }
             }
-            if(key!=null && value!=null){
-                objectNode.putPOJO(String.valueOf(key),value);
+            if (key != null && value != null) {
+                objectNode.putPOJO(String.valueOf(key), value);
                 this.value = objectNode;
             }
         }
@@ -359,10 +380,10 @@ public class ResolvedTypes {
                 }
 
                 Optional<Comments> comments = Comments.of(field.getWrappedNode().getComment());
-                if(comments.isPresent()){
+                if (comments.isPresent()) {
                     description = comments.get().getContent();
                     for (Tag tag : comments.get().getTags()) {
-                        if(tag.getName().equals(Tags.value.name())){
+                        if (tag.getName().equals(Tags.value.name())) {
                             resolvedTypes.value = tag.getContent();
                         }
                     }
@@ -398,31 +419,19 @@ public class ResolvedTypes {
      * @param description
      */
     private void put(String key, ResolvedTypes other, String condition, String description) {
-        if (other.resolved) {
-            if (Objects.nonNull(other.getValue())) {
-                objectNode.putPOJO(key, other.getValue());
-            }
-            Cell<String> cell = new Cell<>(key, other.name);
-
-            if(Objects.nonNull(condition)){
-                cell.add(condition);
-            }else{
-                cell.add("");
-            }
-
-            if (other.primitive) {
-                cell.add(String.valueOf(other.getValue()));
-            } else {
-                cell.add("");
-            }
-            if (description != null) {
-                cell.add(description);
-            } else{
-                cell.add("");
-            }
-            cells.add(cell);
-            cells.addAll(other.cells);
+        Cell<String> cell = new Cell<>(key, noNull(other.name),
+                noNull(condition));
+        if(other.primitive){
+            cell.add(noNull(other.getValue()));
+        }else{
+            cell.add("");
         }
+        cell.add(noNull(description));
+        if (Objects.nonNull(other.getValue())) {
+            objectNode.putPOJO(key, other.getValue());
+        }
+        cells.add(cell);
+        cells.addAll(other.cells);
     }
 
     public void prefix(String prefix) {
@@ -442,6 +451,14 @@ public class ResolvedTypes {
             resolvedTypes.cells.add(cell.duplicate());
         }
         return resolvedTypes;
+    }
+
+
+    private String noNull(Object value) {
+        if (value == null) {
+            return "";
+        }
+        return String.valueOf(value);
     }
 
 }

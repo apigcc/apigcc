@@ -120,7 +120,7 @@ public class UserController extends BaseController {
     /**
      * 查询角色下的用户总数
      * @param role 枚举类型{@link Role}
-     * @return java.lang.String
+     * @return
      */
     @GetMapping("/role")
     public ResultData<Integer> listFromRole(Role role){

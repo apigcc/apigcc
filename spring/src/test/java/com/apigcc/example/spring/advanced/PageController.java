@@ -126,4 +126,15 @@ public class PageController extends BaseController {
     public List<Map<String,List<?>>> maps1(){
         return null;
     }
+
+
+    /**
+     * 多级菜单
+     * @return
+     */
+    @GetMapping("/menus")
+    @ResponseBody
+    public List<Menu> menus(){
+        return null;
+    }
 }

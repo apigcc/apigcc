@@ -26,7 +26,12 @@ public class HttpRequest {
 
     public Object queryString() {
         if (HttpRequestMethod.GET.equals(method)) {
-            return cells.size() > 0 ? "?" + join(cells) : "";
+            if(cells.size()>0){
+                String queryString = join(cells);
+                if(queryString.length()>0){
+                    return "?" + queryString;
+                }
+            }
         }
         return "";
     }

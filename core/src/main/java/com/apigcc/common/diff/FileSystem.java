@@ -1,4 +1,4 @@
-package com.apigcc.example.diff;
+package com.apigcc.common.diff;
 
 import java.awt.*;
 import java.io.File;

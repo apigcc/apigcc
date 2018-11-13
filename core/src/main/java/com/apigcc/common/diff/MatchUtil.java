@@ -1,7 +1,6 @@
-package com.apigcc.example.diff;
+package com.apigcc.common.diff;
 
 import com.google.common.base.Charsets;
-import org.junit.Assert;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,11 +22,11 @@ public class MatchUtil {
         this.resultHtml = resultHtml;
     }
 
-    public void compare(Path template, Path build) {
-        compare(readFile(template), readFile(build));
+    public int compare(Path template, Path build) {
+        return compare(readFile(template), readFile(build));
     }
 
-    public void compare(String templateText, String buildText) {
+    public int compare(String templateText, String buildText) {
         MatchPatcher matchPatcher = new MatchPatcher();
         matchPatcher.Patch_Margin = 20;
         LinkedList<MatchPatcher.Diff> diffs = matchPatcher.diff_main(templateText, buildText, true);
@@ -35,8 +34,8 @@ public class MatchUtil {
         if (changed > 0) {
             rederHtml(matchPatcher.diff_prettyHtml(diffs));
         }
-        Assert.assertEquals(0, changed);
-        System.out.println("BUILD SUCCESS");
+
+        return changed;
     }
 
     private void rederHtml(String results) {

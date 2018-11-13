@@ -25,10 +25,4 @@ public class User {
     @JsonProperty("Sex")
     String sex;
 
-    User user;
-
-    UserDTO userDTO;
-
-    List<User> users;
-
 }

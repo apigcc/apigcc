@@ -28,7 +28,6 @@ public class Cell<T> {
         this.enable = enable;
     }
 
-
     public List<T> toList(){
         return values;
     }
