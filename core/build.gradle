@@ -1,0 +1,76 @@
+plugins {
+    id 'com.novoda.bintray-release'
+    id 'maven'
+}
+
+ext {
+    DESCRIPTION = 'A rest document generator with parse the source code.'
+    SITE_URL = 'https://github.com/apigcc/apigcc'
+    GIT_URL = 'https://github.com/apigcc/apigcc.git'
+
+    LICENSE = 'MIT License'
+
+    DEVELOPER_ID = 'ayz6uem'
+    DEVELOPER_NAME = 'ayz6uem'
+    DEVELOPER_EMAIL = '360188606@qq.com'
+
+    IS_UPLOADING = project.getGradle().startParameter.taskNames.any { it.contains('bintrayUpload') }
+}
+
+dependencies {
+    compile 'com.github.javaparser:javaparser-symbol-solver-core:3.6.25'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.2'
+    compile 'org.asciidoctor:asciidoctorj:1.5.6'
+
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+}
+
+publish {
+    userOrg = 'apiggs'
+    groupId = group
+    artifactId = name
+    publishVersion = version
+    desc = project.DESCRIPTION
+    website = project.SITE_URL
+//    bintrayUser = project.BINTRAYUSER
+//    bintrayKey = project.BINTRAYKEY
+    dryRun = false
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    taskGraph.getAllTasks().find { it.path == ":generatePomFileForMavenPublication" }?.doLast {
+        file("build/publications/maven/pom-default.xml").delete()
+        println 'Overriding pom-file to make sure we can sync to maven!'
+        pom {
+            //noinspection GroovyAssignabilityCheck
+            project {
+                name "$project.name"
+                artifactId name
+                packaging 'jar'
+                description DESCRIPTION
+                url SITE_URL
+                version version
+
+                scm {
+                    url GIT_URL
+                    connection GIT_URL
+                    developerConnection GIT_URL
+                }
+
+                licenses {
+                    license {
+                        name LICENSE
+                    }
+                }
+
+                developers {
+                    developer {
+                        id DEVELOPER_ID
+                        name DEVELOPER_NAME
+                        email DEVELOPER_EMAIL
+                    }
+                }
+            }
+        }.writeTo("build/publications/maven/pom-default.xml")
+    }
+}

@@ -21,7 +21,7 @@ public interface MarkupBuilder {
      * @param attrs 文档属性
      * @return this builder
      */
-    MarkupBuilder header(String text, CharSequence ... attrs);
+    MarkupBuilder header(String text, CharSequence... attrs);
 
     /**
      * 文档标题
@@ -51,7 +51,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder paragraph(String text, CharSequence ... attrs);
+    MarkupBuilder paragraph(String text, CharSequence... attrs);
     /**
      * 带icon的各种段落
      */
@@ -68,21 +68,21 @@ public interface MarkupBuilder {
     /**
      * 各种block
      */
-    MarkupBuilder block(Consumer<MarkupBuilder> consumer, CharSequence flag, CharSequence ... attrs);
+    MarkupBuilder block(Consumer<MarkupBuilder> consumer, CharSequence flag, CharSequence... attrs);
 
-    MarkupBuilder listing(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
+    MarkupBuilder listing(Consumer<MarkupBuilder> consumer, CharSequence... attrs);
 
-    MarkupBuilder literal(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
+    MarkupBuilder literal(Consumer<MarkupBuilder> consumer, CharSequence... attrs);
 
-    MarkupBuilder sidebar(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
+    MarkupBuilder sidebar(Consumer<MarkupBuilder> consumer, CharSequence... attrs);
 
-    MarkupBuilder comment(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
+    MarkupBuilder comment(Consumer<MarkupBuilder> consumer, CharSequence... attrs);
 
-    MarkupBuilder passthrough(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
+    MarkupBuilder passthrough(Consumer<MarkupBuilder> consumer, CharSequence... attrs);
 
-    MarkupBuilder quote(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
+    MarkupBuilder quote(Consumer<MarkupBuilder> consumer, CharSequence... attrs);
 
-    MarkupBuilder example(Consumer<MarkupBuilder> consumer, CharSequence ... attrs);
+    MarkupBuilder example(Consumer<MarkupBuilder> consumer, CharSequence... attrs);
 
     /**
      * 列表 默认数字
@@ -131,7 +131,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder emphasized(String text, CharSequence ... textStyle);
+    MarkupBuilder emphasized(String text, CharSequence... textStyle);
 
     /**
      * 加粗
@@ -139,7 +139,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder strong(String text, CharSequence ... textStyle);
+    MarkupBuilder strong(String text, CharSequence... textStyle);
 
     /**
      * 等宽
@@ -147,7 +147,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder monospaced(String text, CharSequence ... textStyle);
+    MarkupBuilder monospaced(String text, CharSequence... textStyle);
 
     /**
      * 单引号
@@ -155,7 +155,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder quoted(String text, CharSequence ... textStyle);
+    MarkupBuilder quoted(String text, CharSequence... textStyle);
 
     /**
      * 双引号
@@ -163,7 +163,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder doubleQuoted(String text, CharSequence ... textStyle);
+    MarkupBuilder doubleQuoted(String text, CharSequence... textStyle);
 
     /**
      * 正常的引用文字
@@ -171,7 +171,7 @@ public interface MarkupBuilder {
      * @param text text
      * @return this builder
      */
-    MarkupBuilder unquoted(String text, CharSequence ... textStyle);
+    MarkupBuilder unquoted(String text, CharSequence... textStyle);
 
 
     /**
