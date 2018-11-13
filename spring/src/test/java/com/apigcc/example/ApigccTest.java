@@ -1,9 +1,9 @@
 package com.apigcc.example;
 
-import com.apigcc.Apigcc;
-import com.apigcc.Options;
-import com.apigcc.example.diff.MatchUtil;
-import com.apigcc.visitor.Framework;
+import com.apigcc.core.Apigcc;
+import com.apigcc.core.Options;
+import com.apigcc.core.common.diff.MatchUtil;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -34,9 +34,11 @@ public class ApigccTest {
         Path buildAdoc = options.getOutPath().resolve(options.getId() + ".adoc");
         Path template = options.getOutPath().resolve("../../src/test/resources/template.adoc");
         Path templateHtml = options.getOutPath().resolve("../../src/test/resources/template.html");
-        Path resultHtml = options.getOutPath().resolve("result.html");
+        Path resultHtml = options.getOutPath().resolve("diff.html");
 
-        new MatchUtil(templateHtml, resultHtml).compare(template, buildAdoc);
+        int changed = new MatchUtil(templateHtml, resultHtml).compare(template, buildAdoc);
+        Assert.assertEquals(0, changed);
+        System.out.println("BUILD SUCCESS");
     }
 
 }

@@ -65,7 +65,7 @@ HTTP/1.1 200 OK
 请求
 [source,HTTP ]
 ----
-GET /users/{id}? HTTP/1.1
+GET /users/{id} HTTP/1.1
 
 ----
 
@@ -88,8 +88,7 @@ HTTP/1.1 200 OK
     "name" : "",
     "age" : 0,
     "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
+    "Sex" : ""
   }
 }
 ----
@@ -105,7 +104,6 @@ HTTP/1.1 200 OK
 |+data.age+|+Integer+|+Min(1) NotNull+|+0+|
 |+data.createAt+|+Date+|||
 |+data.Sex+|+String+|+NotBlank+||
-|+data.users+|+List+|||
 |===
 
 
@@ -141,8 +139,7 @@ HTTP/1.1 200 OK
     "name" : "",
     "age" : 0,
     "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
+    "Sex" : ""
   }
 }
 ----
@@ -158,7 +155,6 @@ HTTP/1.1 200 OK
 |+data.age+|+Integer+|+Min(1) NotNull+|+0+|
 |+data.createAt+|+Date+|||
 |+data.Sex+|+String+|+NotBlank+||
-|+data.users+|+List+|||
 |===
 
 
@@ -179,14 +175,6 @@ Content-Type: application/json
   "icons" : [ "" ],
   "attrs" : {
     "" : ""
-  },
-  "user" : {
-    "id" : 0,
-    "name" : "",
-    "age" : 0,
-    "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
   }
 }
 ----
@@ -198,17 +186,10 @@ Content-Type: application/json
 |+name+|+String+|+Size(min=5,max=20) NotEmpty+||+姓名+
 |+age+|+int+|+Min(1)+|+0+|+年龄+
 |+birthday+|+Date+|+NotNull+||+生日，还是推荐使用javadoc+
-|+tags+|+List+|+Size(min=1,max=2)+||+用户标签+
-|+data+|+List+|||
+|+tags+|+List<String>+|+Size(min=1,max=2)+||+用户标签+
+|+data+|+List<>+|||
 |+icons+|+java.lang.String[]+|||+用户图标+
-|+attrs+|+Map+|||
-|+user+|+User+|||
-|+user.id+|+int+||+0+|
-|+user.name+|+String+|+NotBlank+||
-|+user.age+|+Integer+|+Min(1) NotNull+|+0+|
-|+user.createAt+|+Date+|||
-|+user.Sex+|+String+|+NotBlank+||
-|+user.users+|+List+|||
+|+attrs+|+Map<String, String>+|||
 |===
 
 响应
@@ -227,6 +208,7 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
+|+data+||||
 |===
 
 
@@ -247,14 +229,6 @@ Content-Type: application/json
   "icons" : [ "" ],
   "attrs" : {
     "" : ""
-  },
-  "user" : {
-    "id" : 0,
-    "name" : "",
-    "age" : 0,
-    "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
   }
 }
 ----
@@ -266,17 +240,10 @@ Content-Type: application/json
 |+name+|+String+|+Size(min=5,max=20) NotEmpty+||+姓名+
 |+age+|+int+|+Min(1)+|+0+|+年龄+
 |+birthday+|+Date+|+NotNull+||+生日，还是推荐使用javadoc+
-|+tags+|+List+|+Size(min=1,max=2)+||+用户标签+
-|+data+|+List+|||
+|+tags+|+List<String>+|+Size(min=1,max=2)+||+用户标签+
+|+data+|+List<>+|||
 |+icons+|+java.lang.String[]+|||+用户图标+
-|+attrs+|+Map+|||
-|+user+|+User+|||
-|+user.id+|+int+||+0+|
-|+user.name+|+String+|+NotBlank+||
-|+user.age+|+Integer+|+Min(1) NotNull+|+0+|
-|+user.createAt+|+Date+|||
-|+user.Sex+|+String+|+NotBlank+||
-|+user.users+|+List+|||
+|+attrs+|+Map<String, String>+|||
 |===
 
 响应
@@ -295,6 +262,7 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
+|+data+||||
 |===
 
 
@@ -325,7 +293,13 @@ HTTP/1.1 200 OK
 {
   "code" : 0,
   "msg" : "",
-  "data" : [ ]
+  "data" : [ {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : ""
+  } ]
 }
 ----
 
@@ -334,7 +308,12 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
-|+data+|+List+|||
+|+data+|+List<User>+|||
+|+data.[].id+|+int+||+0+|
+|+data.[].name+|+String+|+NotBlank+||
+|+data.[].age+|+Integer+|+Min(1) NotNull+|+0+|
+|+data.[].createAt+|+Date+|||
+|+data.[].Sex+|+String+|+NotBlank+||
 |===
 
 
@@ -369,7 +348,13 @@ HTTP/1.1 200 OK
 {
   "code" : 0,
   "msg" : "",
-  "data" : [ ]
+  "data" : [ {
+    "id" : 0,
+    "name" : "",
+    "age" : 0,
+    "createAt" : "",
+    "Sex" : ""
+  } ]
 }
 ----
 
@@ -378,7 +363,12 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
-|+data+|+List+|||
+|+data+|+List<User>+|||
+|+data.[].id+|+int+||+0+|
+|+data.[].name+|+String+|+NotBlank+||
+|+data.[].age+|+Integer+|+Min(1) NotNull+|+0+|
+|+data.[].createAt+|+Date+|||
+|+data.[].Sex+|+String+|+NotBlank+||
 |===
 
 
@@ -415,6 +405,7 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
+|+data+||||
 |===
 
 
@@ -446,6 +437,7 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
+|+data+||||
 |===
 
 
@@ -468,6 +460,11 @@ GET /users/role?role= HTTP/1.1
 ----
 HTTP/1.1 200 OK
 
+{
+  "code" : 0,
+  "msg" : "",
+  "data" : 0
+}
 ----
 
 [options="header"]
@@ -496,14 +493,6 @@ Content-Type: application/json
   "icons" : [ "" ],
   "attrs" : {
     "" : ""
-  },
-  "user" : {
-    "id" : 0,
-    "name" : "",
-    "age" : 0,
-    "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
   }
 } ]
 ----
@@ -515,17 +504,10 @@ Content-Type: application/json
 |+[].name+|+String+|+Size(min=5,max=20) NotEmpty+||+姓名+
 |+[].age+|+int+|+Min(1)+|+0+|+年龄+
 |+[].birthday+|+Date+|+NotNull+||+生日，还是推荐使用javadoc+
-|+[].tags+|+List+|+Size(min=1,max=2)+||+用户标签+
-|+[].data+|+List+|||
+|+[].tags+|+List<String>+|+Size(min=1,max=2)+||+用户标签+
+|+[].data+|+List<>+|||
 |+[].icons+|+java.lang.String[]+|||+用户图标+
-|+[].attrs+|+Map+|||
-|+[].user+|+User+|||
-|+[].user.id+|+int+||+0+|
-|+[].user.name+|+String+|+NotBlank+||
-|+[].user.age+|+Integer+|+Min(1) NotNull+|+0+|
-|+[].user.createAt+|+Date+|||
-|+[].user.Sex+|+String+|+NotBlank+||
-|+[].user.users+|+List+|||
+|+[].attrs+|+Map<String, String>+|||
 |===
 
 响应
@@ -543,14 +525,6 @@ HTTP/1.1 200 OK
   "icons" : [ "" ],
   "attrs" : {
     "" : ""
-  },
-  "user" : {
-    "id" : 0,
-    "name" : "",
-    "age" : 0,
-    "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
   }
 }
 ----
@@ -562,17 +536,10 @@ HTTP/1.1 200 OK
 |+name+|+String+|+Size(min=5,max=20) NotEmpty+||+姓名+
 |+age+|+int+|+Min(1)+|+0+|+年龄+
 |+birthday+|+Date+|+NotNull+||+生日，还是推荐使用javadoc+
-|+tags+|+List+|+Size(min=1,max=2)+||+用户标签+
-|+data+|+List+|||
+|+tags+|+List<String>+|+Size(min=1,max=2)+||+用户标签+
+|+data+|+List<>+|||
 |+icons+|+java.lang.String[]+|||+用户图标+
-|+attrs+|+Map+|||
-|+user+|+User+|||
-|+user.id+|+int+||+0+|
-|+user.name+|+String+|+NotBlank+||
-|+user.age+|+Integer+|+Min(1) NotNull+|+0+|
-|+user.createAt+|+Date+|||
-|+user.Sex+|+String+|+NotBlank+||
-|+user.users+|+List+|||
+|+attrs+|+Map<String, String>+|||
 |===
 
 
@@ -642,22 +609,13 @@ HTTP/1.1 200 OK
   "icons" : [ "" ],
   "attrs" : {
     "" : ""
-  },
-  "user" : {
-    "id" : 0,
-    "name" : "",
-    "age" : 0,
-    "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
   }
 }, {
   "id" : 0,
   "name" : "",
   "age" : 0,
   "createAt" : "",
-  "Sex" : "",
-  "users" : [ ]
+  "Sex" : ""
 } ]
 ----
 
@@ -668,23 +626,15 @@ HTTP/1.1 200 OK
 |+?0.name+|+String+|+Size(min=5,max=20) NotEmpty+||+姓名+
 |+?0.age+|+int+|+Min(1)+|+0+|+年龄+
 |+?0.birthday+|+Date+|+NotNull+||+生日，还是推荐使用javadoc+
-|+?0.tags+|+List+|+Size(min=1,max=2)+||+用户标签+
-|+?0.data+|+List+|||
+|+?0.tags+|+List<String>+|+Size(min=1,max=2)+||+用户标签+
+|+?0.data+|+List<>+|||
 |+?0.icons+|+java.lang.String[]+|||+用户图标+
-|+?0.attrs+|+Map+|||
-|+?0.user+|+User+|||
-|+?0.user.id+|+int+||+0+|
-|+?0.user.name+|+String+|+NotBlank+||
-|+?0.user.age+|+Integer+|+Min(1) NotNull+|+0+|
-|+?0.user.createAt+|+Date+|||
-|+?0.user.Sex+|+String+|+NotBlank+||
-|+?0.user.users+|+List+|||
+|+?0.attrs+|+Map<String, String>+|||
 |+?1.id+|+int+||+0+|
 |+?1.name+|+String+|+NotBlank+||
 |+?1.age+|+Integer+|+Min(1) NotNull+|+0+|
 |+?1.createAt+|+Date+|||
 |+?1.Sex+|+String+|+NotBlank+||
-|+?1.users+|+List+|||
 |===
 
 
@@ -712,6 +662,7 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
+|+data+||||
 |===
 
 
@@ -737,14 +688,6 @@ Content-Type: application/json
       "icons" : [ "" ],
       "attrs" : {
         "" : ""
-      },
-      "user" : {
-        "id" : 0,
-        "name" : "",
-        "age" : 0,
-        "createAt" : "",
-        "Sex" : "",
-        "users" : [ ]
       }
     } ]
   }
@@ -756,24 +699,17 @@ Content-Type: application/json
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
-|+data+|+Wrapper+|||
+|+data+|+Wrapper<List>+|||
 |+data.wrapper+|+String+|||
-|+data.data+|+List+|||
+|+data.data+|+List<UserDTO>+|||
 |+data.data.[].id+|+Integer+||+0+|+编号+
 |+data.data.[].name+|+String+|+Size(min=5,max=20) NotEmpty+||+姓名+
 |+data.data.[].age+|+int+|+Min(1)+|+0+|+年龄+
 |+data.data.[].birthday+|+Date+|+NotNull+||+生日，还是推荐使用javadoc+
-|+data.data.[].tags+|+List+|+Size(min=1,max=2)+||+用户标签+
-|+data.data.[].data+|+List+|||
+|+data.data.[].tags+|+List<String>+|+Size(min=1,max=2)+||+用户标签+
+|+data.data.[].data+|+List<>+|||
 |+data.data.[].icons+|+java.lang.String[]+|||+用户图标+
-|+data.data.[].attrs+|+Map+|||
-|+data.data.[].user+|+User+|||
-|+data.data.[].user.id+|+int+||+0+|
-|+data.data.[].user.name+|+String+|+NotBlank+||
-|+data.data.[].user.age+|+Integer+|+Min(1) NotNull+|+0+|
-|+data.data.[].user.createAt+|+Date+|||
-|+data.data.[].user.Sex+|+String+|+NotBlank+||
-|+data.data.[].user.users+|+List+|||
+|+data.data.[].attrs+|+Map<String, String>+|||
 |===
 
 响应
@@ -796,14 +732,6 @@ HTTP/1.1 200 OK
       "icons" : [ "" ],
       "attrs" : {
         "" : ""
-      },
-      "user" : {
-        "id" : 0,
-        "name" : "",
-        "age" : 0,
-        "createAt" : "",
-        "Sex" : "",
-        "users" : [ ]
       }
     }
   }
@@ -815,24 +743,17 @@ HTTP/1.1 200 OK
 |+名称+|+类型+|+校验+|+默认+|+描述+
 |+code+|+int+||+0+|+返回码+
 |+msg+|+String+|||+返回信息+
-|+data+|+Wrapper+|||
+|+data+|+Wrapper<UserDTO>+|||
 |+data.wrapper+|+String+|||
 |+data.data+|+UserDTO+|||
 |+data.data.id+|+Integer+||+0+|+编号+
 |+data.data.name+|+String+|+Size(min=5,max=20) NotEmpty+||+姓名+
 |+data.data.age+|+int+|+Min(1)+|+0+|+年龄+
 |+data.data.birthday+|+Date+|+NotNull+||+生日，还是推荐使用javadoc+
-|+data.data.tags+|+List+|+Size(min=1,max=2)+||+用户标签+
-|+data.data.data+|+List+|||
+|+data.data.tags+|+List<String>+|+Size(min=1,max=2)+||+用户标签+
+|+data.data.data+|+List<>+|||
 |+data.data.icons+|+java.lang.String[]+|||+用户图标+
-|+data.data.attrs+|+Map+|||
-|+data.data.user+|+User+|||
-|+data.data.user.id+|+int+||+0+|
-|+data.data.user.name+|+String+|+NotBlank+||
-|+data.data.user.age+|+Integer+|+Min(1) NotNull+|+0+|
-|+data.data.user.createAt+|+Date+|||
-|+data.data.user.Sex+|+String+|+NotBlank+||
-|+data.data.user.users+|+List+|||
+|+data.data.attrs+|+Map<String, String>+|||
 |===
 
 
@@ -902,8 +823,7 @@ HTTP/1.1 200 OK
     "name" : "",
     "age" : 0,
     "createAt" : "",
-    "Sex" : "",
-    "users" : [ ]
+    "Sex" : ""
   }
 } ]
 ----
@@ -932,8 +852,7 @@ HTTP/1.1 200 OK
         "name" : "",
         "age" : 0,
         "createAt" : "",
-        "Sex" : "",
-        "users" : [ ]
+        "Sex" : ""
       }
     }
   }
@@ -958,6 +877,34 @@ HTTP/1.1 200 OK
   "" : [ ]
 } ]
 ----
+
+
+=== 多级菜单
+请求
+[source,HTTP ]
+----
+GET /page/menus HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "id" : 0,
+  "name" : ""
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].id+|+int+||+0+|
+|+[].name+|+String+|||
+|+[].menus+|+List<Menu>+|||
+|===
 
 
 == 附录

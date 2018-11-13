@@ -45,6 +45,5 @@ public class UserDTO {
 
     Map<String, String> attrs;
 
-    User user;
 
 }
