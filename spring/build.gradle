@@ -1,16 +1,3 @@
-plugins {
-    id 'java'
-}
-
-group 'com.apigcc'
-version '1.6'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
 
     testCompile project(":core")

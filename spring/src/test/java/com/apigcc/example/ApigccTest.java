@@ -1,8 +1,8 @@
 package com.apigcc.example;
 
-import com.apigcc.Apigcc;
-import com.apigcc.Options;
-import com.apigcc.common.diff.MatchUtil;
+import com.apigcc.core.Apigcc;
+import com.apigcc.core.Options;
+import com.apigcc.core.common.diff.MatchUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
