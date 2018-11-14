@@ -11,8 +11,6 @@ import com.apigcc.core.common.Cell;
 import com.apigcc.core.common.ObjectMappers;
 import com.apigcc.core.common.loging.Logger;
 import com.apigcc.core.common.loging.LoggerFactory;
-import com.apigcc.handler.postman.schema.*;
-import com.core.handler.postman.schema.*;
 import com.google.common.base.Charsets;
 
 import java.nio.file.Path;
