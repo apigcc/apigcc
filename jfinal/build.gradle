@@ -3,7 +3,7 @@ plugins {
     id 'war'
 }
 
-apply from:'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+//apply from:'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 
 group 'com.apigcc'
 version '1.6'
@@ -11,16 +11,17 @@ version '1.6'
 sourceCompatibility = 1.8
 
 repositories {
-    // mavenCentral()
+    mavenCentral()
     //maven { url 'http://maven.oschina.net/content/groups/public/' }
-    maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    //maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
 }
 
 dependencies {
     testCompile project(":core")
     /*jfinal 核心包*/
-    compile 'com.jfinal:jfinal:2.0'
-    compile 'com.jfinal:jetty-server:8.1.8'
+    compile group: 'com.jfinal', name: 'jfinal', version: '3.5'
+    // https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
+    compile group: 'com.jfinal', name: 'jetty-server', version: '2018.11'
     /*commons-lang3 常用工具包 */
     compile ('org.apache.commons:commons-lang3:3.3.2')
 
