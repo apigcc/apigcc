@@ -4,8 +4,6 @@ import com.apigcc.core.Context;
 import com.apigcc.core.common.Cell;
 import com.apigcc.core.common.ObjectMappers;
 import com.apigcc.core.resolver.ast.*;
-import com.apigcc.resolver.ast.*;
-import com.core.resolver.ast.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
