@@ -1,9 +1,10 @@
 package com.apigcc.core.http;
 
 import com.apigcc.core.Context;
+import com.apigcc.core.resolver.TypeResolvers;
+import com.apigcc.core.resolver.Types;
 import com.apigcc.core.schema.Group;
 import com.apigcc.core.schema.Node;
-import com.apigcc.core.resolver.ResolvedTypes;
 import com.apigcc.core.resolver.ast.Comments;
 import com.apigcc.core.resolver.ast.Tag;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -35,14 +36,10 @@ public class HttpMessage extends Node {
         //解析@return标签
         for (Tag tag : comments.getTags()) {
             if ("return".equals(tag.getName()) && !Strings.isNullOrEmpty(tag.getContent())) {
-                SymbolReference<ResolvedReferenceTypeDeclaration> symbolReference = Context.getContext().getTypeSolver().tryToSolveType(tag.getContent());
-                if (symbolReference.isSolved()) {
-                    ResolvedReferenceTypeDeclaration typeDeclaration = symbolReference.getCorrespondingDeclaration();
-                    ResolvedTypes resolvedTypes = ResolvedTypes.of(typeDeclaration);
-                    if (resolvedTypes.resolved) {
-                        response.setBody(resolvedTypes.getValue());
-                        response.getCells().addAll(resolvedTypes.cells);
-                    }
+                Types types = TypeResolvers.tryParse(tag.getContent());
+                if(types.isResolved()){
+                    response.setBody(types.getValue());
+                    response.getCells().addAll(types.getCells());
                 }
 
             }

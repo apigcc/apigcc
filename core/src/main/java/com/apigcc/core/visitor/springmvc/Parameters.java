@@ -1,12 +1,13 @@
 package com.apigcc.core.visitor.springmvc;
 
 import com.apigcc.core.common.Cell;
+import com.apigcc.core.common.loging.Logger;
+import com.apigcc.core.common.loging.LoggerFactory;
+import com.apigcc.core.resolver.TypeResolvers;
+import com.apigcc.core.resolver.Types;
 import com.apigcc.core.resolver.ast.Annotations;
 import com.apigcc.core.resolver.ast.Comments;
 import com.apigcc.core.resolver.ast.Defaults;
-import com.apigcc.core.common.loging.Logger;
-import com.apigcc.core.common.loging.LoggerFactory;
-import com.apigcc.core.resolver.ResolvedTypes;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -116,15 +117,14 @@ public class Parameters {
     private void tryResolve(Parameter expr) {
         try {
             ResolvedParameterDeclaration parameterDeclaration = expr.resolve();
-            ResolvedType resolvedType = parameterDeclaration.getType();
-            ResolvedTypes astResolvedType = ResolvedTypes.of(resolvedType);
-            if(!astResolvedType.resolved){
+            Types astResolvedType = TypeResolvers.of(parameterDeclaration.getType());
+            if(!astResolvedType.isResolved()){
                 return;
             }
-            setPrimitive(astResolvedType.primitive);
+            setPrimitive(astResolvedType.isPrimitive());
             setValue(astResolvedType.getValue());
 
-            if (astResolvedType.primitive) {
+            if (astResolvedType.isPrimitive()) {
 
                 String name = expr.getNameAsString();
                 String value = String.valueOf(astResolvedType.getValue());
@@ -137,9 +137,9 @@ public class Parameters {
                 if (defaultValueAttr != null) {
                     value = String.valueOf(defaultValueAttr);
                 }
-                cells.add(new Cell<>(name, astResolvedType.name, "", value, Comments.getCommentFromMethod(expr)));
+                cells.add(new Cell<>(name, astResolvedType.getName(), "", value, Comments.getCommentFromMethod(expr)));
             }
-            cells.addAll(astResolvedType.cells);
+            cells.addAll(astResolvedType.getCells());
 
         } catch (Exception e) {
             log.debug("parameters parse fail:{}",expr.toString());

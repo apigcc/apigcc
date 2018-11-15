@@ -5,13 +5,14 @@ import com.apigcc.core.http.HttpHeaders;
 import com.apigcc.core.http.HttpMessage;
 import com.apigcc.core.http.HttpRequest;
 import com.apigcc.core.http.HttpRequestMethod;
-import com.apigcc.core.resolver.ast.Types;
+import com.apigcc.core.resolver.TypeResolvers;
+import com.apigcc.core.resolver.Types;
+import com.apigcc.core.resolver.ast.Clazz;
 import com.apigcc.core.schema.Bucket;
 import com.apigcc.core.schema.Group;
 import com.apigcc.core.schema.Node;
 import com.apigcc.core.schema.Tree;
 import com.apigcc.core.visitor.NodeVisitor;
-import com.apigcc.core.resolver.ResolvedTypes;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -43,8 +44,8 @@ public class SpringVisitor extends NodeVisitor {
         if (arg instanceof Tree && Controllers.accept(n.getAnnotations())) {
             Tree tree = (Tree) arg;
             Group group = new Group();
-            group.setId(Types.getFullName(n));
-            group.setName(Types.getNameInScope(n));
+            group.setId(Clazz.getFullName(n));
+            group.setName(Clazz.getNameInScope(n));
             group.setRest(Controllers.isResponseBody(n));
             //解析注释
             group.accept(n.getComment());
@@ -105,10 +106,10 @@ public class SpringVisitor extends NodeVisitor {
      * @param message
      */
     private void visit(Type type, HttpMessage message) {
-        ResolvedTypes astResolvedType = ResolvedTypes.of(type);
-        if (astResolvedType.resolved) {
+        Types astResolvedType = TypeResolvers.of(type);
+        if (astResolvedType.isResolved()) {
             message.getResponse().setBody(astResolvedType.getValue());
-            message.getResponse().getCells().addAll(astResolvedType.cells);
+            message.getResponse().getCells().addAll(astResolvedType.getCells());
         }
     }
 

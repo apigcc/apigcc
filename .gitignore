@@ -26,3 +26,4 @@ target
 out
 build
 gradlew*
+gradle.properties
