@@ -1,6 +1,7 @@
 package com.apigcc.core.common.diff;
 
 import com.google.common.base.Charsets;
+import lombok.Getter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,34 +12,39 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.util.LinkedList;
+import java.util.List;
 
-public class MatchUtil {
+/**
+ * 文件对比工具
+ */
+@Getter
+public class FileMatcher {
 
-    public Path templateHtml;
-    public Path resultHtml;
+    MatchPatcher matchPatcher = new MatchPatcher();
 
-    public MatchUtil(Path templateHtml, Path resultHtml) {
-        this.templateHtml = templateHtml;
-        this.resultHtml = resultHtml;
-    }
+    /**
+     * 变化的点
+     */
+    private int changs;
+
+    private List<MatchPatcher.Diff> diffs;
 
     public int compare(Path template, Path build) {
         return compare(readFile(template), readFile(build));
     }
 
     public int compare(String templateText, String buildText) {
-        MatchPatcher matchPatcher = new MatchPatcher();
-        matchPatcher.Patch_Margin = 20;
-        LinkedList<MatchPatcher.Diff> diffs = matchPatcher.diff_main(templateText, buildText, true);
-        int changed = hasChange(diffs);
-        if (changed > 0) {
-            rederHtml(matchPatcher.diff_prettyHtml(diffs));
+        diffs = matchPatcher.diff_main(templateText, buildText, true);
+        for (MatchPatcher.Diff diff : diffs) {
+            if (!diff.operation.equals(MatchPatcher.Operation.EQUAL)) {
+                changs++;
+            }
         }
-
-        return changed;
+        return changs;
     }
 
-    private void rederHtml(String results) {
+    public void rederHtml(Path templateHtml, Path resultHtml) {
+        String results = matchPatcher.diff_prettyHtml(diffs);
         String[] lines = br(results).replaceAll("<span>|</span>", "").split("\n");
         String html = readFile(templateHtml);
         html = html.replace("${content}", lines(lines));
@@ -54,16 +60,6 @@ public class MatchUtil {
                     .append(lines[i]).append("</td></tr>");
         }
         return stringBuilder.toString();
-    }
-
-    private static int hasChange(LinkedList<MatchPatcher.Diff> diffs) {
-        int changed = 0;
-        for (MatchPatcher.Diff diff : diffs) {
-            if (!diff.operation.equals(MatchPatcher.Operation.EQUAL)) {
-                changed++;
-            }
-        }
-        return changed;
     }
 
     private static String br(String text) {
