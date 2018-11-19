@@ -21,9 +21,16 @@ dependencies {
     /*jfinal 核心包*/
     compile group: 'com.jfinal', name: 'jfinal', version: '3.5'
     // https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
-    compile group: 'com.jfinal', name: 'jetty-server', version: '2018.11'
+    //compile group: 'com.jfinal', name: 'jetty-server', version: '2018.11'
     /*commons-lang3 常用工具包 */
     compile ('org.apache.commons:commons-lang3:3.3.2')
+
+    compile 'org.projectlombok:lombok:1.18.4'
+
+    compile group: 'com.google.zxing', name: 'javase', version: '3.2.1'
+
+    compile project(":core")
+
 
 }
 
