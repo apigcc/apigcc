@@ -7,22 +7,27 @@ import com.jfinal.config.Interceptors;
 import com.jfinal.config.JFinalConfig;
 import com.jfinal.config.Plugins;
 import com.jfinal.config.Routes;
+import com.jfinal.core.JFinal;
+import com.jfinal.template.Engine;
 
+/**
+ * @author lenovo
+ */
 public class ExampleConfig extends JFinalConfig {
+
     @Override
     public void configConstant(Constants me) {
-        /*开发模式*/
         me.setDevMode(true);
-        me.setBaseViewPath("/");
     }
 
-    /**
-     * 路由配置
-     * @param me
-     */
     @Override
     public void configRoute(Routes me) {
         me.add("/", IndexController.class);
+    }
+
+    @Override
+    public void configEngine(Engine me) {
+
     }
 
     @Override
