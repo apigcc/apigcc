@@ -13,7 +13,7 @@ import java.util.List;
 public enum Framework {
 
     SPRINGMVC(SpringVisitor.class),
-    JFINAL(JFinalVisitor.class)
+    JFINAL(JFinalVisitor.class),
     ;
 
     private Class<? extends NodeVisitor> visitor;

@@ -4,8 +4,11 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.utils.Pair;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.math.BigDecimal;
@@ -14,7 +17,40 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Types {
+public class Clazz {
+
+    /**
+     * 解析类型的名称
+     * 基本类型如：int double
+     * java类型如：String List
+     * 自定义类型如: com.example.User
+     *
+     * @param resolvedType
+     * @return
+     */
+    public static String getName(ResolvedType resolvedType) {
+        if (resolvedType instanceof ReferenceTypeImpl) {
+            StringBuilder sb = new StringBuilder();
+            ReferenceTypeImpl impl = (ReferenceTypeImpl) resolvedType;
+            ResolvedReferenceTypeDeclaration typeDeclaration = impl.getTypeDeclaration();
+            sb.append(typeDeclaration.getName());
+            if (!impl.getTypeParametersMap().isEmpty()) {
+                sb.append("<");
+                List<String> types = Lists.newArrayList();
+                for (Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair : impl.getTypeParametersMap()) {
+                    if (pair.b instanceof ReferenceTypeImpl) {
+                        ReferenceTypeImpl b = (ReferenceTypeImpl) pair.b;
+                        types.add(b.getTypeDeclaration().getName());
+                    }
+                }
+                sb.append(String.join(", ", types));
+                sb.append(">");
+            }
+            return sb.toString();
+        }
+        return resolvedType.describe();
+    }
+
 
     /**
      * 获取类型权限定名

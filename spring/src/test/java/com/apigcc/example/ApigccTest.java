@@ -2,7 +2,7 @@ package com.apigcc.example;
 
 import com.apigcc.core.Apigcc;
 import com.apigcc.core.Options;
-import com.apigcc.core.common.diff.MatchUtil;
+import com.apigcc.core.common.diff.FileMatcher;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +36,11 @@ public class ApigccTest {
         Path templateHtml = options.getOutPath().resolve("../../src/test/resources/template.html");
         Path resultHtml = options.getOutPath().resolve("diff.html");
 
-        int changed = new MatchUtil(templateHtml, resultHtml).compare(template, buildAdoc);
+        FileMatcher fileMatcher = new FileMatcher();
+        int changed = fileMatcher.compare(template, buildAdoc);
+        if(changed>0){
+            fileMatcher.rederHtml(templateHtml, resultHtml);
+        }
         Assert.assertEquals(0, changed);
         System.out.println("BUILD SUCCESS");
     }
