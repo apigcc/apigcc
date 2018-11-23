@@ -1,6 +1,7 @@
 package com.apigcc.example.config;
 
 import com.apigcc.example.Controller.IndexController;
+import com.apigcc.example.Controller.UserController;
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
 import com.jfinal.config.Interceptors;
@@ -23,6 +24,7 @@ public class ExampleConfig extends JFinalConfig {
     @Override
     public void configRoute(Routes me) {
         me.add("/", IndexController.class);
+        me.add("/User", UserController.class);
     }
 
     @Override

@@ -22,7 +22,6 @@ public class JfinalTest {
                 .id("apigcc")
                 .title("jfinal示例接口文档")
                 .description("示例接口文档，使用默认模板");
-
         Apigcc apigcc = new Apigcc(options);
         apigcc.lookup().build();
     }
