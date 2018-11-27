@@ -1,6 +1,7 @@
 package com.apigcc.core.visitor.jfinal;
 
 
+import com.apigcc.core.handler.postman.schema.Method;
 import com.apigcc.core.resolver.ast.Clazz;
 import com.apigcc.core.schema.Bucket;
 import com.apigcc.core.schema.Group;
@@ -10,6 +11,10 @@ import com.apigcc.core.visitor.NodeVisitor;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.SimpleName;
+import com.github.javaparser.ast.stmt.BlockStmt;
+
+import java.util.List;
 
 
 public class JFinalVisitor extends NodeVisitor {
@@ -41,6 +46,11 @@ public class JFinalVisitor extends NodeVisitor {
 
             arg=group;
         }
+
+        if(arg instanceof Tree && Configs.accept(n.getName())){
+            visit(n.getMethods(),n.getName());
+        }
+
         super.visit(n, arg);
     }
 
@@ -53,10 +63,30 @@ public class JFinalVisitor extends NodeVisitor {
     @Override
     public void visit(MethodDeclaration n, Node arg) {
         if (arg instanceof Group && Configs.accept(n.getName())) {
-
+            visit(n.getBody().get().asBlockStmt());
         }
-        super.visit(n, arg);
     }
 
+    /**
+     * 代码块解析
+     * @param stmt
+     */
+    public void visit(BlockStmt stmt){
+        List<RC> rcs=RC.getInstance();
+        rcs.add(new RC("/","IndexController.class"));
+        rcs.add(new RC("/User","UserController.class"));
+    }
+
+    public void visit(List<MethodDeclaration> method,SimpleName name){
+        if(method.size()>0){
+            for (RC rc:RC.getInstance()) {
+                if(rc.getClazz().equals(name)){
+                    rc.setMethod(rc.getMethod());
+                }
+            }
+        }
+
+        System.out.println();
+    }
 
 }
