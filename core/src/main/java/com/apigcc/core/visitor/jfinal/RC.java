@@ -17,20 +17,23 @@ public class RC {
 
     private String path;
     private String clazz;
-
     private String method;
+    private List<RC> rcs;
 
     public RC(String path,String clazz){
         this.path=path;
         this.clazz=clazz;
     }
 
-    private static List<RC> rcs=null;
 
-    public static List<RC> getInstance(){
-        if(rcs==null){
-            rcs=new ArrayList<RC>();
+    /*单例*/
+    private static RC rc=null;
+    public static RC getInstance(){
+        if(rc==null){
+            rc=new RC();
         }
-        return rcs;
+        return rc;
     }
+
 }
+
