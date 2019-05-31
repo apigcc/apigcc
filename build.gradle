@@ -7,19 +7,102 @@ buildscript {
     }
 }
 
-subprojects {
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
 
-    apply plugin: 'java'
+ext {
+    DESCRIPTION = 'A rest document generator with parse the source code.'
+    SITE_URL = 'https://github.com/apigcc/apigcc'
+    GIT_URL = 'https://github.com/apigcc/apigcc.git'
 
-    group 'com.apigcc'
-    version '1.6'
+    LICENSE = 'MIT License'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    DEVELOPER_ID = 'ayz6uem'
+    DEVELOPER_NAME = 'ayz6uem'
+    DEVELOPER_EMAIL = '360188606@qq.com'
 
-    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+    IS_UPLOADING = project.getGradle().startParameter.taskNames.any { it.contains('bintrayUpload') }
+}
 
-    repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+group 'com.apigcc'
+version '1.6'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+repositories {
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+}
+
+dependencies {
+    compile 'com.github.javaparser:javaparser-symbol-solver-core:3.6.25'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.2'
+    compile 'org.asciidoctor:asciidoctorj:1.5.6'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.projectlombok:lombok:1.18.6'
+
+    testCompile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.0.RELEASE'
+    testCompile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    testCompile group: 'com.alibaba', name: 'fastjson', version: '1.2.51'
+    testCompile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+    testCompile fileTree(dir: "src/test/resources/lib/", includes: ["*.jar"])
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.4'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+}
+
+publish {
+    userOrg = 'apiggs'
+    groupId = group
+    artifactId = name
+    publishVersion = version
+    desc = project.DESCRIPTION
+    website = project.SITE_URL
+//    bintrayUser = project.BINTRAYUSER
+//    bintrayKey = project.BINTRAYKEY
+    dryRun = false
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    taskGraph.getAllTasks().find { it.path == ":generatePomFileForMavenPublication" }?.doLast {
+        file("build/publications/maven/pom-default.xml").delete()
+        println 'Overriding pom-file to make sure we can sync to maven!'
+        pom {
+            //noinspection GroovyAssignabilityCheck
+            project {
+                name "$project.name"
+                artifactId name
+                packaging 'jar'
+                description DESCRIPTION
+                url SITE_URL
+                version version
+
+                scm {
+                    url GIT_URL
+                    connection GIT_URL
+                    developerConnection GIT_URL
+                }
+
+                licenses {
+                    license {
+                        name LICENSE
+                    }
+                }
+
+                developers {
+                    developer {
+                        id DEVELOPER_ID
+                        name DEVELOPER_NAME
+                        email DEVELOPER_EMAIL
+                    }
+                }
+            }
+        }.writeTo("build/publications/maven/pom-default.xml")
     }
 }
