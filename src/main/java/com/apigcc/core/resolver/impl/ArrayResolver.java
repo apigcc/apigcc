@@ -1,6 +1,6 @@
 package com.apigcc.core.resolver.impl;
 
-import com.apigcc.core.common.ObjectMappers;
+import com.apigcc.common.ObjectMappers;
 import com.apigcc.core.resolver.TypeResolvers;
 import com.apigcc.core.resolver.Types;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,7 +15,7 @@ public class ArrayResolver extends Resolver {
 
     @Override
     public void resolve(Types types, ResolvedType resolvedType) {
-        ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
+        ArrayNode arrayNode = ObjectMappers.instance.createArrayNode();
         Types componentType = TypeResolvers.of(resolvedType.asArrayType().getComponentType()).duplicate();
         if (componentType.isResolved()) {
             componentType.prefix("[].");

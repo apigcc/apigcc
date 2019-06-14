@@ -1,7 +1,7 @@
 package com.apigcc.core.http;
 
 import com.apigcc.core.common.Cell;
-import com.apigcc.core.common.ObjectMappers;
+import com.apigcc.common.ObjectMappers;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +30,7 @@ public class HttpResponse {
 
     public String bodyString(){
         if(getBody()!=null && getBody() instanceof JsonNode){
-            return ObjectMappers.toPretty(getBody());
+            return ObjectMappers.pretty(getBody());
         }
         return "";
     }

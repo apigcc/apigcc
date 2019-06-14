@@ -8,7 +8,7 @@ import com.apigcc.core.http.HttpMessage;
 import com.apigcc.core.schema.Group;
 import com.apigcc.core.schema.Tree;
 import com.apigcc.core.common.Cell;
-import com.apigcc.core.common.ObjectMappers;
+import com.apigcc.common.ObjectMappers;
 import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +24,7 @@ public class PostmanTreeHandler implements TreeHandler {
     public void handle(Tree tree, Options options) {
         Postman postman = buildPostman(tree);
         Path file = options.getOutPath().resolve(options.getId() + ".json");
-        write(file, ObjectMappers.toPretty(postman), Charsets.UTF_8);
+        write(file, ObjectMappers.pretty(postman), Charsets.UTF_8);
         log.info("Build {}", file);
     }
 
@@ -65,7 +65,7 @@ public class PostmanTreeHandler implements TreeHandler {
             }
         } else if (HttpHeaders.ContentType.APPLICATION_JSON.equals(httpMessage.getRequest().getHeaders().getContentType())) {
             request.getBody().setMode(BodyMode.raw);
-            request.getBody().setRaw(ObjectMappers.toPretty(httpMessage.getRequest().getBody()));
+            request.getBody().setRaw(ObjectMappers.pretty(httpMessage.getRequest().getBody()));
         } else if (HttpHeaders.ContentType.APPLICATION_X_WWW_FORM_URLENCODED.equals(httpMessage.getRequest().getHeaders().getContentType())) {
             request.getBody().setMode(BodyMode.urlencoded);
             for (Cell<String> cell : httpMessage.getRequest().getCells()) {
@@ -83,7 +83,7 @@ public class PostmanTreeHandler implements TreeHandler {
         response.setName(httpMessage.getResponse().getStatus().toString());
         response.setOriginalRequest(request);
         httpMessage.getResponse().getHeaders().forEach((key, value) -> response.getHeader().add(new Header(key, value)));
-        response.setBody(ObjectMappers.toPretty(httpMessage.getResponse().getBody()));
+        response.setBody(ObjectMappers.pretty(httpMessage.getResponse().getBody()));
         response.setCode(httpMessage.getResponse().getStatus().code());
         response.setStatus(httpMessage.getResponse().getStatus().reasonPhrase());
         item.getResponse().add(response);

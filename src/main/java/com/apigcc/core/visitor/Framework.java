@@ -1,6 +1,5 @@
 package com.apigcc.core.visitor;
 
-import com.apigcc.core.visitor.jfinal.JFinalVisitor;
 import com.apigcc.core.visitor.springmvc.SpringVisitor;
 import com.github.javaparser.ast.CompilationUnit;
 
@@ -13,7 +12,6 @@ import java.util.List;
 public enum Framework {
 
     SPRINGMVC(SpringVisitor.class),
-    JFINAL(JFinalVisitor.class),
     ;
 
     private Class<? extends NodeVisitor> visitor;

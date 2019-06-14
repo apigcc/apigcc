@@ -1,10 +1,21 @@
 package com.apigcc.example;
 
+import com.apigcc.common.ObjectMappers;
 import com.apigcc.core.Apigcc;
 import com.apigcc.core.Options;
 import com.apigcc.example.diff.FileMatcher;
+import com.apigcc.spring.SpringParserStrategy;
+import com.apigcc.parser.VisitorParser;
+import com.apigcc.schema.Project;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.utils.SourceRoot;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -17,6 +28,29 @@ import java.nio.file.Paths;
  * /mini路径下的接口为小程序专用
  */
 public class ApigccTest {
+
+    @Test
+    public void test() throws IOException {
+
+        Project project = new Project();
+
+        VisitorParser visitorParser = new VisitorParser();
+        visitorParser.setParserStrategy(new SpringParserStrategy());
+
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+        ParserConfiguration parserConfiguration = new ParserConfiguration();
+        parserConfiguration.setSymbolResolver(new JavaSymbolSolver(typeSolver));
+
+        SourceRoot root = new SourceRoot(Paths.get("D:/apigcc/apigcc-demo-spring/src/main/java"), parserConfiguration);
+        for (ParseResult<CompilationUnit> result : root.tryToParse()) {
+            if(result.isSuccessful() && result.getResult().isPresent()){
+                result.getResult().get().accept(visitorParser, project);
+            }
+        }
+
+        System.out.println(ObjectMappers.pretty(project));
+
+    }
 
     @Test
     public void testApigcc() {

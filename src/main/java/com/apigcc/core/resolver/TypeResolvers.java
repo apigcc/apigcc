@@ -1,7 +1,7 @@
 package com.apigcc.core.resolver;
 
 import com.apigcc.core.Context;
-import com.apigcc.core.common.ObjectMappers;
+import com.apigcc.common.ObjectMappers;
 import com.apigcc.core.resolver.ast.Clazz;
 import com.apigcc.core.resolver.impl.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -88,7 +88,7 @@ public class TypeResolvers {
                 }
 
                 Types result = Types.get(type);
-                ArrayNode arrayNode = ObjectMappers.instance().createArrayNode();
+                ArrayNode arrayNode = ObjectMappers.instance.createArrayNode();
                 int i = 0;
                 for (Types types : typesList) {
                     String field = "?" + i++;
