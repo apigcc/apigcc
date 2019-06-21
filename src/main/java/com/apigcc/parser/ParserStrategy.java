@@ -9,6 +9,7 @@ public interface ParserStrategy {
 
     /**
      * 判断是否为需要解析的类
+     *
      * @param n
      * @return
      */
@@ -16,12 +17,13 @@ public interface ParserStrategy {
 
     /**
      * 判断是否为需要解析的方法
+     *
      * @param n
      * @return
      */
     boolean accept(MethodDeclaration n);
 
-    void visit(MethodDeclaration n, Section section);
+    void visit(MethodDeclaration n, Chapter chapter, Section section);
 
     void visit(ClassOrInterfaceDeclaration n, Chapter chapter);
 }

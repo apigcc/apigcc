@@ -1,5 +1,6 @@
 package com.apigcc.parser;
 
+import com.apigcc.common.OptionalHelper;
 import com.apigcc.schema.Chapter;
 import com.apigcc.schema.Node;
 import com.apigcc.schema.Project;
@@ -8,9 +9,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
-/**
- *
- */
 public class VisitorParser extends VoidVisitorAdapter<Node> {
 
     private ParserStrategy parserStrategy;
@@ -25,14 +23,11 @@ public class VisitorParser extends VoidVisitorAdapter<Node> {
         if (arg instanceof Project && parserStrategy.accept(n)) {
             Project project = (Project) arg;
             Chapter chapter = new Chapter();
-            if (n.getFullyQualifiedName().isPresent()) {
-                chapter.setId(n.getFullyQualifiedName().get());
-            }
+            n.getFullyQualifiedName().ifPresent(chapter::setId);
             n.getComment().ifPresent(chapter::accept);
-            //TODO 支持  book 和 group
-            chapter.getTag("book").ifPresent(tag -> {
-                chapter.setBookName(tag.getContent());
-            });
+
+            OptionalHelper.any(chapter.getTag("book"),chapter.getTag("group"))
+                    .ifPresent(tag -> chapter.setBookName(tag.getContent()));
 
             parserStrategy.visit(n, chapter);
             project.addChapter(chapter);
@@ -48,7 +43,7 @@ public class VisitorParser extends VoidVisitorAdapter<Node> {
             section.setId(n.getNameAsString());
             n.getComment().ifPresent(section::accept);
 
-            parserStrategy.visit(n, section);
+            parserStrategy.visit(n, chapter, section);
             chapter.getSections().add(section);
             super.visit(n, section);
         }

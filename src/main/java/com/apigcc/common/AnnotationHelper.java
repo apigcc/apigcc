@@ -5,6 +5,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class AnnotationHelper {
 
@@ -17,18 +18,18 @@ public class AnnotationHelper {
         return false;
     }
 
-    public static Expression getAttribute(AnnotationExpr annotationExpr, String key) {
+    public static Optional<Expression> getAttribute(AnnotationExpr annotationExpr, String key) {
         if (Objects.equals("value", key) && annotationExpr.isSingleMemberAnnotationExpr()) {
-            return annotationExpr.asSingleMemberAnnotationExpr().getMemberValue();
+            return Optional.of(annotationExpr.asSingleMemberAnnotationExpr().getMemberValue());
         }
         if (annotationExpr.isNormalAnnotationExpr()) {
             for (MemberValuePair pair : annotationExpr.asNormalAnnotationExpr().getPairs()) {
                 if (Objects.equals(key, pair.getNameAsString())){
-                    return pair.getValue();
+                    return Optional.of(pair.getValue());
                 }
             }
         }
-        return new StringLiteralExpr("");
+        return Optional.empty();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.apigcc.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.Iterator;
@@ -22,7 +23,8 @@ public class QueryStringBuilder {
         Iterator<String> iterator = objectNode.fieldNames();
         while (iterator.hasNext()){
             String key = iterator.next();
-            String value = objectNode.get(key).toString();
+            JsonNode valueNode = objectNode.get(key);
+            String value = valueNode.isTextual()?valueNode.asText():valueNode.toString();
             append(key,value);
         }
         return this;

@@ -4,7 +4,6 @@ import com.apigcc.common.CommentHelper;
 import com.apigcc.core.Context;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.javadoc.Javadoc;
-import com.github.javaparser.javadoc.JavadocBlockTag;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,12 +53,12 @@ public class Node implements Comparable<Node> {
         Javadoc javadoc = comment.asJavadocComment().parse();
         setNameAndDescription(CommentHelper.getDescription(javadoc.getDescription()));
 
-        javadoc.getBlockTags().forEach(blockTag->{
+        javadoc.getBlockTags().forEach(blockTag -> {
             Tag tag = new Tag();
             tag.id = blockTag.getTagName();
             tag.key = blockTag.getName().isPresent() ? blockTag.getName().get() : null;
             tag.content = CommentHelper.getDescription(blockTag.getContent());
-            tags.put(tag.id, tag);
+            putTag(tag.id, tag);
         });
 
     }
@@ -76,5 +75,9 @@ public class Node implements Comparable<Node> {
 
     public Optional<Tag> getTag(String id) {
         return Optional.ofNullable(tags.get(id));
+    }
+
+    public void putTag(String id, Tag tag) {
+        tags.put(id, tag);
     }
 }

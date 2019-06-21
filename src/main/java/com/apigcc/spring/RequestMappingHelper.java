@@ -1,8 +1,12 @@
 package com.apigcc.spring;
 
 import com.apigcc.common.AnnotationHelper;
+import com.apigcc.common.ClassDeclarationHelper;
+import com.apigcc.common.OptionalHelper;
+import com.apigcc.common.URI;
 import com.apigcc.schema.HttpMethod;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -10,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RequestMappingHelper {
@@ -44,31 +49,70 @@ public class RequestMappingHelper {
         }
         if(n.isAnnotationPresent(ANNOTATION_REQUEST_MAPPING)){
             AnnotationExpr annotationExpr = n.getAnnotationByName(ANNOTATION_REQUEST_MAPPING).get();
-            Expression expression = AnnotationHelper.getAttribute(annotationExpr, "method");
-            if(expression.isArrayInitializerExpr()){
-                return expression.asArrayInitializerExpr().getValues()
-                        .stream().map(expr -> Objects.toString(expr).replaceAll("RequestMethod.","")).collect(Collectors.joining(","));
+            Optional<Expression> expressionOptional = AnnotationHelper.getAttribute(annotationExpr, "method");
+            if (expressionOptional.isPresent()) {
+                Expression expression = expressionOptional.get();
+                if(expression.isArrayInitializerExpr()){
+                    return expression.asArrayInitializerExpr().getValues()
+                            .stream().map(expr -> Objects.toString(expr).replaceAll("RequestMethod.","")).collect(Collectors.joining(","));
+                }
+                return expression.toString().replaceAll("RequestMethod.","");
             }
-            return expression.toString().replaceAll("RequestMethod.","");
         }
         return HttpMethod.GET;
     }
 
-    public static List<String> pickUris(NodeList<AnnotationExpr> nodeList){
+
+    /**
+     * 获取uri数据
+     * @param n
+     * @return
+     */
+    public static URI pickUriToParent(ClassOrInterfaceDeclaration n){
+        URI parentUri = null;
+        Optional<ClassOrInterfaceDeclaration> parentOptional = ClassDeclarationHelper.getParent(n);
+        if (parentOptional.isPresent()) {
+            parentUri = pickUriToParent(parentOptional.get());
+        }
+        URI uri = new URI(pickUri(n.getAnnotations()));
+        if(parentUri!=null){
+            parentUri.add(uri);
+            return parentUri;
+        }
+        return uri;
+    }
+
+    /**
+     * 获取uri数据，有多个时，暂时只取第一个
+     * @param nodeList
+     * @return
+     */
+    public static String pickUri(NodeList<AnnotationExpr> nodeList){
         for (AnnotationExpr annotationExpr : nodeList) {
             if(ANNOTATION_REQUEST_MAPPINGS.contains(annotationExpr.getNameAsString())){
-                Expression expression = AnnotationHelper.getAttribute(annotationExpr, "value");
-                return Lists.newArrayList(expression.toString());
+                Optional<Expression> expressionOptional = OptionalHelper.any(
+                        AnnotationHelper.getAttribute(annotationExpr, "value"),
+                        AnnotationHelper.getAttribute(annotationExpr, "path")
+                );
+                if (expressionOptional.isPresent()) {
+                    Expression expression = expressionOptional.get();
+                    if(expression.isStringLiteralExpr()){
+                        return expression.asStringLiteralExpr().getValue();
+                    }else if(expression.isArrayInitializerExpr()){
+                        for (Expression e : expression.asArrayInitializerExpr().getValues()) {
+                            if(e.isStringLiteralExpr()){
+                                return e.asStringLiteralExpr().getValue();
+                            }else{
+                                return e.toString();
+                            }
+                        }
+                    }else{
+                        return expression.toString();
+                    }
+                }
             }
         }
-//        for (String annotationName : ANNOTATION_REQUEST_MAPPINGS) {
-//            if (n.isAnnotationPresent(annotationName)) {
-//                Optional<AnnotationExpr> annotationByName = n.getAnnotationByName(annotationName);
-//                return null;
-//            }
-//        }
-
-        return null;
+        return "";
     }
 
 }
