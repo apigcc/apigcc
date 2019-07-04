@@ -40,7 +40,7 @@ repositories {
 dependencies {
     compile 'com.github.javaparser:javaparser-symbol-solver-core:3.14.4'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5.2'
-    compile 'org.asciidoctor:asciidoctorj:1.5.6'
+    compile 'org.asciidoctor:asciidoctorj:2.1.0'
     compile 'ch.qos.logback:logback-classic:1.2.3'
 
     compileOnly 'org.projectlombok:lombok:1.18.4'

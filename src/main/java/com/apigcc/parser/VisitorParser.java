@@ -1,6 +1,6 @@
 package com.apigcc.parser;
 
-import com.apigcc.common.OptionalHelper;
+import com.apigcc.common.helper.OptionalHelper;
 import com.apigcc.schema.Chapter;
 import com.apigcc.schema.Node;
 import com.apigcc.schema.Project;

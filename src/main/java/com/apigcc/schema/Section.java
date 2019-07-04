@@ -4,6 +4,7 @@ import com.apigcc.common.ObjectMappers;
 import com.apigcc.common.QueryStringBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,6 +43,10 @@ public class Section extends Node {
         return "";
     }
 
+    public void addRequestRow(Row row){
+        requestRows.put(row.getKey(), row);
+    }
+
     public void addRequestRows(Collection<Row> rows){
         for (Row row : rows) {
             if(row.getKey()!=null){
@@ -50,12 +55,37 @@ public class Section extends Node {
         }
     }
 
+    public void addResponseRow(Row row){
+        responseRows.put(row.getKey(), row);
+    }
+
     public void addResponseRows(Collection<Row> rows){
         for (Row row : rows) {
             if(row.getKey()!=null) {
                 responseRows.put(row.getKey(), row);
             }
         }
+    }
+
+    public String getRequestLine(){
+        StringBuilder builder = new StringBuilder(this.method);
+        builder.append(" ").append(this.uri);
+        if(this.queryParameter && Objects.equals("GET", this.method)){
+            builder.append("?").append(getParameterString());
+        }
+        builder.append(" HTTP/1.1");
+        return builder.toString();
+    }
+
+    public boolean hasRequestBody(){
+        if(Objects.equals("GET",this.method)){
+            return false;
+        }
+        return parameter!=null && parameter.size()>0;
+    }
+
+    public boolean hasResponseBody(){
+        return response!=null && response.size()>0;
     }
 
 }

@@ -1,11 +1,9 @@
 package com.apigcc.example;
 
-import com.apigcc.common.ObjectMappers;
 import com.apigcc.common.URI;
-import com.apigcc.core.Apigcc;
-import com.apigcc.core.Options;
-import com.apigcc.example.diff.FileMatcher;
 import com.apigcc.parser.VisitorParser;
+import com.apigcc.render.AsciidocHtmlRender;
+import com.apigcc.render.AsciidocRender;
 import com.apigcc.schema.Project;
 import com.apigcc.spring.SpringParserStrategy;
 import com.github.javaparser.ParseResult;
@@ -16,12 +14,9 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.SourceRoot;
-import com.google.common.primitives.Bytes;
 import org.junit.Test;
-import org.springframework.web.util.UriBuilder;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -46,13 +41,15 @@ public class ApigccTest {
     public void test() throws IOException {
 
         Project project = new Project();
+        project.setId("test");
+        project.setName("测试项目");
 
         VisitorParser visitorParser = new VisitorParser();
         visitorParser.setParserStrategy(new SpringParserStrategy());
 
         CombinedTypeSolver typeSolver = new CombinedTypeSolver();
-        typeSolver.add(new ReflectionTypeSolver(false));
         typeSolver.add(new JavaParserTypeSolver("D:/apigcc/apigcc-demo-spring/src/main/java"));
+        typeSolver.add(new ReflectionTypeSolver(false));
 
         ParserConfiguration parserConfiguration = new ParserConfiguration()
                 .setSymbolResolver(new JavaSymbolSolver(typeSolver));
@@ -73,34 +70,38 @@ public class ApigccTest {
 //            });
 //        });
 
-        System.out.println(ObjectMappers.pretty(project));
+//        System.out.println(ObjectMappers.pretty(project));
+
+        new AsciidocRender().render(project);
+
+        new AsciidocHtmlRender().render(project);
 
     }
 
     @Test
     public void testApigcc() {
-        Options options = new Options()
-                .source(Paths.get("src", "test", "java"))
-                .ignore("ResponseEntity")
-                .jar(Paths.get("src/test/resources/lib/apigcc-model-1.0-SNAPSHOT.jar"))
-                .id("apigcc")
-                .title("示例接口文档")
-                .description("示例接口文档，使用默认模板");
-        Apigcc apigcc = new Apigcc(options);
-        apigcc.lookup().build();
-
-        Path buildAdoc = options.getOutPath().resolve(options.getId() + ".adoc");
-        Path template = options.getOutPath().resolve("../../src/test/resources/template.adoc");
-        Path templateHtml = options.getOutPath().resolve("../../src/test/resources/template.html");
-        Path resultHtml = options.getOutPath().resolve("diff.html");
-
-        FileMatcher fileMatcher = new FileMatcher();
-        int changed = fileMatcher.compare(template, buildAdoc);
-        if(changed>0){
-            fileMatcher.rederHtml(templateHtml, resultHtml);
-        }
-
-        System.out.println("BUILD SUCCESS");
+//        Options options = new Options()
+//                .source(Paths.get("src", "test", "java"))
+//                .ignore("ResponseEntity")
+//                .jar(Paths.get("src/test/resources/lib/apigcc-model-1.0-SNAPSHOT.jar"))
+//                .id("apigcc")
+//                .title("示例接口文档")
+//                .description("示例接口文档，使用默认模板");
+//        Apigcc apigcc = new Apigcc(options);
+//        apigcc.lookup().build();
+//
+//        Path buildAdoc = options.getOutPath().resolve(options.getId() + ".adoc");
+//        Path template = options.getOutPath().resolve("../../src/test/resources/template.adoc");
+//        Path templateHtml = options.getOutPath().resolve("../../src/test/resources/template.html");
+//        Path resultHtml = options.getOutPath().resolve("diff.html");
+//
+//        FileMatcher fileMatcher = new FileMatcher();
+//        int changed = fileMatcher.compare(template, buildAdoc);
+//        if(changed>0){
+//            fileMatcher.rederHtml(templateHtml, resultHtml);
+//        }
+//
+//        System.out.println("BUILD SUCCESS");
     }
 
 }

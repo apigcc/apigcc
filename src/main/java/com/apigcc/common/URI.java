@@ -1,5 +1,6 @@
 package com.apigcc.common;
 
+import com.apigcc.common.helper.StringHelper;
 import com.google.common.collect.Lists;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

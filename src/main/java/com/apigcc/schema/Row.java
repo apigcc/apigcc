@@ -1,14 +1,12 @@
 package com.apigcc.schema;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 
 @EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 @Setter
 @Getter
 public class Row {

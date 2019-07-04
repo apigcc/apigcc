@@ -1,14 +1,20 @@
 package com.apigcc.spring;
 
-import com.apigcc.common.*;
+import com.apigcc.common.ResolvedTypes;
+import com.apigcc.common.URI;
+import com.apigcc.common.description.ObjectTypeDescription;
+import com.apigcc.common.description.TypeDescription;
+import com.apigcc.common.helper.AnnotationHelper;
 import com.apigcc.parser.ParserStrategy;
 import com.apigcc.schema.Chapter;
+import com.apigcc.schema.Row;
 import com.apigcc.schema.Section;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.type.Type;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 
 public class SpringParserStrategy implements ParserStrategy {
 
@@ -17,21 +23,46 @@ public class SpringParserStrategy implements ParserStrategy {
 
     public static final String EXT_URI = "uri";
 
+    public static final List<String> ANNOTATION_CONTROLLERS = Lists.newArrayList(ANNOTATION_CONTROLLER, ANNOTATION_REST_CONTROLLER);
+
+    /**
+     * TODO
+     * 处理被@RestController和@Controller标记的类
+     * @param n
+     * @return
+     */
     @Override
     public boolean accept(ClassOrInterfaceDeclaration n) {
-        return n.isAnnotationPresent(ANNOTATION_REST_CONTROLLER);
+        return AnnotationHelper.isAnnotationPresent(n,ANNOTATION_CONTROLLERS);
     }
 
+    /**
+     * TODO
+     * 类被@RestController标记，或方法被@ResponseBody标记
+     * @param n
+     * @return
+     */
     @Override
     public boolean accept(MethodDeclaration n) {
         return AnnotationHelper.isAnnotationPresent(n, RequestMappingHelper.ANNOTATION_REQUEST_MAPPINGS);
     }
 
+    /**
+     * 解析类定义
+     * @param n
+     * @param chapter
+     */
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Chapter chapter) {
         chapter.getExt().put(EXT_URI, RequestMappingHelper.pickUriToParent(n));
     }
 
+    /**
+     * 解析方法定义
+     * @param n
+     * @param chapter
+     * @param section
+     */
     @Override
     public void visit(MethodDeclaration n, Chapter chapter, Section section) {
         visitMethod(n, chapter, section);
@@ -54,6 +85,11 @@ public class SpringParserStrategy implements ParserStrategy {
         for (Parameter parameter : n.getParameters()) {
             if (ParameterHelper.isPathVariable(parameter)) {
                 section.getPathVariable().put(parameter.getNameAsString(), "");
+                Row row = new Row();
+                row.setKey(parameter.getNameAsString());
+                row.setType(parameter.getType().toString());
+                section.getParamTag(row.getKey()).ifPresent(tag-> row.setRemark(tag.getContent()));
+                section.addRequestRow(row);
             }
         }
 
@@ -62,46 +98,40 @@ public class SpringParserStrategy implements ParserStrategy {
             Parameter parameter = ParameterHelper.getRequestBody(n.getParameters());
             TypeDescription description = ResolvedTypes.resolve(parameter.getType());
             if(description.isArray()){
-                section.setParameter(description.getArrayNode());
-            }else if(description.isBean()){
-                section.setParameter(description.getObjectNode());
+                section.setParameter(description.asArray().getValue());
+            }else if(description.isObject()){
+                section.setParameter(description.asObject().getValue());
             }
-            section.addRequestRows(description.getRows());
+            section.addRequestRows(description.rows());
 
         } else {
-            ObjectNode objectNode = ObjectMappers.instance.createObjectNode();
+            ObjectTypeDescription objectTypeDescription = new ObjectTypeDescription();
             for (Parameter parameter : n.getParameters()) {
                 if (ParameterHelper.isRequestParam(parameter)) {
-                    Type type = parameter.getType();
                     String key = parameter.getNameAsString();
-                    TypeDescription description = ResolvedTypes.resolve(type);
-                    if (description.isPrimitive()) {
-                        TypeDescription.setNumber(objectNode, key, description.getPrimitive());
-                        description.fieldName(key);
-                    }else if(description.isString()){
-                        objectNode.put(key, description.getCharSequence().toString());
-                        description.fieldName(key);
-                    }else if(description.isArray()){
-                        objectNode.set(key+"[]", description.getArrayNode());
-                        description.fieldName(key+"[]");
-                    }else if(description.isBean()){
-                        ObjectMappers.merge(objectNode, description.getObjectNode());
+                    TypeDescription description = ResolvedTypes.resolve(parameter.getType());
+                    description.setKey(key);
+                    section.getParamTag(key).ifPresent(tag->description.setRemark(tag.getContent()));
+                    if(description.isObject()){
+                        objectTypeDescription.merge(description.asObject());
+                    }else{
+                        objectTypeDescription.add(description);
                     }
-                    section.addRequestRows(description.getRows());
                 }
             }
-            section.setParameter(objectNode);
+            section.setParameter(objectTypeDescription.getValue());
+            section.addRequestRows(objectTypeDescription.rows());
         }
     }
 
     private void visitReturn(MethodDeclaration n, Chapter chapter, Section section) {
         TypeDescription description = ResolvedTypes.resolve(n.getType());
         if(description.isArray()){
-            section.setResponse(description.getArrayNode());
-        }else if(description.isBean()){
-            section.setResponse(description.getObjectNode());
+            section.setResponse(description.asArray().getValue());
+        }else if(description.isObject()){
+            section.setResponse(description.asObject().getValue());
         }
-        section.addResponseRows(description.getRows());
+        section.addResponseRows(description.rows());
     }
 
 }

@@ -1,8 +1,8 @@
 package com.apigcc.spring;
 
-import com.apigcc.common.AnnotationHelper;
-import com.apigcc.common.ClassDeclarationHelper;
-import com.apigcc.common.OptionalHelper;
+import com.apigcc.common.helper.AnnotationHelper;
+import com.apigcc.common.helper.ClassDeclarationHelper;
+import com.apigcc.common.helper.OptionalHelper;
 import com.apigcc.common.URI;
 import com.apigcc.schema.HttpMethod;
 import com.github.javaparser.ast.NodeList;
@@ -13,9 +13,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.google.common.collect.Lists;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RequestMappingHelper {
 
@@ -53,8 +51,11 @@ public class RequestMappingHelper {
             if (expressionOptional.isPresent()) {
                 Expression expression = expressionOptional.get();
                 if(expression.isArrayInitializerExpr()){
-                    return expression.asArrayInitializerExpr().getValues()
-                            .stream().map(expr -> Objects.toString(expr).replaceAll("RequestMethod.","")).collect(Collectors.joining(","));
+                    NodeList<Expression> values = expression.asArrayInitializerExpr().getValues();
+                    // TODO 多个method时，取第一个
+                    if(values!=null&&values.size()>0){
+                        return values.get(0).toString().replaceAll("RequestMethod.","");
+                    }
                 }
                 return expression.toString().replaceAll("RequestMethod.","");
             }

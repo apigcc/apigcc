@@ -1,7 +1,8 @@
 package com.apigcc.schema;
 
-import com.apigcc.common.CommentHelper;
-import com.apigcc.core.Context;
+import com.apigcc.Context;
+import com.apigcc.common.helper.CommentHelper;
+import com.apigcc.common.helper.StringHelper;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.javadoc.Javadoc;
 import lombok.Getter;
@@ -56,19 +57,20 @@ public class Node implements Comparable<Node> {
         javadoc.getBlockTags().forEach(blockTag -> {
             Tag tag = new Tag();
             tag.id = blockTag.getTagName();
-            tag.key = blockTag.getName().isPresent() ? blockTag.getName().get() : null;
+            tag.key = blockTag.getName().isPresent() ? blockTag.getName().get() : "";
             tag.content = CommentHelper.getDescription(blockTag.getContent());
-            putTag(tag.id, tag);
+            putTag(tag);
         });
 
+        getTag("index").ifPresent(tag -> setIndex(tag.getIntContent(Context.DEFAULT_NODE_INDEX)));
     }
 
     public void setNameAndDescription(String content) {
         String[] arr = content.split("(\\r\\n)|(\\r)|(\\n)+", 2);
-        if (arr.length >= 1) {
+        if (arr.length >= 1 && StringHelper.nonBlank(arr[0])) {
             name = arr[0];
         }
-        if (arr.length >= 2) {
+        if (arr.length >= 2 && StringHelper.nonBlank(arr[1])) {
             description = arr[1];
         }
     }
@@ -77,7 +79,24 @@ public class Node implements Comparable<Node> {
         return Optional.ofNullable(tags.get(id));
     }
 
-    public void putTag(String id, Tag tag) {
+    public Optional<Tag> getParamTag(String id) {
+        return Optional.ofNullable(tags.get("param:"+id));
+    }
+
+    public void putTag(Tag tag) {
+        String id = tag.id;
+        if(StringHelper.nonBlank(tag.getKey())){
+            id += ":" + tag.getKey();
+        }
         tags.put(id, tag);
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this.name = id;
+    }
+
+    public boolean isIgnore() {
+        return getTag("ignore").isPresent();
     }
 }
