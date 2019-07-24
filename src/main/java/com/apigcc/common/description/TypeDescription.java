@@ -4,13 +4,11 @@ import com.apigcc.schema.Row;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.Collection;
 
 @Setter
 @Getter
-//@ToString
 public abstract class TypeDescription {
 
     protected String key;
@@ -18,6 +16,14 @@ public abstract class TypeDescription {
     protected String condition;
     protected String remark;
     protected Object value;
+
+    public boolean isAvailable() {
+        return !isUnAvailable();
+    }
+
+    public boolean isUnAvailable() {
+        return this instanceof UnAvailableTypeDescription;
+    }
 
     public boolean isPrimitive() {
         return this instanceof PrimitiveTypeDescription;
@@ -52,7 +58,7 @@ public abstract class TypeDescription {
     }
 
     public Collection<Row> rows() {
-        return Lists.newArrayList(new Row(key, type, condition, String.valueOf(value), remark));
+        return Lists.newArrayList(new Row(key, type, condition, value==null?"":String.valueOf(value), remark));
     }
 
 }

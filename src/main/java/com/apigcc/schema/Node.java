@@ -91,11 +91,6 @@ public class Node implements Comparable<Node> {
         tags.put(id, tag);
     }
 
-    public void setId(String id) {
-        this.id = id;
-        this.name = id;
-    }
-
     public boolean isIgnore() {
         return getTag("ignore").isPresent();
     }

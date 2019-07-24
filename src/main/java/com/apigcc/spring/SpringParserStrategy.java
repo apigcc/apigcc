@@ -1,6 +1,6 @@
 package com.apigcc.spring;
 
-import com.apigcc.common.ResolvedTypes;
+import com.apigcc.common.resolver.TypeResolvers;
 import com.apigcc.common.URI;
 import com.apigcc.common.description.ObjectTypeDescription;
 import com.apigcc.common.description.TypeDescription;
@@ -81,7 +81,15 @@ public class SpringParserStrategy implements ParserStrategy {
     }
 
     private void visitParameters(MethodDeclaration n, Chapter chapter, Section section) {
+        visitPathVariable(n, chapter, section);
+        if (ParameterHelper.hasRequestBody(n.getParameters())) {
+            visitRequestBody(n, chapter, section);
+        }else{
+            visitParameter(n, chapter, section);
+        }
+    }
 
+    private void visitPathVariable(MethodDeclaration n, Chapter chapter, Section section) {
         for (Parameter parameter : n.getParameters()) {
             if (ParameterHelper.isPathVariable(parameter)) {
                 section.getPathVariable().put(parameter.getNameAsString(), "");
@@ -92,46 +100,53 @@ public class SpringParserStrategy implements ParserStrategy {
                 section.addRequestRow(row);
             }
         }
+    }
 
-        if (ParameterHelper.hasRequestBody(n.getParameters())) {
-            section.setQueryParameter(false);
-            Parameter parameter = ParameterHelper.getRequestBody(n.getParameters());
-            TypeDescription description = ResolvedTypes.resolve(parameter.getType());
-            if(description.isArray()){
+    private void visitRequestBody(MethodDeclaration n, Chapter chapter, Section section) {
+        section.setQueryParameter(false);
+        Parameter parameter = ParameterHelper.getRequestBody(n.getParameters());
+        TypeDescription description = TypeResolvers.resolve(parameter.getType());
+        if (description.isAvailable()) {
+            if (description.isArray()) {
                 section.setParameter(description.asArray().getValue());
-            }else if(description.isObject()){
+            } else if (description.isObject()) {
                 section.setParameter(description.asObject().getValue());
             }
             section.addRequestRows(description.rows());
+        }
+    }
 
-        } else {
-            ObjectTypeDescription objectTypeDescription = new ObjectTypeDescription();
-            for (Parameter parameter : n.getParameters()) {
-                if (ParameterHelper.isRequestParam(parameter)) {
-                    String key = parameter.getNameAsString();
-                    TypeDescription description = ResolvedTypes.resolve(parameter.getType());
-                    description.setKey(key);
+    private void visitParameter(MethodDeclaration n, Chapter chapter, Section section) {
+        ObjectTypeDescription objectTypeDescription = new ObjectTypeDescription();
+        for (Parameter parameter : n.getParameters()) {
+            if (ParameterHelper.isRequestParam(parameter)) {
+                String key = parameter.getNameAsString();
+                TypeDescription description = TypeResolvers.resolve(parameter.getType());
+                if(description.isAvailable()){
                     section.getParamTag(key).ifPresent(tag->description.setRemark(tag.getContent()));
                     if(description.isObject()){
                         objectTypeDescription.merge(description.asObject());
                     }else{
+                        description.setKey(key);
                         objectTypeDescription.add(description);
                     }
                 }
             }
-            section.setParameter(objectTypeDescription.getValue());
-            section.addRequestRows(objectTypeDescription.rows());
         }
+        section.setParameter(objectTypeDescription.getValue());
+        section.addRequestRows(objectTypeDescription.rows());
     }
 
     private void visitReturn(MethodDeclaration n, Chapter chapter, Section section) {
-        TypeDescription description = ResolvedTypes.resolve(n.getType());
-        if(description.isArray()){
-            section.setResponse(description.asArray().getValue());
-        }else if(description.isObject()){
-            section.setResponse(description.asObject().getValue());
+        TypeDescription description = TypeResolvers.resolve(n.getType());
+        if(description.isAvailable()){
+            if(description.isArray()){
+                section.setResponse(description.asArray().getValue());
+            }else if(description.isObject()){
+                section.setResponse(description.asObject().getValue());
+            }
+            section.addResponseRows(description.rows());
         }
-        section.addResponseRows(description.rows());
     }
 
 }

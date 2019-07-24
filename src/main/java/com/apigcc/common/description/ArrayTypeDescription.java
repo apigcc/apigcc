@@ -4,6 +4,7 @@ import com.apigcc.common.ObjectMappers;
 import com.apigcc.schema.Row;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -14,16 +15,20 @@ public class ArrayTypeDescription extends TypeDescription {
 
     public ArrayTypeDescription(TypeDescription component) {
         this.component = component;
-        this.type = component.getType() + "[]";
         this.value = ObjectMappers.instance.createArrayNode();
-        if(component.isPrimitive()){
-            primitive(component.asPrimitive());
-        }else if(component.isString()){
-            value.add(component.asString().getValue());
-        }else if(component.isArray()){
-            value.add(component.asArray().getValue());
-        }else if(component.isObject()){
-            value.add(component.asObject().getValue());
+        if(component.isAvailable()){
+            this.type = component.getType() + "[]";
+            if(component.isPrimitive()){
+                primitive(component.asPrimitive());
+            }else if(component.isString()){
+                value.add(component.asString().getValue());
+            }else if(component.isArray()){
+                value.add(component.asArray().getValue());
+            }else if(component.isObject()){
+                value.add(component.asObject().getValue());
+            }
+        }else{
+            this.type = "[]";
         }
     }
 
@@ -56,13 +61,27 @@ public class ArrayTypeDescription extends TypeDescription {
         }
     }
 
+    @Override
+    public void setKey(String key) {
+        super.setKey(key);
+        if (component.isAvailable()) {
+            component.setKey(key);
+        }
+    }
+
     public ArrayNode getValue(){
         return value;
     }
 
     @Override
     public Collection<Row> rows() {
-        //TODO 循环引用
-        return Collections.emptyList();
+        ArrayList<Row> rows = new ArrayList<>();
+        if(key != null){
+            rows.addAll(super.rows());
+        }
+        if(component.isAvailable()){
+            rows.addAll(component.rows());
+        }
+        return rows;
     }
 }

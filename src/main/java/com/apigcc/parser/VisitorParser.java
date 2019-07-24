@@ -24,6 +24,7 @@ public class VisitorParser extends VoidVisitorAdapter<Node> {
             Project project = (Project) arg;
             Chapter chapter = new Chapter();
             n.getFullyQualifiedName().ifPresent(chapter::setId);
+            chapter.setName(n.getNameAsString());
             n.getComment().ifPresent(chapter::accept);
 
             OptionalHelper.any(chapter.getTag("book"),chapter.getTag("group"))
@@ -41,6 +42,8 @@ public class VisitorParser extends VoidVisitorAdapter<Node> {
             Chapter chapter = (Chapter) arg;
             Section section = new Section();
             section.setId(n.getNameAsString());
+            section.setName(n.getNameAsString());
+            section.setIndex(chapter.getSections().size());
             n.getComment().ifPresent(section::accept);
 
             parserStrategy.visit(n, chapter, section);

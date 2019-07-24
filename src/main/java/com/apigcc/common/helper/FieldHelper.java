@@ -1,19 +1,5 @@
 package com.apigcc.common.helper;
 
-import com.apigcc.common.description.ITypeDescription;
-import com.apigcc.common.description.TypeDescription;
-import com.github.javaparser.ast.AccessSpecifier;
-import com.github.javaparser.resolution.MethodUsage;
-import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import com.github.javaparser.symbolsolver.logic.AbstractClassDeclaration;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.apigcc.common.ResolvedTypes.pick;
-
 public class FieldHelper {
 
     /**

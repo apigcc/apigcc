@@ -25,56 +25,67 @@ public class ObjectTypeDescription extends TypeDescription {
 
     public void add(TypeDescription component) {
         members.add(component);
-        if(component.isPrimitive()){
+        if (component.isPrimitive()) {
             primitive(component.asPrimitive());
-        }else if(component.isString()){
+        } else if (component.isString()) {
             value.put(component.getKey(), component.asString().getValue());
-        }else if(component.isArray()){
+        } else if (component.isArray()) {
             value.set(component.getKey(), component.asArray().getValue());
-        }else if(component.isObject()){
+        } else if (component.isObject()) {
             value.set(component.getKey(), component.asObject().getValue());
         }
     }
 
-    public void primitive(PrimitiveTypeDescription typeDescription){
-        switch (typeDescription.getType()){
+    public void primitive(PrimitiveTypeDescription typeDescription) {
+        switch (typeDescription.getType()) {
             case "byte":
-                value.put(typeDescription.getKey(), (byte)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (byte) typeDescription.getValue());
                 break;
             case "short":
-                value.put(typeDescription.getKey(), (short)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (short) typeDescription.getValue());
                 break;
             case "char":
-                value.put(typeDescription.getKey(), (char)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (char) typeDescription.getValue());
                 break;
             case "int":
-                value.put(typeDescription.getKey(), (int)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (int) typeDescription.getValue());
                 break;
             case "long":
-                value.put(typeDescription.getKey(), (long)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (long) typeDescription.getValue());
                 break;
             case "boolean":
-                value.put(typeDescription.getKey(), (boolean)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (boolean) typeDescription.getValue());
                 break;
             case "float":
-                value.put(typeDescription.getKey(), (float)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (float) typeDescription.getValue());
                 break;
             case "double":
-                value.put(typeDescription.getKey(), (double)typeDescription.getValue());
+                value.put(typeDescription.getKey(), (double) typeDescription.getValue());
                 break;
         }
     }
 
-    public ObjectNode getValue(){
+    @Override
+    public void setKey(String key) {
+        super.setKey(key);
+        for (TypeDescription member : members) {
+            if (member.isAvailable()) {
+                member.setKey(key + "." + member.getKey());
+            }
+        }
+    }
+
+    public ObjectNode getValue() {
         return value;
     }
 
     @Override
     public Collection<Row> rows() {
-        Collection<Row> rows = Lists.newArrayList();
+        Collection<Row> rows = super.rows();
         for (TypeDescription member : members) {
-//            System.out.println(member);
-            rows.addAll(member.rows());
+            if (member.isAvailable()) {
+                rows.addAll(member.rows());
+            }
         }
         return rows;
     }

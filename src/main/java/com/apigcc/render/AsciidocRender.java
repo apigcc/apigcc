@@ -56,19 +56,19 @@ public class AsciidocRender {
 
                     table(builder, section.getRequestRows().values());
 
-                    if (!section.getResponseRows().isEmpty()) {
-                        builder.title(4, "response");
+                    builder.title(4, "response");
 
-                        builder.listing(b -> {
+                    builder.listing(b -> {
 //                            response.getHeaders().forEach((k, v) -> builder.textLine(k + ": " + v));
-                            if (section.hasResponseBody()) {
-                                b.br();
-                                b.text(section.getResponseString());
-                            }
-                        }, "source,JSON");
+                        if (section.hasResponseBody()) {
+                            b.br();
+                            b.text(section.getResponseString());
+                        }else{
+                            b.text("N/A");
+                        }
+                    }, "source,JSON");
 
-                        table(builder, section.getResponseRows().values());
-                    }
+                    table(builder, section.getResponseRows().values());
 
                 }
             }
