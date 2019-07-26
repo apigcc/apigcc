@@ -13,9 +13,11 @@ public abstract class TypeDescription {
 
     protected String key;
     protected String type;
-    protected String condition;
+    protected StringBuilder condition = new StringBuilder();
     protected String remark;
     protected Object value;
+    protected Object defaultValue;
+    protected Boolean required;
 
     public boolean isAvailable() {
         return !isUnAvailable();
@@ -58,7 +60,19 @@ public abstract class TypeDescription {
     }
 
     public Collection<Row> rows() {
-        return Lists.newArrayList(new Row(key, type, condition, value==null?"":String.valueOf(value), remark));
+        String def;
+        if(defaultValue!=null){
+            def = String.valueOf(defaultValue);
+        }else if(value!=null){
+            def = String.valueOf(value);
+        }else{
+            def = "";
+        }
+
+        if(required!=null){
+            condition.append("required=").append(required);
+        }
+        return Lists.newArrayList(new Row(key, type, condition.toString(), def, remark));
     }
 
 }

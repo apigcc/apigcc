@@ -47,7 +47,7 @@ public class AsciidocRender {
                     builder.title(4, "request");
                     builder.listing(b -> {
                         b.textLine(section.getRequestLine());
-//                        request.getHeaders().forEach((k, v) -> b.textLine(k + ": " + v));
+                        section.getInHeaders().forEach(b::textLine);
                         if (section.hasRequestBody()) {
                             b.br();
                             b.text(section.getParameterString());
@@ -59,7 +59,7 @@ public class AsciidocRender {
                     builder.title(4, "response");
 
                     builder.listing(b -> {
-//                            response.getHeaders().forEach((k, v) -> builder.textLine(k + ": " + v));
+                        section.getOutHeaders().forEach(builder::textLine);
                         if (section.hasResponseBody()) {
                             b.br();
                             b.text(section.getResponseString());

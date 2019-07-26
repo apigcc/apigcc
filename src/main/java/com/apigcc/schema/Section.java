@@ -20,13 +20,13 @@ public class Section extends Node {
 
     String method;
     String uri;
-    List<Header> inHeaders = new ArrayList<>();
+    List<String> inHeaders = new ArrayList<>();
     ObjectNode pathVariable = ObjectMappers.instance.createObjectNode();
     JsonNode parameter;
     boolean queryParameter = true;
     Map<String,Row> requestRows = new LinkedHashMap<>();
 
-    List<Header> outHeaders = new ArrayList<>();
+    List<String> outHeaders = new ArrayList<>();
     JsonNode response;
     Map<String,Row> responseRows = new LinkedHashMap<>();
 

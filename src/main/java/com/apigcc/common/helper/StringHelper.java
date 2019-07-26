@@ -12,4 +12,18 @@ public class StringHelper {
         return !isBlank(text);
     }
 
+    public static boolean isBlank(Object text) {
+        if(text instanceof String){
+            return isBlank(((String) text));
+        }
+        return isBlank(String.valueOf(text));
+    }
+
+    public static boolean nonBlank(Object text) {
+        if(text instanceof String){
+            return nonBlank(((String) text));
+        }
+        return nonBlank(String.valueOf(text));
+    }
+
 }

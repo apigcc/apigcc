@@ -32,4 +32,14 @@ public class AnnotationHelper {
         return Optional.empty();
     }
 
+    public static Optional<Expression> getAnyAttribute(AnnotationExpr annotationExpr, String ... keys) {
+        for (String key : keys) {
+            Optional<Expression> optional = getAttribute(annotationExpr, key);
+            if(optional.isPresent()){
+                return optional;
+            }
+        }
+        return Optional.empty();
+    }
+
 }

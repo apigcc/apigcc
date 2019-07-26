@@ -2,6 +2,7 @@ package com.apigcc.spring;
 
 import com.apigcc.common.helper.AnnotationHelper;
 import com.apigcc.common.helper.ClassDeclarationHelper;
+import com.apigcc.common.helper.ExpressionHelper;
 import com.apigcc.common.helper.OptionalHelper;
 import com.apigcc.common.URI;
 import com.apigcc.schema.HttpMethod;
@@ -91,29 +92,68 @@ public class RequestMappingHelper {
     public static String pickUri(NodeList<AnnotationExpr> nodeList){
         for (AnnotationExpr annotationExpr : nodeList) {
             if(ANNOTATION_REQUEST_MAPPINGS.contains(annotationExpr.getNameAsString())){
-                Optional<Expression> expressionOptional = OptionalHelper.any(
-                        AnnotationHelper.getAttribute(annotationExpr, "value"),
-                        AnnotationHelper.getAttribute(annotationExpr, "path")
-                );
+                Optional<Expression> expressionOptional = AnnotationHelper.getAnyAttribute(annotationExpr, "value","path");
                 if (expressionOptional.isPresent()) {
                     Expression expression = expressionOptional.get();
-                    if(expression.isStringLiteralExpr()){
-                        return expression.asStringLiteralExpr().getValue();
-                    }else if(expression.isArrayInitializerExpr()){
-                        for (Expression e : expression.asArrayInitializerExpr().getValues()) {
-                            if(e.isStringLiteralExpr()){
-                                return e.asStringLiteralExpr().getValue();
-                            }else{
-                                return e.toString();
-                            }
-                        }
-                    }else{
-                        return expression.toString();
-                    }
+                    return ExpressionHelper.getStringValue(expression);
                 }
             }
         }
         return "";
+    }
+
+    /**
+     * 获取headers
+     * @param nodeList
+     * @return
+     */
+    public static List<String> pickHeaders(NodeList<AnnotationExpr> nodeList){
+        for (AnnotationExpr annotationExpr : nodeList) {
+            if(ANNOTATION_REQUEST_MAPPINGS.contains(annotationExpr.getNameAsString())){
+                Optional<Expression> expressionOptional = AnnotationHelper.getAttribute(annotationExpr, "headers");
+                if (expressionOptional.isPresent()) {
+                    Expression expression = expressionOptional.get();
+                    return ExpressionHelper.getStringValues(expression);
+                }
+            }
+        }
+        return Lists.newArrayList();
+    }
+
+    /**
+     * 获取headers
+     * @param nodeList
+     * @return
+     */
+    public static List<String> pickConsumers(NodeList<AnnotationExpr> nodeList){
+        for (AnnotationExpr annotationExpr : nodeList) {
+            if(ANNOTATION_REQUEST_MAPPINGS.contains(annotationExpr.getNameAsString())){
+                Optional<Expression> expressionOptional = AnnotationHelper.getAttribute(annotationExpr, "consumes");
+                if (expressionOptional.isPresent()) {
+                    Expression expression = expressionOptional.get();
+                    return ExpressionHelper.getStringValues(expression);
+                }
+            }
+        }
+        return Lists.newArrayList();
+    }
+
+    /**
+     * 获取headers
+     * @param nodeList
+     * @return
+     */
+    public static List<String> pickProduces(NodeList<AnnotationExpr> nodeList){
+        for (AnnotationExpr annotationExpr : nodeList) {
+            if(ANNOTATION_REQUEST_MAPPINGS.contains(annotationExpr.getNameAsString())){
+                Optional<Expression> expressionOptional = AnnotationHelper.getAttribute(annotationExpr, "produces");
+                if (expressionOptional.isPresent()) {
+                    Expression expression = expressionOptional.get();
+                    return ExpressionHelper.getStringValues(expression);
+                }
+            }
+        }
+        return Lists.newArrayList();
     }
 
 }

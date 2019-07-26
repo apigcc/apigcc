@@ -6,6 +6,10 @@ import com.apigcc.render.AsciidocHtmlRender;
 import com.apigcc.render.AsciidocRender;
 import com.apigcc.schema.Project;
 import com.apigcc.spring.SpringParserStrategy;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
@@ -14,6 +18,9 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.SourceRoot;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -28,14 +35,6 @@ import java.nio.file.Paths;
  * /mini路径下的接口为小程序专用
  */
 public class ApigccTest {
-
-    @Test
-    public void test1(){
-        URI users = new URI("").add("").add("/users").add("{id}");
-        System.out.println(users);
-
-        System.out.println(String.format("%02X",(byte)'/'));
-    }
 
     @Test
     public void test() throws IOException {

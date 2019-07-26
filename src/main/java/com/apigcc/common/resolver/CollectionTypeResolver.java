@@ -18,9 +18,9 @@ public class CollectionTypeResolver implements TypeResolver {
     @Override
     public TypeDescription resolve(ResolvedType type) {
         Optional<ResolvedType> optional = TypeParameterHelper.getTypeParameter(type.asReferenceType(), 0);
-        return optional
-                .<TypeDescription>map(resolvedType -> new ArrayTypeDescription(TypeResolvers.resolve(resolvedType)))
-                .orElseGet(UnAvailableTypeDescription::new);
+        return new ArrayTypeDescription(optional
+                .map(TypeResolvers::resolve)
+                .orElseGet(UnAvailableTypeDescription::new));
     }
 
     private static boolean isCollection(ResolvedType type){
