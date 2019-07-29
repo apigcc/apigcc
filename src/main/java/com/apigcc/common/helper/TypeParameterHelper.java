@@ -41,4 +41,21 @@ public class TypeParameterHelper {
         }
         return Optional.empty();
     }
+
+    /**
+     * 使用父类的泛型
+     * @param parent
+     * @param field
+     */
+    public static ResolvedType useClassTypeParameter(ResolvedReferenceType parent, ResolvedReferenceType field ){
+        for (Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair : field.getTypeParametersMap()) {
+            if(pair.b.isTypeVariable()){
+                Optional<ResolvedType> typeParameter = TypeParameterHelper.getTypeParameter(parent, pair.b.asTypeVariable().describe());
+                if (typeParameter.isPresent()) {
+                    return field.replaceTypeVariables(pair.b.asTypeVariable().asTypeParameter(), typeParameter.get());
+                }
+            }
+        }
+        return field;
+    }
 }

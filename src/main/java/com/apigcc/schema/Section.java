@@ -29,20 +29,7 @@ public class Section extends Node {
     List<String> outHeaders = new ArrayList<>();
     JsonNode response;
     Map<String,Row> responseRows = new LinkedHashMap<>();
-
-    public String getParameterString(){
-        if(queryParameter && parameter instanceof ObjectNode){
-            return new QueryStringBuilder().append((ObjectNode)parameter).toString();
-        }
-        return ObjectMappers.pretty(parameter);
-    }
-
-    public String getResponseString(){
-        if(response!=null){
-            return ObjectMappers.pretty(response);
-        }
-        return "";
-    }
+    Object rawResponse;
 
     public void addRequestRow(Row row){
         requestRows.put(row.getKey(), row);
@@ -52,18 +39,6 @@ public class Section extends Node {
         for (Row row : rows) {
             if(row.getKey()!=null && !requestRows.containsKey(row.getKey())){
                 requestRows.put(row.getKey(),row);
-            }
-        }
-    }
-
-    public void addResponseRow(Row row){
-        responseRows.put(row.getKey(), row);
-    }
-
-    public void addResponseRows(Collection<Row> rows){
-        for (Row row : rows) {
-            if(row.getKey()!=null && !responseRows.containsKey(row.getKey())) {
-                responseRows.put(row.getKey(), row);
             }
         }
     }
@@ -81,6 +56,13 @@ public class Section extends Node {
         return builder.toString();
     }
 
+    public String getParameterString(){
+        if(queryParameter && parameter instanceof ObjectNode){
+            return new QueryStringBuilder().append((ObjectNode)parameter).toString();
+        }
+        return ObjectMappers.pretty(parameter);
+    }
+
     public boolean hasRequestBody(){
         if(Objects.equals("GET",this.method)){
             return false;
@@ -88,8 +70,27 @@ public class Section extends Node {
         return parameter!=null && parameter.size()>0;
     }
 
+    public void addResponseRow(Row row){
+        responseRows.put(row.getKey(), row);
+    }
+
+    public void addResponseRows(Collection<Row> rows){
+        for (Row row : rows) {
+            if(row.getKey()!=null && !responseRows.containsKey(row.getKey())) {
+                responseRows.put(row.getKey(), row);
+            }
+        }
+    }
+
     public boolean hasResponseBody(){
-        return response!=null;
+        return response!=null || rawResponse!=null;
+    }
+
+    public String getResponseString(){
+        if(response!=null){
+            return ObjectMappers.pretty(response);
+        }
+        return String.valueOf(rawResponse);
     }
 
 }

@@ -68,9 +68,21 @@ public class ObjectTypeDescription extends TypeDescription {
     @Override
     public void setKey(String key) {
         super.setKey(key);
+        String memberPrefix = fullKey();
         for (TypeDescription member : members) {
             if (member.isAvailable()) {
-                member.setKey(key + "." + member.getKey());
+                member.setPrefix(memberPrefix);
+            }
+        }
+    }
+
+    @Override
+    public void setPrefix(String prefix) {
+        super.setPrefix(prefix);
+        String memberPrefix = fullKey();
+        for (TypeDescription member : members) {
+            if (member.isAvailable()) {
+                member.setPrefix(memberPrefix);
             }
         }
     }

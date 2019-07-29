@@ -26,4 +26,18 @@ public class StringHelper {
         return nonBlank(String.valueOf(text));
     }
 
+    public static String join(String delimiter, String ... values){
+        StringBuilder builder = new StringBuilder();
+        for (String value : values) {
+            if(isBlank(value)){
+                continue;
+            }
+            if(builder.length()>0){
+                builder.append(delimiter);
+            }
+            builder.append(value);
+        }
+        return builder.toString();
+    }
+
 }

@@ -2,23 +2,17 @@ package com.apigcc.common.resolver;
 
 import com.apigcc.common.description.ObjectTypeDescription;
 import com.apigcc.common.description.TypeDescription;
+import com.apigcc.common.helper.ReferenceContext;
 import com.apigcc.common.helper.CommentHelper;
+import com.apigcc.common.helper.JsonPropertyHelper;
 import com.apigcc.common.helper.TypeParameterHelper;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class ObjectTypeResolver implements TypeResolver {
-
-    /**
-     * 已解析的类型池，
-     * 解决循环依赖问题
-     */
-    private static Map<String, ObjectTypeDescription> resolvedPool = new HashMap<>();
 
     @Override
     public boolean accept(ResolvedType type) {
@@ -27,15 +21,17 @@ public class ObjectTypeResolver implements TypeResolver {
 
     @Override
     public TypeDescription resolve(ResolvedType type) {
+
         ResolvedReferenceType referenceType = type.asReferenceType();
-        if(resolvedPool.containsKey(referenceType.describe())){
-            return resolvedPool.get(referenceType.describe());
-        }
         ObjectTypeDescription typeDescription = new ObjectTypeDescription();
-        resolvedPool.put(referenceType.describe(),typeDescription);
 
         typeDescription.setType(referenceType.getTypeDeclaration().getName());
+        //类型解析缓冲池，防止循环引用
+        if(!ReferenceContext.getInstance().push(referenceType.describe())){
+            return typeDescription;
+        }
 
+        //解析父类属性，并合并至当前
         for (ResolvedReferenceType directAncestor : referenceType.getDirectAncestors()) {
             TypeDescription ancestorDescription = TypeResolvers.resolve(directAncestor);
             if(ancestorDescription.isAvailable() && ancestorDescription.isObject()){
@@ -43,32 +39,38 @@ public class ObjectTypeResolver implements TypeResolver {
             }
         }
 
+
+        //TODO fix use access method
         for (ResolvedFieldDeclaration declaredField : referenceType.getTypeDeclaration().getDeclaredFields()) {
             if(declaredField.isStatic()){
                 continue;
             }
             ResolvedType fieldType = declaredField.getType();
+            String key = declaredField.getName();
+            //查找json别名
+            Optional<String> jsonName = JsonPropertyHelper.getJsonName(declaredField);
+            if(jsonName.isPresent()){
+                key = jsonName.get();
+            }
+            if(fieldType.isReferenceType()){
+                //将父类的T，传递给 属性的T
+                fieldType = TypeParameterHelper.useClassTypeParameter(referenceType,fieldType.asReferenceType());
+            }
             if(declaredField.getType().isTypeVariable()){
+                //类型为T，这种泛型
                 Optional<ResolvedType> optional = TypeParameterHelper.getTypeParameter(referenceType, declaredField.getType().asTypeParameter().getName());
                 if(optional.isPresent()){
                     fieldType = optional.get();
                 }
             }
-            if(fieldType!=null){
-                TypeDescription fieldDescription = TypeResolvers.resolve(fieldType);
-                fieldDescription.setKey(declaredField.getName());
-                fieldDescription.setRemark(CommentHelper.getComment(declaredField));
-                typeDescription.add(fieldDescription);
-            }
+            TypeDescription fieldDescription = TypeResolvers.resolve(fieldType);
+            fieldDescription.setKey(key);
+            fieldDescription.addRemark(CommentHelper.getComment(declaredField));
+            typeDescription.add(fieldDescription);
         }
 
-        //TODO access method
-
+        ReferenceContext.getInstance().remove(referenceType.describe());
         return typeDescription;
-    }
-
-    public void clear(){
-        resolvedPool.clear();
     }
 
 }

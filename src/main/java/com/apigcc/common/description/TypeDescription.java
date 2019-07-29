@@ -1,5 +1,7 @@
 package com.apigcc.common.description;
 
+import com.apigcc.common.helper.StringHelper;
+import com.apigcc.schema.Project;
 import com.apigcc.schema.Row;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -11,7 +13,8 @@ import java.util.Collection;
 @Getter
 public abstract class TypeDescription {
 
-    protected String key;
+    protected String prefix = "";
+    protected String key = "";
     protected String type;
     protected StringBuilder condition = new StringBuilder();
     protected String remark;
@@ -59,7 +62,26 @@ public abstract class TypeDescription {
         return (ObjectTypeDescription) this;
     }
 
+    public void addRemark(String value){
+        if(value==null){
+            return;
+        }
+        if(remark==null){
+            remark = value;
+        }else{
+            remark += " " + value;
+        }
+    }
+
+    public String fullKey(){
+        return StringHelper.join(".",prefix,key);
+    }
+
     public Collection<Row> rows() {
+        String key = fullKey();
+        if(StringHelper.isBlank(key)){
+            return Lists.newArrayList();
+        }
         String def;
         if(defaultValue!=null){
             def = String.valueOf(defaultValue);
@@ -72,6 +94,7 @@ public abstract class TypeDescription {
         if(required!=null){
             condition.append("required=").append(required);
         }
+
         return Lists.newArrayList(new Row(key, type, condition.toString(), def, remark));
     }
 

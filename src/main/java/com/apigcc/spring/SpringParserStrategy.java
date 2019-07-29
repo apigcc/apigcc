@@ -240,7 +240,7 @@ public class SpringParserStrategy implements ParserStrategy {
 
                 TypeDescription description = TypeResolvers.resolve(parameter.getType());
                 if(description.isAvailable()){
-                    section.getParamTag(key).ifPresent(tag->description.setRemark(tag.getContent()));
+                    section.getParamTag(key).ifPresent(tag->description.addRemark(tag.getContent()));
                     if(required!=null){
                         description.setRequired(required);
                     }
@@ -269,7 +269,11 @@ public class SpringParserStrategy implements ParserStrategy {
     private void visitReturn(MethodDeclaration n, Chapter chapter, Section section) {
         TypeDescription description = TypeResolvers.resolve(n.getType());
         if(description.isAvailable()){
-            if(description.isArray()){
+            if(description.isPrimitive()){
+                section.setRawResponse(description.getValue());
+            }else if(description.isString()){
+                section.setRawResponse(description.getValue());
+            }else if(description.isArray()){
                 section.setResponse(description.asArray().getValue());
             }else if(description.isObject()){
                 section.setResponse(description.asObject().getValue());

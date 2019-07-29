@@ -65,7 +65,15 @@ public class ArrayTypeDescription extends TypeDescription {
     public void setKey(String key) {
         super.setKey(key);
         if (component.isAvailable()) {
-            component.setKey(key);
+            component.setPrefix(fullKey());
+        }
+    }
+
+    @Override
+    public void setPrefix(String prefix) {
+        super.setPrefix(prefix);
+        if (component.isAvailable()) {
+            component.setPrefix(fullKey());
         }
     }
 

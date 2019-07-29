@@ -1,15 +1,15 @@
 package com.apigcc.example;
 
-import com.apigcc.common.URI;
+import com.apigcc.common.ObjectMappers;
+import com.apigcc.example.diff.FileMatcher;
 import com.apigcc.parser.VisitorParser;
 import com.apigcc.render.AsciidocHtmlRender;
 import com.apigcc.render.AsciidocRender;
 import com.apigcc.schema.Project;
 import com.apigcc.spring.SpringParserStrategy;
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.type.SimpleType;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
@@ -18,12 +18,11 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.SourceRoot;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -35,6 +34,22 @@ import java.nio.file.Paths;
  * /mini路径下的接口为小程序专用
  */
 public class ApigccTest {
+
+    @Test
+    public void test1(){
+        String str = "1";
+        try {
+            Integer integer = ObjectMappers.instance.readValue(str, Integer.class);
+            System.out.println(integer);
+
+            ArrayNode add = ObjectMappers.instance.createArrayNode().add(2);
+            System.out.println(ObjectMappers.instance.writeValueAsString(add.get(0)));
+
+            System.out.println(ObjectMappers.instance.writerFor(SimpleType.construct(String.class)).writeValueAsString("haha"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void test() throws IOException {
@@ -76,6 +91,96 @@ public class ApigccTest {
         new AsciidocHtmlRender().render(project);
 
     }
+
+
+    @Test
+    public void testTestToolls() throws IOException {
+
+        Project project = new Project();
+        project.setId("test-tools");
+        project.setName("测试工具");
+
+        VisitorParser visitorParser = new VisitorParser();
+        visitorParser.setParserStrategy(new SpringParserStrategy());
+
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-test-tools/backend/src/main/java"));
+        typeSolver.add(new ReflectionTypeSolver(false));
+
+        ParserConfiguration parserConfiguration = new ParserConfiguration()
+                .setSymbolResolver(new JavaSymbolSolver(typeSolver));
+
+        SourceRoot root = new SourceRoot(Paths.get("D:/workspaces/ubisor-test-tools/backend/src/main/java"), parserConfiguration);
+        for (ParseResult<CompilationUnit> result : root.tryToParse()) {
+            if(result.isSuccessful() && result.getResult().isPresent()){
+                result.getResult().get().accept(visitorParser, project);
+            }
+        }
+
+        new AsciidocRender().render(project);
+
+        new AsciidocHtmlRender().render(project);
+
+        Path buildAdoc = Paths.get("build/test-tools/index.adoc");
+        Path template = Paths.get("src/test/resources/test-tools.adoc");
+        Path templateHtml = Paths.get("src/test/resources/template.html");
+        Path resultHtml = Paths.get("build/test-tools/diff.html");
+
+        FileMatcher fileMatcher = new FileMatcher();
+        int changed = fileMatcher.compare(template, buildAdoc);
+        if(changed>0){
+            fileMatcher.rederHtml(templateHtml, resultHtml);
+        }
+
+        System.out.println("BUILD SUCCESS");
+    }
+
+
+    @Test
+    public void testUbcloud() throws IOException {
+
+        Project project = new Project();
+        project.setId("ubcloud");
+        project.setName("优碧云");
+
+        VisitorParser visitorParser = new VisitorParser();
+        visitorParser.setParserStrategy(new SpringParserStrategy());
+
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
+        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-front-web/src/main/java"));
+        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-common/src/main/java"));
+        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-io/ubcloud-io-interface/src/main/java"));
+        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-manager/ubcloud-manager-interface/src/main/java"));
+        typeSolver.add(new ReflectionTypeSolver(false));
+
+        ParserConfiguration parserConfiguration = new ParserConfiguration()
+                .setSymbolResolver(new JavaSymbolSolver(typeSolver));
+
+        SourceRoot root = new SourceRoot(Paths.get("D:/workspaces/ubisor-backend/ubcloud-front-web/src/main/java"), parserConfiguration);
+        for (ParseResult<CompilationUnit> result : root.tryToParse()) {
+            if(result.isSuccessful() && result.getResult().isPresent()){
+                result.getResult().get().accept(visitorParser, project);
+            }
+        }
+
+        new AsciidocRender().render(project);
+
+        new AsciidocHtmlRender().render(project);
+
+        Path buildAdoc = Paths.get("build/ubcloud/index.adoc");
+        Path template = Paths.get("src/test/resources/ubcloud-front-web.adoc");
+        Path templateHtml = Paths.get("src/test/resources/template.html");
+        Path resultHtml = Paths.get("build/ubcloud/diff.html");
+
+        FileMatcher fileMatcher = new FileMatcher();
+        int changed = fileMatcher.compare(template, buildAdoc);
+        if(changed>0){
+            fileMatcher.rederHtml(templateHtml, resultHtml);
+        }
+
+        System.out.println("BUILD SUCCESS");
+    }
+
 
     @Test
     public void testApigcc() {

@@ -1,12 +1,14 @@
 package com.apigcc.common.resolver;
 
-import com.apigcc.common.description.*;
+import com.apigcc.common.description.TypeDescription;
+import com.apigcc.common.description.UnAvailableTypeDescription;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 public class TypeResolvers {
@@ -23,6 +25,7 @@ public class TypeResolvers {
             new CollectionTypeResolver(),
             new DateTypeResolver(),
             new MapTypeResolver(),
+            new EnumTypeResolver(),
             new SystemObjectTypeResolver(),
             new SpringComponentTypeResolver(),
             objectTypeResolver
@@ -35,10 +38,10 @@ public class TypeResolvers {
      */
     public static TypeDescription resolve(Type type){
         try{
-            //清除历史解析记录，重新解析，换方法后，前一个方法的解析不会影响这次
-            objectTypeResolver.clear();
             ResolvedType resolvedType = type.resolve();
             return resolve(resolvedType);
+        } catch (UnsolvedSymbolException e){
+            log.warn("UnsolvedSymbolException:{}",e.getMessage());
         } catch (Exception e){
             log.error(e.getMessage(),e);
         }
