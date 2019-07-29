@@ -1,5 +1,7 @@
 package com.apigcc.example;
 
+import com.apigcc.Apigcc;
+import com.apigcc.Context;
 import com.apigcc.common.ObjectMappers;
 import com.apigcc.example.diff.FileMatcher;
 import com.apigcc.parser.VisitorParser;
@@ -22,8 +24,11 @@ import lombok.*;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static com.apigcc.Context.DEFAULT_CODE_STRUCTURE;
 
 /**
  * @title Apigcc示例文档
@@ -36,60 +41,17 @@ import java.nio.file.Paths;
 public class ApigccTest {
 
     @Test
-    public void test1(){
-        String str = "1";
-        try {
-            Integer integer = ObjectMappers.instance.readValue(str, Integer.class);
-            System.out.println(integer);
-
-            ArrayNode add = ObjectMappers.instance.createArrayNode().add(2);
-            System.out.println(ObjectMappers.instance.writeValueAsString(add.get(0)));
-
-            System.out.println(ObjectMappers.instance.writerFor(SimpleType.construct(String.class)).writeValueAsString("haha"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void test() throws IOException {
 
-        Project project = new Project();
-        project.setId("test");
-        project.setName("测试项目");
+        Context context = new Context();
+        context.setId("test");
+        context.setName("测试项目手工");
+        context.addSource(Paths.get("D:/apigcc/apigcc-demo-spring"));
+        context.setCss("https://darshandsoni.com/asciidoctor-skins/css/boot-lumen.css");
 
-        VisitorParser visitorParser = new VisitorParser();
-        visitorParser.setParserStrategy(new SpringParserStrategy());
-
-        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
-        typeSolver.add(new JavaParserTypeSolver("D:/apigcc/apigcc-demo-spring/src/main/java"));
-        typeSolver.add(new ReflectionTypeSolver(false));
-
-        ParserConfiguration parserConfiguration = new ParserConfiguration()
-                .setSymbolResolver(new JavaSymbolSolver(typeSolver));
-
-        SourceRoot root = new SourceRoot(Paths.get("D:/apigcc/apigcc-demo-spring/src/main/java"), parserConfiguration);
-        for (ParseResult<CompilationUnit> result : root.tryToParse()) {
-            if(result.isSuccessful() && result.getResult().isPresent()){
-                result.getResult().get().accept(visitorParser, project);
-            }
-        }
-
-//        project.getBooks().forEach((key,value)->{
-//            value.getChapters().forEach(chapter -> {
-//                chapter.getSections().forEach(section -> {
-//                    System.out.println(section.getId()+" "+section.getUri());
-//                    System.out.println(ObjectMappers.pretty(section.getParameter()));
-//                });
-//            });
-//        });
-
-//        System.out.println(ObjectMappers.pretty(project));
-
-        new AsciidocRender().render(project);
-
-        new AsciidocHtmlRender().render(project);
-
+        Apigcc apigcc = new Apigcc(context);
+        apigcc.parse();
+        apigcc.render();
     }
 
 

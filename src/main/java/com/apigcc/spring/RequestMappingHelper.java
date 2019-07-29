@@ -6,6 +6,7 @@ import com.apigcc.common.helper.ExpressionHelper;
 import com.apigcc.common.helper.OptionalHelper;
 import com.apigcc.common.URI;
 import com.apigcc.schema.HttpMethod;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -15,6 +16,8 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.apigcc.spring.SpringParserStrategy.ANNOTATION_REST_CONTROLLER;
 
 public class RequestMappingHelper {
 
@@ -26,8 +29,26 @@ public class RequestMappingHelper {
     public static final String ANNOTATION_DELETE_MAPPING = "DeleteMapping";
     public static final String ANNOTATION_REQUEST_MAPPING = "RequestMapping";
 
+    public static final String ANNOTATION_RESPONSE_BODY = "ResponseBody";
+
     public static final List<String> ANNOTATION_REQUEST_MAPPINGS = Lists.newArrayList(ANNOTATION_GET_MAPPING,
             ANNOTATION_POST_MAPPING, ANNOTATION_PUT_MAPPING, ANNOTATION_PATCH_MAPPING, ANNOTATION_DELETE_MAPPING, ANNOTATION_REQUEST_MAPPING);
+
+    public static boolean isRest(MethodDeclaration n){
+        if(n.isAnnotationPresent(ANNOTATION_RESPONSE_BODY)){
+            return true;
+        }
+        Optional<Node> parentOptional = n.getParentNode();
+        if(parentOptional.isPresent()){
+            Node parentNode = parentOptional.get();
+            if(parentNode instanceof ClassOrInterfaceDeclaration){
+                if (((ClassOrInterfaceDeclaration) parentNode).isAnnotationPresent(ANNOTATION_REST_CONTROLLER)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
     public static String pickMethod(MethodDeclaration n){

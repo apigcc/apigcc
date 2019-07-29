@@ -37,6 +37,9 @@ public class ExpressionHelper {
         if (expr.isArrayInitializerExpr()) {
             return expr.asArrayInitializerExpr().getValues().stream().map(ExpressionHelper::getValue).collect(Collectors.toList());
         }
+        if (expr instanceof Resolvable) {
+            return String.valueOf(resolve((Resolvable) expr));
+        }
         return expr.toString();
     }
 

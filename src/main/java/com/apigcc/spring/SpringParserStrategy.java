@@ -11,6 +11,7 @@ import com.apigcc.parser.ParserStrategy;
 import com.apigcc.schema.Chapter;
 import com.apigcc.schema.Row;
 import com.apigcc.schema.Section;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
@@ -35,7 +36,6 @@ public class SpringParserStrategy implements ParserStrategy {
     public static final List<String> ANNOTATION_CONTROLLERS = Lists.newArrayList(ANNOTATION_CONTROLLER, ANNOTATION_REST_CONTROLLER);
 
     /**
-     * TODO
      * 处理被@RestController和@Controller标记的类
      * @param n
      * @return
@@ -46,14 +46,13 @@ public class SpringParserStrategy implements ParserStrategy {
     }
 
     /**
-     * TODO
      * 类被@RestController标记，或方法被@ResponseBody标记
      * @param n
      * @return
      */
     @Override
     public boolean accept(MethodDeclaration n) {
-        return AnnotationHelper.isAnnotationPresent(n, RequestMappingHelper.ANNOTATION_REQUEST_MAPPINGS);
+        return RequestMappingHelper.isRest(n) && AnnotationHelper.isAnnotationPresent(n, RequestMappingHelper.ANNOTATION_REQUEST_MAPPINGS);
     }
 
     /**

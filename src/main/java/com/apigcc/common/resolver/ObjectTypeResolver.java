@@ -2,16 +2,16 @@ package com.apigcc.common.resolver;
 
 import com.apigcc.common.description.ObjectTypeDescription;
 import com.apigcc.common.description.TypeDescription;
-import com.apigcc.common.helper.ReferenceContext;
-import com.apigcc.common.helper.CommentHelper;
-import com.apigcc.common.helper.JsonPropertyHelper;
-import com.apigcc.common.helper.TypeParameterHelper;
+import com.apigcc.common.helper.*;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import java.util.Optional;
 
+/**
+ * java bean解析
+ */
 public class ObjectTypeResolver implements TypeResolver {
 
     @Override
@@ -46,12 +46,7 @@ public class ObjectTypeResolver implements TypeResolver {
                 continue;
             }
             ResolvedType fieldType = declaredField.getType();
-            String key = declaredField.getName();
-            //查找json别名
-            Optional<String> jsonName = JsonPropertyHelper.getJsonName(declaredField);
-            if(jsonName.isPresent()){
-                key = jsonName.get();
-            }
+
             if(fieldType.isReferenceType()){
                 //将父类的T，传递给 属性的T
                 fieldType = TypeParameterHelper.useClassTypeParameter(referenceType,fieldType.asReferenceType());
@@ -63,9 +58,20 @@ public class ObjectTypeResolver implements TypeResolver {
                     fieldType = optional.get();
                 }
             }
+
             TypeDescription fieldDescription = TypeResolvers.resolve(fieldType);
-            fieldDescription.setKey(key);
+            fieldDescription.setKey(declaredField.getName());
+            //查找json别名
+            JsonPropertyHelper.getJsonName(declaredField).ifPresent(fieldDescription::setKey);
+            //解析注释
             fieldDescription.addRemark(CommentHelper.getComment(declaredField));
+            //查找Validation注解
+            for (String validation : ValidationHelper.getValidations(declaredField)) {
+                fieldDescription.getCondition().append(validation).append(" ");
+            }
+            //查找字段初始化值
+            FieldHelper.getInitializer(declaredField).ifPresent(expr-> fieldDescription.setDefaultValue(ExpressionHelper.getValue(expr)));
+
             typeDescription.add(fieldDescription);
         }
 

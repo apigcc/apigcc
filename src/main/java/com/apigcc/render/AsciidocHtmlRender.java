@@ -1,27 +1,34 @@
 package com.apigcc.render;
 
+import com.apigcc.Apigcc;
 import com.apigcc.Context;
+import com.apigcc.common.helper.StringHelper;
 import com.apigcc.schema.Project;
 import org.asciidoctor.*;
 import org.asciidoctor.jruby.AsciiDocDirectoryWalker;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
-public class AsciidocHtmlRender {
+/**
+ * 转换adoc文件为html文件
+ */
+public class AsciidocHtmlRender implements ProjectRender {
 
+    @Override
     public void render(Project project){
 
-        Path buildPath = Context.getInstance().getBuildPath();
+        Path buildPath = Apigcc.getInstance().getContext().getBuildPath();
         Path projectBuildPath = buildPath.resolve(project.getId());
-
 
         AttributesBuilder attributes = AttributesBuilder.attributes();
         attributes.sectionNumbers(true);
         attributes.noFooter(true);
-//        if (Objects.nonNull(options.getCss())) {
-//            attributes.linkCss(true);
-//            attributes.styleSheetName(options.getCss());
-//        }
+        String css = Apigcc.getInstance().getContext().getCss();
+        if (StringHelper.nonBlank(css)) {
+            attributes.linkCss(true);
+            attributes.styleSheetName(css);
+        }
         //asciidoctorj 的 options
         OptionsBuilder builder = OptionsBuilder.options()
                 .mkDirs(true)

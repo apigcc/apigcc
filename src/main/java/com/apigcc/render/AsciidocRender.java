@@ -1,5 +1,6 @@
 package com.apigcc.render;
 
+import com.apigcc.Apigcc;
 import com.apigcc.Context;
 import com.apigcc.common.helper.FileHelper;
 import com.apigcc.common.markup.MarkupBuilder;
@@ -13,13 +14,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class AsciidocRender {
+/**
+ * 渲染adoc文件
+ */
+public class AsciidocRender implements ProjectRender {
 
     public static final CharSequence[] attrs = Lists.newArrayList(
             AsciiDoc.attr(AsciiDoc.DOCTYPE, AsciiDoc.BOOK),
             AsciiDoc.attr(AsciiDoc.TOC, AsciiDoc.LEFT), AsciiDoc.attr(AsciiDoc.TOC_LEVEL, 2), AsciiDoc.attr(AsciiDoc.TOC_TITLE, "TOC"),
             AsciiDoc.attr(AsciiDoc.SOURCE_HIGHLIGHTER, AsciiDoc.HIGHLIGHTJS)).toArray(new CharSequence[0]);
 
+    @Override
     public void render(Project project) {
 
         project.getBooks().forEach((name, book) -> {
@@ -73,7 +78,7 @@ public class AsciidocRender {
                 }
             }
 
-            Path buildPath = Context.getInstance().getBuildPath();
+            Path buildPath = Apigcc.getInstance().getContext().getBuildPath();
             Path projectBuildPath = buildPath.resolve(project.getId());
             Path adocFile = projectBuildPath.resolve(name + AsciiDoc.EXTENSION);
             FileHelper.write(adocFile, builder.getContent());

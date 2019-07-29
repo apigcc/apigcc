@@ -1,5 +1,11 @@
 package com.apigcc.common.helper;
 
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+
+import java.util.Optional;
+
 public class FieldHelper {
 
     /**
@@ -21,44 +27,12 @@ public class FieldHelper {
         return null;
     }
 
-    /**
-     * 获取可访问的属性
-     * 1、通过get方法能访问的数据
-     * 2、通过is方法能访问的数据
-     * 3、被lombok标记Getter的属性  TODO 暂时获取所有属性
-     * 4、被Getter标记的类
-     * @param referenceType
-     * @return
-     */
-//    public static List<ResolvedField> getAccessFields(ResolvedReferenceType referenceType){
-//        List<ResolvedField> result = new ArrayList<>();
-//        ResolvedReferenceTypeDeclaration typeDeclaration = referenceType.getTypeDeclaration();
-//        if(typeDeclaration instanceof AbstractClassDeclaration){
-//            AbstractClassDeclaration classDeclaration = (AbstractClassDeclaration) typeDeclaration;
-//
-//            for (MethodUsage it : classDeclaration.getAllMethods()) {
-//                if(!it.getDeclaration().isStatic() &&
-//                        !it.getDeclaration().isAbstract() &&
-//                        !it.getQualifiedSignature().startsWith("java") &&
-//                        AccessSpecifier.PUBLIC.equals(it.getDeclaration().accessSpecifier())){
-//                    String fieldName = FieldHelper.getByAccessMethod(it.getName());
-//                    if(fieldName != null){
-//                        TypeDescription description = pick(it.getDeclaration().getReturnType());
-//                        description.setRemark(CommentHelper.getComment(it));
-//                        result.add(new ResolvedField(fieldName, description));
-//                    }
-//                }
-//            }
-//            for (ResolvedFieldDeclaration it : classDeclaration.getAllFields()) {
-//                if(!it.isStatic()){
-//                    ITypeDescription description = pick(it.getType());
-//                    description.setRemark(CommentHelper.getComment(it));
-//                    result.add(new ResolvedField(it.getName(), description));
-//                }
-//            }
-//        }
-//
-//        return result;
-//    }
+    public static Optional<Expression> getInitializer(ResolvedFieldDeclaration declaredField){
+        if(declaredField instanceof JavaParserFieldDeclaration){
+            JavaParserFieldDeclaration field = (JavaParserFieldDeclaration) declaredField;
+            return field.getVariableDeclarator().getInitializer();
+        }
+        return Optional.empty();
+    }
 
 }
