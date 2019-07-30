@@ -5,7 +5,6 @@ import com.apigcc.render.AsciidocHtmlRender;
 import com.apigcc.render.AsciidocRender;
 import com.apigcc.render.ProjectRender;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import lombok.Getter;
 import lombok.Setter;
 

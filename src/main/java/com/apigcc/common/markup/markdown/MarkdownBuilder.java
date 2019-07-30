@@ -1,17 +1,16 @@
-package com.apigcc.common.markup.asciidoc;
+package com.apigcc.common.markup.markdown;
 
-import com.apigcc.common.markup.MarkupBuilder;
 import com.apigcc.common.Assert;
+import com.apigcc.common.markup.MarkupBuilder;
 import com.google.common.base.Strings;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
-import static com.apigcc.common.markup.asciidoc.AsciiDoc.*;
+import static com.apigcc.common.markup.markdown.Markdown.*;
 
-public class AsciiDocBuilder implements MarkupBuilder {
+public class MarkdownBuilder implements MarkupBuilder {
 
     public static final int MAX_TITLE = 6;
 
@@ -22,11 +21,6 @@ public class AsciiDocBuilder implements MarkupBuilder {
         Assert.notBlank(text, "header must not be blank");
         content.append(HEADER);
         content.append(nobr(text.trim()));
-        br();
-        for (CharSequence attr : attrs) {
-            content.append(attr);
-            br();
-        }
         br();
         return this;
     }
@@ -66,16 +60,6 @@ public class AsciiDocBuilder implements MarkupBuilder {
         if (Assert.isBlank(text)) {
             return this;
         }
-        content.append(HARDBREAKS);
-        br();
-        if (attrs.length > 0) {
-            content.append("[");
-            for (CharSequence attr : attrs) {
-                content.append(attr).append(WHITESPACE);
-            }
-            content.append("]");
-            br();
-        }
         text(text);
         newLine();
         return this;
@@ -83,44 +67,41 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder note(String text) {
-        paragraph(text, NOTE);
+        content.append(QUOTE);
+        paragraph(text);
         return this;
     }
 
     @Override
     public MarkupBuilder tip(String text) {
-        paragraph(text, TIP);
+        content.append(QUOTE);
+        paragraph(text);
         return this;
     }
 
     @Override
     public MarkupBuilder important(String text) {
-        paragraph(text, IMPORTANT);
+        content.append(QUOTE);
+        paragraph(text);
         return this;
     }
 
     @Override
     public MarkupBuilder warning(String text) {
-        paragraph(text, WARNING);
+        content.append(QUOTE);
+        paragraph(text);
         return this;
     }
 
     @Override
     public MarkupBuilder caution(String text) {
-        paragraph(text, CAUTION);
+        content.append(QUOTE);
+        paragraph(text);
         return this;
     }
 
     @Override
     public MarkupBuilder block(Consumer<MarkupBuilder> consumer, CharSequence flag, CharSequence... attrs) {
-        if (attrs.length > 0) {
-            content.append("[");
-            for (CharSequence attr : attrs) {
-                content.append(attr).append(" ");
-            }
-            content.append("]");
-            br();
-        }
         content.append(flag);
         br();
         consumer.accept(this);
@@ -138,32 +119,32 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder literal(Consumer<MarkupBuilder> consumer, CharSequence... attrs) {
-        return block(consumer, LITERAL, attrs);
+        return block(consumer, LISTING, attrs);
     }
 
     @Override
     public MarkupBuilder sidebar(Consumer<MarkupBuilder> consumer, CharSequence... attrs) {
-        return block(consumer, SIDEBAR, attrs);
+        return block(consumer, LISTING, attrs);
     }
 
     @Override
     public MarkupBuilder comment(Consumer<MarkupBuilder> consumer, CharSequence... attrs) {
-        return block(consumer, COMMENT, attrs);
+        return block(consumer, LISTING, attrs);
     }
 
     @Override
     public MarkupBuilder passthrough(Consumer<MarkupBuilder> consumer, CharSequence... attrs) {
-        return block(consumer, PASSTHROUGH, attrs);
+        return block(consumer, LISTING, attrs);
     }
 
     @Override
     public MarkupBuilder quote(Consumer<MarkupBuilder> consumer, CharSequence... attrs) {
-        return block(consumer, QUOTE, attrs);
+        return block(consumer, LISTING, attrs);
     }
 
     @Override
     public MarkupBuilder example(Consumer<MarkupBuilder> consumer, CharSequence... attrs) {
-        return block(consumer, EXAMPLE, attrs);
+        return block(consumer, LISTING, attrs);
     }
 
     @Override
@@ -182,7 +163,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
     @Override
     public MarkupBuilder url(String text, String url) {
         if (!Assert.isBlank(text) && !Assert.isBlank(url)) {
-            content.append(url).append("[").append(nobr(text)).append("]");
+            content.append("[").append(nobr(text)).append("](").append(url).append(")");
             br();
         }
         return this;
@@ -191,7 +172,7 @@ public class AsciiDocBuilder implements MarkupBuilder {
     @Override
     public MarkupBuilder image(String text, String url) {
         if (!Assert.isBlank(text) && !Assert.isBlank(url)) {
-            text("image:");
+            text("!");
             url(text, url);
         }
         return this;
@@ -204,40 +185,34 @@ public class AsciiDocBuilder implements MarkupBuilder {
 
     @Override
     public MarkupBuilder table(List<List<String>> data, boolean header, boolean footer) {
-        int min = 1;
-        if (header) {
-            min++;
-        }
-        if (footer) {
-            min++;
-        }
-        if (data.size() < min) {
-            return this;
-        }
-        content.append("[stripes=even,options=\"");
-        if (header) {
-            content.append("header");
-        }
-        if (header && footer) {
-            content.append(",");
-        }
-        if (footer) {
-            content.append("footer");
-        }
-        content.append("\"]");
-        br();
-        content.append(TABLE);
-        br();
-        for (List<String> rows : data) {
-            for (String cell : rows) {
-                content.append(TABLE_CELL);
-                if(cell!=null){
-                    monospaced(cell.replace(TABLE_CELL, "\\" + TABLE_CELL));
+
+        for (int i = 0; i < data.size(); i++) {
+            content.append(TABLE_CELL);
+            for (int j = 0; j < data.get(i).size(); j++) {
+                String value = data.get(i).get(j);
+                if(value!=null){
+                    content.append(data.get(i).get(j).replace(TABLE_CELL, "\\" + TABLE_CELL));
+                }else{
+                    content.append(" ");
                 }
+                content.append(TABLE_CELL);
             }
             br();
+            if(i==0 && header){
+                content.append(TABLE_CELL);
+                for (int j = 0; j < data.get(i).size(); j++) {
+                    content.append(TABLE_Header);
+                }
+                br();
+            }
+            if(i==data.size()-2 && footer){
+                content.append(TABLE_CELL);
+                for (int j = 0; j < data.get(i).size(); j++) {
+                    content.append(TABLE_Header);
+                }
+                br();
+            }
         }
-        content.append(TABLE);
         newLine();
         return this;
     }
@@ -246,13 +221,6 @@ public class AsciiDocBuilder implements MarkupBuilder {
     public MarkupBuilder style(CharSequence flag, String text, CharSequence... textStyle) {
         if (Assert.isBlank(text)) {
             return this;
-        }
-        if (Objects.nonNull(textStyle) && textStyle.length > 0) {
-            content.append("[");
-            for (CharSequence style : textStyle) {
-                content.append(style).append(" ");
-            }
-            content.append("]");
         }
         content.append(flag);
         text(text);

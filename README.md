@@ -1,4 +1,4 @@
-# 🐷 Apiggs - 非侵入的RestDoc文档生成工具
+# 🐷 Apigcc - 非侵入的RestDoc文档生成工具
 
 ![](https://img.shields.io/badge/Language-Java-yellow.svg)
 [![Download](https://api.bintray.com/packages/apiggs/maven/apiggs/images/download.svg)](https://bintray.com/apiggs/maven/apiggs/_latestVersion)
@@ -12,7 +12,7 @@ Python提出了一个方案，叫**docstring**，来试图解决这个问题。�
 +
 ### 代码即文档
 
-Apiggs是一个**非侵入**的RestDoc文档生成工具。工具通过分析代码和注释，获取文档信息，生成RestDoc文档。
+Apigcc是一个**非侵入**的RestDoc文档生成工具。工具通过分析代码和注释，获取文档信息，生成RestDoc文档。
 
 ### 引入插件
 
@@ -24,7 +24,7 @@ buildscript {
     }
 }
 
-apply plugin: 'com.github.apiggs'
+apply plugin: 'com.apigcc'
 ```
 [maven](https://github.com/apiggs/apiggs-maven-plugin)
 ```xml

@@ -1,6 +1,7 @@
 package com.apigcc.common.markup;
 
 import com.apigcc.common.markup.asciidoc.AsciiDocBuilder;
+import com.apigcc.common.markup.markdown.MarkdownBuilder;
 
 import java.util.List;
 import java.util.function.Consumer;

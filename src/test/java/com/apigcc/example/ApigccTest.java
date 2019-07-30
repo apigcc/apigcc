@@ -30,14 +30,6 @@ import java.nio.file.Paths;
 
 import static com.apigcc.Context.DEFAULT_CODE_STRUCTURE;
 
-/**
- * @title Apigcc示例文档
- * @description 通过javadoc设置文档描述信息
- * 优先级大于通过Environment.description()设置的值
- * @readme 所有接口均使用Https调用
- * /app路径下的接口为app专用
- * /mini路径下的接口为小程序专用
- */
 public class ApigccTest {
 
     @Test
@@ -47,7 +39,7 @@ public class ApigccTest {
         context.setId("test");
         context.setName("测试项目手工");
         context.addSource(Paths.get("D:/apigcc/apigcc-demo-spring"));
-        context.setCss("https://darshandsoni.com/asciidoctor-skins/css/boot-lumen.css");
+//        context.setCss("https://darshandsoni.com/asciidoctor-skins/css/monospace.css");
 
         Apigcc apigcc = new Apigcc(context);
         apigcc.parse();
@@ -58,30 +50,15 @@ public class ApigccTest {
     @Test
     public void testTestToolls() throws IOException {
 
-        Project project = new Project();
-        project.setId("test-tools");
-        project.setName("测试工具");
+        Context context = new Context();
+        context.setId("test-tools");
+        context.setName("测试工具");
+        context.addSource(Paths.get("D:/workspaces/ubisor-test-tools/backend/"));
+//        context.setCss("https://darshandsoni.com/asciidoctor-skins/css/monospace.css");
 
-        VisitorParser visitorParser = new VisitorParser();
-        visitorParser.setParserStrategy(new SpringParserStrategy());
-
-        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
-        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-test-tools/backend/src/main/java"));
-        typeSolver.add(new ReflectionTypeSolver(false));
-
-        ParserConfiguration parserConfiguration = new ParserConfiguration()
-                .setSymbolResolver(new JavaSymbolSolver(typeSolver));
-
-        SourceRoot root = new SourceRoot(Paths.get("D:/workspaces/ubisor-test-tools/backend/src/main/java"), parserConfiguration);
-        for (ParseResult<CompilationUnit> result : root.tryToParse()) {
-            if(result.isSuccessful() && result.getResult().isPresent()){
-                result.getResult().get().accept(visitorParser, project);
-            }
-        }
-
-        new AsciidocRender().render(project);
-
-        new AsciidocHtmlRender().render(project);
+        Apigcc apigcc = new Apigcc(context);
+        apigcc.parse();
+        apigcc.render();
 
         Path buildAdoc = Paths.get("build/test-tools/index.adoc");
         Path template = Paths.get("src/test/resources/test-tools.adoc");
@@ -101,33 +78,16 @@ public class ApigccTest {
     @Test
     public void testUbcloud() throws IOException {
 
-        Project project = new Project();
-        project.setId("ubcloud");
-        project.setName("优碧云");
+        Context context = new Context();
+        context.setId("ubcloud");
+        context.setName("优碧云");
+        context.addSource(Paths.get("D:/workspaces/ubisor-backend/ubcloud-front-web/"));
+        context.addDependency(Paths.get("D:/workspaces/ubisor-backend/"));
+//        context.setCss("https://darshandsoni.com/asciidoctor-skins/css/monospace.css");
 
-        VisitorParser visitorParser = new VisitorParser();
-        visitorParser.setParserStrategy(new SpringParserStrategy());
-
-        CombinedTypeSolver typeSolver = new CombinedTypeSolver();
-        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-front-web/src/main/java"));
-        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-common/src/main/java"));
-        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-io/ubcloud-io-interface/src/main/java"));
-        typeSolver.add(new JavaParserTypeSolver("D:/workspaces/ubisor-backend/ubcloud-manager/ubcloud-manager-interface/src/main/java"));
-        typeSolver.add(new ReflectionTypeSolver(false));
-
-        ParserConfiguration parserConfiguration = new ParserConfiguration()
-                .setSymbolResolver(new JavaSymbolSolver(typeSolver));
-
-        SourceRoot root = new SourceRoot(Paths.get("D:/workspaces/ubisor-backend/ubcloud-front-web/src/main/java"), parserConfiguration);
-        for (ParseResult<CompilationUnit> result : root.tryToParse()) {
-            if(result.isSuccessful() && result.getResult().isPresent()){
-                result.getResult().get().accept(visitorParser, project);
-            }
-        }
-
-        new AsciidocRender().render(project);
-
-        new AsciidocHtmlRender().render(project);
+        Apigcc apigcc = new Apigcc(context);
+        apigcc.parse();
+        apigcc.render();
 
         Path buildAdoc = Paths.get("build/ubcloud/index.adoc");
         Path template = Paths.get("src/test/resources/ubcloud-front-web.adoc");
@@ -141,33 +101,6 @@ public class ApigccTest {
         }
 
         System.out.println("BUILD SUCCESS");
-    }
-
-
-    @Test
-    public void testApigcc() {
-//        Options options = new Options()
-//                .source(Paths.get("src", "test", "java"))
-//                .ignore("ResponseEntity")
-//                .jar(Paths.get("src/test/resources/lib/apigcc-model-1.0-SNAPSHOT.jar"))
-//                .id("apigcc")
-//                .title("示例接口文档")
-//                .description("示例接口文档，使用默认模板");
-//        Apigcc apigcc = new Apigcc(options);
-//        apigcc.lookup().build();
-//
-//        Path buildAdoc = options.getOutPath().resolve(options.getId() + ".adoc");
-//        Path template = options.getOutPath().resolve("../../src/test/resources/template.adoc");
-//        Path templateHtml = options.getOutPath().resolve("../../src/test/resources/template.html");
-//        Path resultHtml = options.getOutPath().resolve("diff.html");
-//
-//        FileMatcher fileMatcher = new FileMatcher();
-//        int changed = fileMatcher.compare(template, buildAdoc);
-//        if(changed>0){
-//            fileMatcher.rederHtml(templateHtml, resultHtml);
-//        }
-//
-//        System.out.println("BUILD SUCCESS");
     }
 
 }

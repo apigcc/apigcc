@@ -4,12 +4,14 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ExpressionHelper {
 
     /**
@@ -84,7 +86,7 @@ public class ExpressionHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("resolve expression {} error: {}",resolvable.toString(),e.getMessage());
         }
         return resolvable;
     }
