@@ -1,0 +1,2809 @@
+= 优碧云接口文档
+:doctype: book
+:toc: left
+:toclevels: 3
+:toc-title: 目录
+:source-highlighter: highlightjs
+
+[%hardbreaks]
+version:1.0
+
+[%hardbreaks]
+使用http或https访问服务
+                        使用http code标识服务处理状态
+                        处理成功使用200+
+                        错误信息使用400+
+                        服务端错误使用500+
+
+
+== 文档说明
+[%hardbreaks]
+系统使用cookie跟踪会话SESSION，如
+SESSION=ZDczYzVhYjItOGExZC00ZWE3LWI5MzUtZmZiOTc0NDEyZDk0; path=/; domain=127.0.0.1; HttpOnly; Expires=Tue, 19 Jan 2038 03:14:07 GMT;
+分页使用 page，size；size为-1时返回不分页的数据
+
+
+== 登录、注册等
+
+=== 登录
+[%hardbreaks]
+支持手机号、验证码 和 用户名、密码
+登录成功结果参考 /users/my
+
+请求
+[source,HTTP ]
+----
+POST /login HTTP/1.1
+Content-Type: application/json
+
+{
+  "account" : "",
+  "code" : "",
+  "codeType" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+account+|+String+|+NotBlank+||+登录账户，用户名或手机号+
+|+code+|+String+|+NotBlank+||+登录码，密码或短信验证码+
+|+codeType+|+CodeType+|+NotNull+||+登录码类型，支持 PASSWORD、VERIFYCODE+
+|===
+
+
+=== 用户注册
+请求
+[source,HTTP ]
+----
+POST /register HTTP/1.1
+Content-Type: application/json
+
+{
+  "account" : "",
+  "code" : "",
+  "password" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+account+|+String+|+NotBlank+||+手机号+
+|+code+|+String+|+NotBlank+||+短信校验码+
+|+password+|+String+|+NotBlank+||+密码+
+|===
+
+
+=== 获取验证码
+请求
+[source,HTTP ]
+----
+POST /code HTTP/1.1
+Content-Type: application/json
+
+{
+  "account" : "",
+  "module" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+account+|+String+|+NotBlank+||+手机号+
+|+module+|+VerifyCodeModule+|+NotNull+||+校验码用途，支持 REGISTER LOGIN RESETPASSWORD+
+|===
+
+
+=== 验证码校验
+[%hardbreaks]
+单纯校验，后端不会作废该验证码
+
+请求
+[source,HTTP ]
+----
+POST /code/check HTTP/1.1
+Content-Type: application/json
+
+{
+  "account" : "",
+  "module" : "",
+  "code" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+account+|+String+|+NotBlank+||+手机号+
+|+module+|+VerifyCodeModule+|+NotNull+||+校验码用途，支持 REGISTER LOGIN RESETPASSWORD+
+|+code+|+String+|+NotBlank+||+短信校验码+
+|===
+
+
+=== 退出登录
+[%hardbreaks]
+spring security 的拦截器处理，这里什么都不做
+用于apigcc生成文档
+
+请求
+[source,HTTP ]
+----
+GET /logout HTTP/1.1
+
+----
+
+
+=== 用户重置密码
+请求
+[source,HTTP ]
+----
+PUT /password/reset HTTP/1.1
+Content-Type: application/json
+
+{
+  "account" : "",
+  "code" : "",
+  "password" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+account+|+String+|+NotBlank+||+手机号+
+|+code+|+String+|+NotBlank+||+验证码+
+|+password+|+String+|+NotBlank+||+新密码+
+|===
+
+
+== 用户管理
+
+=== 获取当前登录用户信息
+[%hardbreaks]
+包含员工信息
+获取自己对哪个组织具有权限
+organizationId 为null时，表示系统权限：sys_admin或 sys_visit
+
+请求
+[source,HTTP ]
+----
+GET /users/my HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "username" : "",
+  "phone" : "",
+  "avatarUrl" : "",
+  "email" : "",
+  "location" : "",
+  "country" : "",
+  "remark" : "",
+  "fixedPhone" : "",
+  "createTime" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "roleCode" : "",
+  "staffs" : [ {
+    "userId" : 0,
+    "roleCode" : "",
+    "organizationId" : 0,
+    "duty" : "",
+    "createTime" : "",
+    "createUserId" : 0,
+    "createUserName" : "",
+    "updateTime" : "",
+    "updateUserId" : 0,
+    "updateUserName" : ""
+  } ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+name+|+String+|||+姓名+
+|+username+|+String+|||+用户名+
+|+phone+|+String+|||+注册手机号+
+|+avatarUrl+|+String+|||+用户头像+
+|+email+|+String+|||+注册邮箱+
+|+location+|+String+|||+详细地址+
+|+country+|+String+|||+国家+
+|+remark+|+String+|||+个人备注+
+|+fixedPhone+|+String+|||+固定手机号+
+|+createTime+|+Date+|||+设备创建时间+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+roleCode+|+String+|||+系统角色+
+|+staffs+|+List+|||
+|+staffs.[].userId+|+Long+||+0+|
+|+staffs.[].roleCode+|+String+|||
+|+staffs.[].organizationId+|+Long+||+0+|
+|+staffs.[].duty+|+String+|||+组织内职位（不涉及到权限）+
+|+staffs.[].createTime+|+Date+|||+设备创建时间+
+|+staffs.[].createUserId+|+Long+||+0+|+创建人id+
+|+staffs.[].createUserName+|+String+|||+创建人用户名+
+|+staffs.[].updateTime+|+Date+|||+设备修改时间+
+|+staffs.[].updateUserId+|+Long+||+0+|+更新人id+
+|+staffs.[].updateUserName+|+String+|||+操作人员+
+|+staffs.[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 获取某个用户信息
+请求
+[source,HTTP ]
+----
+GET /users/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "username" : "",
+  "phone" : "",
+  "avatarUrl" : "",
+  "email" : "",
+  "location" : "",
+  "country" : "",
+  "remark" : "",
+  "fixedPhone" : "",
+  "createTime" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "roleCode" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+name+|+String+|||+姓名+
+|+username+|+String+|||+用户名+
+|+phone+|+String+|||+注册手机号+
+|+avatarUrl+|+String+|||+用户头像+
+|+email+|+String+|||+注册邮箱+
+|+location+|+String+|||+详细地址+
+|+country+|+String+|||+国家+
+|+remark+|+String+|||+个人备注+
+|+fixedPhone+|+String+|||+固定手机号+
+|+createTime+|+Date+|||+设备创建时间+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+roleCode+|+String+|||+系统角色+
+|===
+
+
+=== 通过电话号码查找用户，全匹配
+请求
+[source,HTTP ]
+----
+GET /users/phone?phone= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+phone+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "username" : "",
+  "phone" : "",
+  "avatarUrl" : "",
+  "email" : "",
+  "location" : "",
+  "country" : "",
+  "remark" : "",
+  "fixedPhone" : "",
+  "createTime" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "roleCode" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+name+|+String+|||+姓名+
+|+username+|+String+|||+用户名+
+|+phone+|+String+|||+注册手机号+
+|+avatarUrl+|+String+|||+用户头像+
+|+email+|+String+|||+注册邮箱+
+|+location+|+String+|||+详细地址+
+|+country+|+String+|||+国家+
+|+remark+|+String+|||+个人备注+
+|+fixedPhone+|+String+|||+固定手机号+
+|+createTime+|+Date+|||+设备创建时间+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+roleCode+|+String+|||+系统角色+
+|===
+
+
+=== 更新个人信息
+请求
+[source,HTTP ]
+----
+PUT /users/my HTTP/1.1
+Content-Type: application/json
+
+{
+  "id" : 0,
+  "name" : "",
+  "avatarUrl" : "",
+  "email" : "",
+  "location" : "",
+  "country" : "",
+  "remark" : "",
+  "fixedPhone" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+name+|+String+|||+姓名+
+|+avatarUrl+|+String+|||+用户头像+
+|+email+|+String+|||+注册邮箱+
+|+location+|+String+|||+详细地址+
+|+country+|+String+|||+国家+
+|+remark+|+String+|||+个人备注+
+|+fixedPhone+|+String+|||+固定手机号+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "username" : "",
+  "phone" : "",
+  "avatarUrl" : "",
+  "email" : "",
+  "location" : "",
+  "country" : "",
+  "remark" : "",
+  "fixedPhone" : "",
+  "createTime" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "roleCode" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+name+|+String+|||+姓名+
+|+username+|+String+|||+用户名+
+|+phone+|+String+|||+注册手机号+
+|+avatarUrl+|+String+|||+用户头像+
+|+email+|+String+|||+注册邮箱+
+|+location+|+String+|||+详细地址+
+|+country+|+String+|||+国家+
+|+remark+|+String+|||+个人备注+
+|+fixedPhone+|+String+|||+固定手机号+
+|+createTime+|+Date+|||+设备创建时间+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+roleCode+|+String+|||+系统角色+
+|===
+
+
+=== 获取用户头像上传签名
+[%hardbreaks]
+不设置callback，上传完成后，拿到完整图片路径，调用更新个人信息接口
+
+请求
+[source,HTTP ]
+----
+GET /users/avatar/sign HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "accessid" : "",
+  "policy" : "",
+  "signature" : "",
+  "dir" : "",
+  "host" : "",
+  "expire" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+accessid+|+String+|||
+|+policy+|+String+|||
+|+signature+|+String+|||
+|+dir+|+String+|||
+|+host+|+String+|||
+|+expire+|+String+|||
+|===
+
+
+=== 用户修改密码
+请求
+[source,HTTP ]
+----
+PUT /users/my/password HTTP/1.1
+Content-Type: application/json
+
+{
+  "password" : "",
+  "newPassword" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+password+|+String+|+NotBlank+||+原密码+
+|+newPassword+|+String+|+NotBlank+||+新密码+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+
+----
+
+
+=== 获取用户列表
+请求
+[source,HTTP ]
+----
+GET /users HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "page" : 0,
+  "size" : 0,
+  "totalPage" : 0,
+  "totalElement" : 0,
+  "data" : [ ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+page+|+int+||+0+|+页码+
+|+size+|+int+||+0+|+每页数据量+
+|+totalPage+|+int+||+0+|+总页数+
+|+totalElement+|+long+||+0+|+总记录数+
+|+data+|+Iterable+|||+数据+
+|===
+
+
+== 组织管理
+
+=== 创建组织
+请求
+[source,HTTP ]
+----
+POST /organizations HTTP/1.1
+Content-Type: application/json
+
+{
+  "name" : "",
+  "managerId" : 0,
+  "remarks" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+name+|+String+|+NotBlank+||+组织名称+
+|+managerId+|+Long+|+NotNull+|+0+|+组织管理员用户 id+
+|+remarks+|+String+|+NotBlank+||+组织备注信息+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "managerId" : 0,
+  "remarks" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|+ID-主键+
+|+name+|+String+|||+组织名称+
+|+managerId+|+Long+||+0+|+组织管理员用户 id+
+|+remarks+|+String+|||+组织备注信息+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 修改组织信息
+请求
+[source,HTTP ]
+----
+PUT /organizations/{id} HTTP/1.1
+Content-Type: application/json
+
+{
+  "name" : "",
+  "remarks" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+|||
+|+name+|+String+|+NotBlank+||+组织名称+
+|+remarks+|+String+|+NotBlank+||+组织备注信息+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "managerId" : 0,
+  "remarks" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|+ID-主键+
+|+name+|+String+|||+组织名称+
+|+managerId+|+Long+||+0+|+组织管理员用户 id+
+|+remarks+|+String+|||+组织备注信息+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 删除组织
+请求
+[source,HTTP ]
+----
+DELETE /organizations/{id} HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+|||
+|===
+
+
+=== 查询组织列表
+请求
+[source,HTTP ]
+----
+GET /organizations HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "id" : 0,
+  "name" : "",
+  "managerId" : 0,
+  "remarks" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].id+|+Long+||+0+|+ID-主键+
+|+[].name+|+String+|||+组织名称+
+|+[].managerId+|+Long+||+0+|+组织管理员用户 id+
+|+[].remarks+|+String+|||+组织备注信息+
+|+[].createTime+|+Date+|||+设备创建时间+
+|+[].createUserId+|+Long+||+0+|+创建人id+
+|+[].createUserName+|+String+|||+创建人用户名+
+|+[].updateTime+|+Date+|||+设备修改时间+
+|+[].updateUserId+|+Long+||+0+|+更新人id+
+|+[].updateUserName+|+String+|||+操作人员+
+|+[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 查询组织详情
+请求
+[source,HTTP ]
+----
+GET /organizations/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "managerId" : 0,
+  "remarks" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|+ID-主键+
+|+name+|+String+|||+组织名称+
+|+managerId+|+Long+||+0+|+组织管理员用户 id+
+|+remarks+|+String+|||+组织备注信息+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+== 角色、权限管理
+
+=== 全部角色列表
+[%hardbreaks]
+接口返回数据格式: [{"name":"管理员","code":"sys_admin"},...]
+
+请求
+[source,HTTP ]
+----
+GET /roles HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ "" ]
+----
+
+
+=== 组织内可分配的角色
+[%hardbreaks]
+接口返回数据格式: [{"name":"管理员","code":"sys_admin"},...]
+
+请求
+[source,HTTP ]
+----
+GET /roles/assignable HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ "" ]
+----
+
+
+=== 获取该角色具有的权限
+[%hardbreaks]
+接口返回数据是权限数组 如 ["org_read","org_write"]
+
+请求
+[source,HTTP ]
+----
+GET /roles/{role}/authorities? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+role+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ "" ]
+----
+
+
+=== 修改角色权限
+请求
+[source,HTTP ]
+----
+PUT /roles/{role}/authorities HTTP/1.1
+Content-Type: application/json
+
+[ "" ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+role+|+String+|||
+|===
+
+
+=== 获取系统预置权限列表
+[%hardbreaks]
+接口返回数据是权限数组 如 ["org_read","org_write"]
+
+请求
+[source,HTTP ]
+----
+GET /authorities HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ "" ]
+----
+
+
+== 员工管理
+
+=== 我的员工信息
+[%hardbreaks]
+获取自己对哪个组织具有权限
+organizationId 为null时，表示系统权限：sys_admin或 sys_visit
+
+请求
+[source,HTTP ]
+----
+GET /staffs/my HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "userId" : 0,
+  "roleCode" : "",
+  "organizationId" : 0,
+  "duty" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].userId+|+Long+||+0+|
+|+[].roleCode+|+String+|||
+|+[].organizationId+|+Long+||+0+|
+|+[].duty+|+String+|||+组织内职位（不涉及到权限）+
+|+[].createTime+|+Date+|||+设备创建时间+
+|+[].createUserId+|+Long+||+0+|+创建人id+
+|+[].createUserName+|+String+|||+创建人用户名+
+|+[].updateTime+|+Date+|||+设备修改时间+
+|+[].updateUserId+|+Long+||+0+|+更新人id+
+|+[].updateUserName+|+String+|||+操作人员+
+|+[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 我的默认员工信息
+请求
+[source,HTTP ]
+----
+GET /staffs/my/default HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "userId" : 0,
+  "roleCode" : "",
+  "organizationId" : 0,
+  "duty" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+userId+|+Long+||+0+|
+|+roleCode+|+String+|||
+|+organizationId+|+Long+||+0+|
+|+duty+|+String+|||+组织内职位（不涉及到权限）+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 根据电话号码查询用户与组织的关系
+[%hardbreaks]
+roleCode为null时表示在组织无角色
+
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/staffs/phone?phone= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+phone+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "userId" : 0,
+  "roleCode" : "",
+  "organizationId" : 0,
+  "duty" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "user" : {
+    "id" : 0,
+    "name" : "",
+    "username" : "",
+    "phone" : "",
+    "avatarUrl" : "",
+    "email" : "",
+    "location" : "",
+    "country" : "",
+    "remark" : "",
+    "fixedPhone" : "",
+    "createTime" : "",
+    "updateTime" : "",
+    "updateUserId" : 0,
+    "updateUserName" : "",
+    "roleCode" : ""
+  }
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+userId+|+Long+||+0+|
+|+roleCode+|+String+|||
+|+organizationId+|+Long+||+0+|
+|+duty+|+String+|||+组织内职位（不涉及到权限）+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+user+|+UserDTO+|||+用户信息+
+|+user.id+|+Long+||+0+|
+|+user.name+|+String+|||+姓名+
+|+user.username+|+String+|||+用户名+
+|+user.phone+|+String+|||+注册手机号+
+|+user.avatarUrl+|+String+|||+用户头像+
+|+user.email+|+String+|||+注册邮箱+
+|+user.location+|+String+|||+详细地址+
+|+user.country+|+String+|||+国家+
+|+user.remark+|+String+|||+个人备注+
+|+user.fixedPhone+|+String+|||+固定手机号+
+|+user.createTime+|+Date+|||+设备创建时间+
+|+user.updateTime+|+Date+|||+设备修改时间+
+|+user.updateUserId+|+Long+||+0+|+更新人id+
+|+user.updateUserName+|+String+|||+操作人员+
+|+user.disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+user.roleCode+|+String+|||+系统角色+
+|===
+
+
+=== 查询员工信息
+[%hardbreaks]
+<p>
+包含角色和用户信息
+返回的数组内的结构 参考上一个接口
+
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/staffs? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "userId" : 0,
+  "roleCode" : "",
+  "organizationId" : 0,
+  "duty" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "user" : {
+    "id" : 0,
+    "name" : "",
+    "username" : "",
+    "phone" : "",
+    "avatarUrl" : "",
+    "email" : "",
+    "location" : "",
+    "country" : "",
+    "remark" : "",
+    "fixedPhone" : "",
+    "createTime" : "",
+    "updateTime" : "",
+    "updateUserId" : 0,
+    "updateUserName" : "",
+    "roleCode" : ""
+  }
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].userId+|+Long+||+0+|
+|+[].roleCode+|+String+|||
+|+[].organizationId+|+Long+||+0+|
+|+[].duty+|+String+|||+组织内职位（不涉及到权限）+
+|+[].createTime+|+Date+|||+设备创建时间+
+|+[].createUserId+|+Long+||+0+|+创建人id+
+|+[].createUserName+|+String+|||+创建人用户名+
+|+[].updateTime+|+Date+|||+设备修改时间+
+|+[].updateUserId+|+Long+||+0+|+更新人id+
+|+[].updateUserName+|+String+|||+操作人员+
+|+[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+[].user+|+UserDTO+|||+用户信息+
+|+[].user.id+|+Long+||+0+|
+|+[].user.name+|+String+|||+姓名+
+|+[].user.username+|+String+|||+用户名+
+|+[].user.phone+|+String+|||+注册手机号+
+|+[].user.avatarUrl+|+String+|||+用户头像+
+|+[].user.email+|+String+|||+注册邮箱+
+|+[].user.location+|+String+|||+详细地址+
+|+[].user.country+|+String+|||+国家+
+|+[].user.remark+|+String+|||+个人备注+
+|+[].user.fixedPhone+|+String+|||+固定手机号+
+|+[].user.createTime+|+Date+|||+设备创建时间+
+|+[].user.updateTime+|+Date+|||+设备修改时间+
+|+[].user.updateUserId+|+Long+||+0+|+更新人id+
+|+[].user.updateUserName+|+String+|||+操作人员+
+|+[].user.disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+[].user.roleCode+|+String+|||+系统角色+
+|===
+
+
+=== 设置为员工（角色）
+请求
+[source,HTTP ]
+----
+PUT /organizations/{organizationId}/staffs HTTP/1.1
+Content-Type: application/json
+
+{
+  "userId" : 0,
+  "roleCode" : "",
+  "duty" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+userId+|+Long+|+NotNull+|+0+|
+|+roleCode+|+String+|+NotBlank+||
+|+duty+|+String+|+NotBlank+||+组织内职位（不涉及到权限）+
+|===
+
+
+=== 移除员工
+请求
+[source,HTTP ]
+----
+DELETE /organizations/{organizationId}/staffs/{userId} HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+userId+|+Long+|||
+|===
+
+
+== 线路管理
+
+=== 添加线路
+请求
+[source,HTTP ]
+----
+POST /organizations/{organizationId}/lines HTTP/1.1
+Content-Type: application/json
+
+{
+  "name" : "",
+  "start" : "",
+  "end" : "",
+  "currentType" : "",
+  "towers" : 0,
+  "length" : 0,
+  "voltLevel" : "",
+  "faultyPushPhone" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+name+|+String+|+NotBlank+||+线路名称+
+|+start+|+String+|+NotBlank+||+线路的起点+
+|+end+|+String+|+NotBlank+||+线路的终点+
+|+currentType+|+CurrentType+|+NotNull+||+电流类型 AC DC+
+|+towers+|+Integer+|+NotNull+|+0+|+塔杆基数+
+|+length+|+Integer+|+NotNull+|+0+|+线路长度km+
+|+voltLevel+|+String+|+NotBlank+||+电压等级+
+|+faultyPushPhone+|+String+|+NotBlank+||+故障推送手机+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "start" : "",
+  "end" : "",
+  "currentType" : "",
+  "deviceGroups" : 0,
+  "towers" : 0,
+  "length" : 0,
+  "voltLevel" : "",
+  "organizationId" : 0,
+  "faultyPushPhone" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|+线路ID-主键+
+|+name+|+String+|||+线路名称+
+|+start+|+String+|||+线路的起点+
+|+end+|+String+|||+线路的终点+
+|+currentType+|+CurrentType+|||+电流类型+
+|+deviceGroups+|+Integer+||+0+|+当前设备组数+
+|+towers+|+Integer+||+0+|+塔杆基数+
+|+length+|+Integer+||+0+|+线路长度km+
+|+voltLevel+|+String+|||+电压等级+
+|+organizationId+|+Long+||+0+|+线路管理单位+
+|+faultyPushPhone+|+String+|||+故障推送手机+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 更新线路信息
+请求
+[source,HTTP ]
+----
+PUT /organizations/{organizationId}/lines/{id} HTTP/1.1
+Content-Type: application/json
+
+{
+  "name" : "",
+  "start" : "",
+  "end" : "",
+  "towers" : 0,
+  "length" : 0,
+  "voltLevel" : "",
+  "faultyPushPhone" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+id+|+Long+|||
+|+name+|+String+|+NotBlank+||+线路名称+
+|+start+|+String+|+NotBlank+||+线路的起点+
+|+end+|+String+|+NotBlank+||+线路的终点+
+|+towers+|+Integer+|+NotNull+|+0+|+塔杆基数+
+|+length+|+Integer+|+NotNull+|+0+|+线路长度km+
+|+voltLevel+|+String+|+NotBlank+||+电压等级+
+|+faultyPushPhone+|+String+|+NotBlank+||+故障推送手机+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "start" : "",
+  "end" : "",
+  "currentType" : "",
+  "deviceGroups" : 0,
+  "towers" : 0,
+  "length" : 0,
+  "voltLevel" : "",
+  "organizationId" : 0,
+  "faultyPushPhone" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|+线路ID-主键+
+|+name+|+String+|||+线路名称+
+|+start+|+String+|||+线路的起点+
+|+end+|+String+|||+线路的终点+
+|+currentType+|+CurrentType+|||+电流类型+
+|+deviceGroups+|+Integer+||+0+|+当前设备组数+
+|+towers+|+Integer+||+0+|+塔杆基数+
+|+length+|+Integer+||+0+|+线路长度km+
+|+voltLevel+|+String+|||+电压等级+
+|+organizationId+|+Long+||+0+|+线路管理单位+
+|+faultyPushPhone+|+String+|||+故障推送手机+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 查询线路详情
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+id+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "name" : "",
+  "start" : "",
+  "end" : "",
+  "currentType" : "",
+  "deviceGroups" : 0,
+  "towers" : 0,
+  "length" : 0,
+  "voltLevel" : "",
+  "organizationId" : 0,
+  "faultyPushPhone" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|+线路ID-主键+
+|+name+|+String+|||+线路名称+
+|+start+|+String+|||+线路的起点+
+|+end+|+String+|||+线路的终点+
+|+currentType+|+CurrentType+|||+电流类型+
+|+deviceGroups+|+Integer+||+0+|+当前设备组数+
+|+towers+|+Integer+||+0+|+塔杆基数+
+|+length+|+Integer+||+0+|+线路长度km+
+|+voltLevel+|+String+|||+电压等级+
+|+organizationId+|+Long+||+0+|+线路管理单位+
+|+faultyPushPhone+|+String+|||+故障推送手机+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 查询线路
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines?key= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+key+|+String+|||+查询的关键字+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "id" : 0,
+  "name" : "",
+  "start" : "",
+  "end" : "",
+  "currentType" : "",
+  "deviceGroups" : 0,
+  "towers" : 0,
+  "length" : 0,
+  "voltLevel" : "",
+  "organizationId" : 0,
+  "faultyPushPhone" : "",
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].id+|+Long+||+0+|+线路ID-主键+
+|+[].name+|+String+|||+线路名称+
+|+[].start+|+String+|||+线路的起点+
+|+[].end+|+String+|||+线路的终点+
+|+[].currentType+|+CurrentType+|||+电流类型+
+|+[].deviceGroups+|+Integer+||+0+|+当前设备组数+
+|+[].towers+|+Integer+||+0+|+塔杆基数+
+|+[].length+|+Integer+||+0+|+线路长度km+
+|+[].voltLevel+|+String+|||+电压等级+
+|+[].organizationId+|+Long+||+0+|+线路管理单位+
+|+[].faultyPushPhone+|+String+|||+故障推送手机+
+|+[].createTime+|+Date+|||+设备创建时间+
+|+[].createUserId+|+Long+||+0+|+创建人id+
+|+[].createUserName+|+String+|||+创建人用户名+
+|+[].updateTime+|+Date+|||+设备修改时间+
+|+[].updateUserId+|+Long+||+0+|+更新人id+
+|+[].updateUserName+|+String+|||+操作人员+
+|+[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 删除线路
+请求
+[source,HTTP ]
+----
+DELETE /organizations/{organizationId}/lines/{id} HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+id+|+Long+|||
+|===
+
+
+== 设备组管理
+
+=== 新增设备组
+[%hardbreaks]
+以组为单位添加设备
+
+请求
+[source,HTTP ]
+----
+POST /organizations/{organizationId}/lines/{lineId}/devices/groups HTTP/1.1
+Content-Type: application/json
+
+{
+  "address" : "",
+  "towerNumber" : "",
+  "milepost" : 0,
+  "devices" : [ {
+    "sn" : "",
+    "phase" : "",
+    "name" : ""
+  } ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|+address+|+String+|+NotBlank+||+设备地址+
+|+towerNumber+|+String+|+NotBlank+||+塔杆编号+
+|+milepost+|+Integer+|+NotNull+|+0+|+里程标，安装在线路多少米处，单位：米+
+|+devices+|+List+|+NotNull+||
+|+devices.[].sn+|+String+|+NotBlank+||+设备SN+
+|+devices.[].phase+|+Phase+|+NotBlank+||+设备相别+
+|+devices.[].name+|+String+|+NotBlank+||+设备名称+
+|===
+
+
+=== 更新设备组信息
+请求
+[source,HTTP ]
+----
+PUT /organizations/{organizationId}/lines/{lineId}/devices/groups/{number} HTTP/1.1
+Content-Type: application/json
+
+{
+  "address" : "",
+  "towerNumber" : "",
+  "milepost" : 0,
+  "devices" : [ {
+    "id" : 0,
+    "name" : ""
+  } ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|+number+|+Integer+|||
+|+address+|+String+|+NotBlank+||+设备地址+
+|+towerNumber+|+String+|+NotBlank+||+塔杆编号+
+|+milepost+|+Integer+|+NotNull+|+0+|+里程标，安装在线路多少米处，单位：米+
+|+devices+|+List+|||
+|+devices.[].id+|+Long+|+NotNull+|+0+|
+|+devices.[].name+|+String+|+NotBlank+||+设备名称+
+|===
+
+
+=== 查询设备组详情,包含设备信息
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{lineId}/devices/groups/{number}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|+number+|+Integer+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "organizationId" : 0,
+  "lineId" : 0,
+  "number" : 0,
+  "address" : "",
+  "towerNumber" : "",
+  "milepost" : 0,
+  "longitude" : 0,
+  "latitude" : 0,
+  "devices" : [ {
+    "id" : 0,
+    "sn" : "",
+    "name" : "",
+    "phase" : "",
+    "groupNumber" : 0,
+    "organizationId" : 0,
+    "lineId" : 0,
+    "createTime" : "",
+    "createUserId" : 0,
+    "createUserName" : "",
+    "updateTime" : "",
+    "updateUserId" : 0,
+    "updateUserName" : "",
+    "online" : 0,
+    "longitude" : 0,
+    "latitude" : 0
+  } ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+||+0+|
+|+lineId+|+Long+||+0+|+关联线路+
+|+number+|+Integer+||+0+|+组编号+
+|+address+|+String+|||+设备地址+
+|+towerNumber+|+String+|||+塔杆编号+
+|+milepost+|+Integer+||+0+|+里程标，安装在线路多少米处，单位：米+
+|+longitude+|+Double+||+0+|+经度+
+|+latitude+|+Double+||+0+|+纬度+
+|+devices+|+List+|||
+|+devices.[].id+|+Long+||+0+|
+|+devices.[].sn+|+String+|||+设备SN+
+|+devices.[].name+|+String+|||+设备名称+
+|+devices.[].phase+|+Phase+|||+设备相别+
+|+devices.[].groupNumber+|+Integer+||+0+|+组编号+
+|+devices.[].organizationId+|+Long+||+0+|+组织id+
+|+devices.[].lineId+|+Long+||+0+|+关联线路+
+|+devices.[].createTime+|+Date+|||+设备创建时间+
+|+devices.[].createUserId+|+Long+||+0+|+创建人id+
+|+devices.[].createUserName+|+String+|||+创建人用户名+
+|+devices.[].updateTime+|+Date+|||+设备修改时间+
+|+devices.[].updateUserId+|+Long+||+0+|+更新人id+
+|+devices.[].updateUserName+|+String+|||+操作人员+
+|+devices.[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+devices.[].online+|+boolean+||+0+|+是否在线+
+|+devices.[].longitude+|+Double+||+0+|+经度+
+|+devices.[].latitude+|+Double+||+0+|+纬度+
+|===
+
+
+=== 查询设备组
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{lineId}/devices/groups? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "organizationId" : 0,
+  "lineId" : 0,
+  "number" : 0,
+  "address" : "",
+  "towerNumber" : "",
+  "milepost" : 0,
+  "longitude" : 0,
+  "latitude" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].organizationId+|+Long+||+0+|
+|+[].lineId+|+Long+||+0+|+关联线路+
+|+[].number+|+Integer+||+0+|+组编号+
+|+[].address+|+String+|||+设备地址+
+|+[].towerNumber+|+String+|||+塔杆编号+
+|+[].milepost+|+Integer+||+0+|+里程标，安装在线路多少米处，单位：米+
+|+[].longitude+|+Double+||+0+|+经度+
+|+[].latitude+|+Double+||+0+|+纬度+
+|===
+
+
+=== 删除设备组
+请求
+[source,HTTP ]
+----
+DELETE /organizations/{organizationId}/lines/{lineId}/devices/groups/{number} HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|+number+|+Integer+|||
+|===
+
+
+== 设备管理
+
+=== 更新设备信息
+请求
+[source,HTTP ]
+----
+PUT /organizations/{organizationId}/lines/{lineId}/devices/{id} HTTP/1.1
+Content-Type: application/json
+
+{
+  "name" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|+id+|+Long+|||
+|+name+|+String+|+NotBlank+||+设备名称+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "sn" : "",
+  "name" : "",
+  "phase" : "",
+  "groupNumber" : 0,
+  "organizationId" : 0,
+  "lineId" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+sn+|+String+|||+设备SN+
+|+name+|+String+|||+设备名称+
+|+phase+|+Phase+|||+设备相别+
+|+groupNumber+|+Integer+||+0+|+组编号+
+|+organizationId+|+Long+||+0+|+组织id+
+|+lineId+|+Long+||+0+|+关联线路+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 查询设备详情
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{lineId}/devices/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|+id+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "sn" : "",
+  "name" : "",
+  "phase" : "",
+  "groupNumber" : 0,
+  "organizationId" : 0,
+  "lineId" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+sn+|+String+|||+设备SN+
+|+name+|+String+|||+设备名称+
+|+phase+|+Phase+|||+设备相别+
+|+groupNumber+|+Integer+||+0+|+组编号+
+|+organizationId+|+Long+||+0+|+组织id+
+|+lineId+|+Long+||+0+|+关联线路+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 根据终端sn查询设备
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{lineId}/devices/sn/{sn}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|+sn+|+String+|||+终端sn+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "sn" : "",
+  "name" : "",
+  "phase" : "",
+  "groupNumber" : 0,
+  "organizationId" : 0,
+  "lineId" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+sn+|+String+|||+设备SN+
+|+name+|+String+|||+设备名称+
+|+phase+|+Phase+|||+设备相别+
+|+groupNumber+|+Integer+||+0+|+组编号+
+|+organizationId+|+Long+||+0+|+组织id+
+|+lineId+|+Long+||+0+|+关联线路+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 查询设备
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{lineId}/devices? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "id" : 0,
+  "sn" : "",
+  "name" : "",
+  "phase" : "",
+  "groupNumber" : 0,
+  "organizationId" : 0,
+  "lineId" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : ""
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].id+|+Long+||+0+|
+|+[].sn+|+String+|||+设备SN+
+|+[].name+|+String+|||+设备名称+
+|+[].phase+|+Phase+|||+设备相别+
+|+[].groupNumber+|+Integer+||+0+|+组编号+
+|+[].organizationId+|+Long+||+0+|+组织id+
+|+[].lineId+|+Long+||+0+|+关联线路+
+|+[].createTime+|+Date+|||+设备创建时间+
+|+[].createUserId+|+Long+||+0+|+创建人id+
+|+[].createUserName+|+String+|||+创建人用户名+
+|+[].updateTime+|+Date+|||+设备修改时间+
+|+[].updateUserId+|+Long+||+0+|+更新人id+
+|+[].updateUserName+|+String+|||+操作人员+
+|+[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|===
+
+
+=== 查询线路下的设备，包含工况数据
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{lineId}/devices/work? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "id" : 0,
+  "sn" : "",
+  "name" : "",
+  "phase" : "",
+  "groupNumber" : 0,
+  "organizationId" : 0,
+  "lineId" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "towerNumber" : "",
+  "temp" : 0,
+  "src" : 0,
+  "batVoltage" : 0,
+  "rmsI" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].id+|+Long+||+0+|
+|+[].sn+|+String+|||+设备SN+
+|+[].name+|+String+|||+设备名称+
+|+[].phase+|+Phase+|||+设备相别+
+|+[].groupNumber+|+Integer+||+0+|+组编号+
+|+[].organizationId+|+Long+||+0+|+组织id+
+|+[].lineId+|+Long+||+0+|+关联线路+
+|+[].createTime+|+Date+|||+设备创建时间+
+|+[].createUserId+|+Long+||+0+|+创建人id+
+|+[].createUserName+|+String+|||+创建人用户名+
+|+[].updateTime+|+Date+|||+设备修改时间+
+|+[].updateUserId+|+Long+||+0+|+更新人id+
+|+[].updateUserName+|+String+|||+操作人员+
+|+[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+[].towerNumber+|+String+|||+塔杆编号+
+|+[].temp+|+Float+||+0+|+设备温度+
+|+[].src+|+Integer+||+0+|+供电方式+
+|+[].batVoltage+|+Float+||+0+|+电池电压+
+|+[].rmsI+|+Float+||+0+|+电流有效值+
+|+[].updateTime+|+Date+|||+设备修改时间+
+|===
+
+
+== 终端管理
+
+=== 查询终端详情
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/terminals/{sn}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "sn" : "",
+  "organizationId" : 0,
+  "name" : "",
+  "model" : "",
+  "manufacturer" : "",
+  "versionHw" : 0,
+  "versionSw" : 0,
+  "productionDate" : "",
+  "xbdlUpTime" : "",
+  "xbdlThreshold" : 0,
+  "xbdlAdcDeep" : 0,
+  "xbdlAdcHz" : 0,
+  "gzdlUpTime" : "",
+  "gzdlThreshold" : 0,
+  "gzdlAdcDeep" : 0,
+  "gzdlAdcHz" : 0,
+  "workInfoUpTime" : "",
+  "workInfoAcQGAP" : 0,
+  "loraAddr" : 0,
+  "ip" : "",
+  "port" : 0,
+  "lteRssi" : 0,
+  "angleX" : 0,
+  "angleY" : 0,
+  "angleZ" : 0,
+  "power" : 0,
+  "longitude" : 0,
+  "latitude" : 0,
+  "temp" : 0,
+  "src" : 0,
+  "batVoltage" : 0,
+  "rmsI" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||+终端编号+
+|+organizationId+|+Long+||+0+|
+|+name+|+String+|||+设备名称+
+|+model+|+String+|||+设备型号+
+|+manufacturer+|+String+|||+生产厂家+
+|+versionHw+|+Integer+||+0+|+硬件版本+
+|+versionSw+|+Integer+||+0+|+软件版本+
+|+productionDate+|+String+|||+生产日期+
+|+xbdlUpTime+|+String+|||+行波电流波形数据召回时间+
+|+xbdlThreshold+|+Long+||+0+|+行波电流阈值+
+|+xbdlAdcDeep+|+Long+||+0+|+行波电流采集深度+
+|+xbdlAdcHz+|+Long+||+0+|+行波电流采样频率+
+|+gzdlUpTime+|+String+|||+故障电流波形数据召回时间+
+|+gzdlThreshold+|+Long+||+0+|+故障电流阈值+
+|+gzdlAdcDeep+|+Long+||+0+|+故障电流采集深度+
+|+gzdlAdcHz+|+Long+||+0+|+故障电流采集频率+
+|+workInfoUpTime+|+String+|||+工况数据上报时间+
+|+workInfoAcQGAP+|+Long+||+0+|+工况数据采集间隔+
+|+loraAddr+|+Long+||+0+|+lora地址+
+|+ip+|+String+|||
+|+port+|+Integer+||+0+|
+|+lteRssi+|+Long+||+0+|+4g信号强度+
+|+angleX+|+Float+||+0+|+设备倾角+
+|+angleY+|+Float+||+0+|
+|+angleZ+|+Float+||+0+|
+|+power+|+Float+||+0+|+设备功率+
+|+longitude+|+Double+||+0+|
+|+latitude+|+Double+||+0+|
+|+temp+|+Float+||+0+|+设备温度+
+|+src+|+Integer+||+0+|+供电方式+
+|+batVoltage+|+Float+||+0+|+电池电压+
+|+rmsI+|+Float+||+0+|+电流有效值+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+used+|+Boolean+|||+终端是否已被绑定+
+|+online+|+Boolean+|||
+|===
+
+
+=== 根据关键字查询sn
+[%hardbreaks]
+关键字模糊搜索
+
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/terminals/search?key= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+key+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ "" ]
+----
+
+
+=== 发送重置命令
+请求
+[source,HTTP ]
+----
+PUT /organizations/{organizationId}/terminals/{sn}/reset HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+sn+|+String+|||
+|===
+
+
+=== 从终端同步参数到云平台
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/terminals/{sn}/sync? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "sn" : "",
+  "organizationId" : 0,
+  "name" : "",
+  "model" : "",
+  "manufacturer" : "",
+  "versionHw" : 0,
+  "versionSw" : 0,
+  "productionDate" : "",
+  "xbdlUpTime" : "",
+  "xbdlThreshold" : 0,
+  "xbdlAdcDeep" : 0,
+  "xbdlAdcHz" : 0,
+  "gzdlUpTime" : "",
+  "gzdlThreshold" : 0,
+  "gzdlAdcDeep" : 0,
+  "gzdlAdcHz" : 0,
+  "workInfoUpTime" : "",
+  "workInfoAcQGAP" : 0,
+  "loraAddr" : 0,
+  "ip" : "",
+  "port" : 0,
+  "lteRssi" : 0,
+  "angleX" : 0,
+  "angleY" : 0,
+  "angleZ" : 0,
+  "power" : 0,
+  "longitude" : 0,
+  "latitude" : 0,
+  "temp" : 0,
+  "src" : 0,
+  "batVoltage" : 0,
+  "rmsI" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||+终端编号+
+|+organizationId+|+Long+||+0+|
+|+name+|+String+|||+设备名称+
+|+model+|+String+|||+设备型号+
+|+manufacturer+|+String+|||+生产厂家+
+|+versionHw+|+Integer+||+0+|+硬件版本+
+|+versionSw+|+Integer+||+0+|+软件版本+
+|+productionDate+|+String+|||+生产日期+
+|+xbdlUpTime+|+String+|||+行波电流波形数据召回时间+
+|+xbdlThreshold+|+Long+||+0+|+行波电流阈值+
+|+xbdlAdcDeep+|+Long+||+0+|+行波电流采集深度+
+|+xbdlAdcHz+|+Long+||+0+|+行波电流采样频率+
+|+gzdlUpTime+|+String+|||+故障电流波形数据召回时间+
+|+gzdlThreshold+|+Long+||+0+|+故障电流阈值+
+|+gzdlAdcDeep+|+Long+||+0+|+故障电流采集深度+
+|+gzdlAdcHz+|+Long+||+0+|+故障电流采集频率+
+|+workInfoUpTime+|+String+|||+工况数据上报时间+
+|+workInfoAcQGAP+|+Long+||+0+|+工况数据采集间隔+
+|+loraAddr+|+Long+||+0+|+lora地址+
+|+ip+|+String+|||
+|+port+|+Integer+||+0+|
+|+lteRssi+|+Long+||+0+|+4g信号强度+
+|+angleX+|+Float+||+0+|+设备倾角+
+|+angleY+|+Float+||+0+|
+|+angleZ+|+Float+||+0+|
+|+power+|+Float+||+0+|+设备功率+
+|+longitude+|+Double+||+0+|
+|+latitude+|+Double+||+0+|
+|+temp+|+Float+||+0+|+设备温度+
+|+src+|+Integer+||+0+|+供电方式+
+|+batVoltage+|+Float+||+0+|+电池电压+
+|+rmsI+|+Float+||+0+|+电流有效值+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+used+|+Boolean+|||+终端是否已被绑定+
+|+online+|+Boolean+|||
+|===
+
+
+=== 修改参数，并同步至终端
+请求
+[source,HTTP ]
+----
+PUT /organizations/{organizationId}/terminals/{sn} HTTP/1.1
+Content-Type: application/json
+
+{
+  "sn" : "",
+  "organizationId" : 0,
+  "name" : "",
+  "model" : "",
+  "manufacturer" : "",
+  "versionHw" : 0,
+  "versionSw" : 0,
+  "productionDate" : "",
+  "xbdlUpTime" : "",
+  "xbdlThreshold" : 0,
+  "xbdlAdcDeep" : 0,
+  "xbdlAdcHz" : 0,
+  "gzdlUpTime" : "",
+  "gzdlThreshold" : 0,
+  "gzdlAdcDeep" : 0,
+  "gzdlAdcHz" : 0,
+  "workInfoUpTime" : "",
+  "workInfoAcQGAP" : 0,
+  "loraAddr" : 0,
+  "ip" : "",
+  "port" : 0,
+  "lteRssi" : 0,
+  "angleX" : 0,
+  "angleY" : 0,
+  "angleZ" : 0,
+  "power" : 0,
+  "longitude" : 0,
+  "latitude" : 0,
+  "temp" : 0,
+  "src" : 0,
+  "batVoltage" : 0,
+  "rmsI" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+sn+|+String+|||
+|+sn+|+String+|||+终端编号+
+|+organizationId+|+Long+||+0+|
+|+name+|+String+|||+设备名称+
+|+model+|+String+|||+设备型号+
+|+manufacturer+|+String+|||+生产厂家+
+|+versionHw+|+Integer+||+0+|+硬件版本+
+|+versionSw+|+Integer+||+0+|+软件版本+
+|+productionDate+|+String+|||+生产日期+
+|+xbdlUpTime+|+String+|||+行波电流波形数据召回时间+
+|+xbdlThreshold+|+Long+||+0+|+行波电流阈值+
+|+xbdlAdcDeep+|+Long+||+0+|+行波电流采集深度+
+|+xbdlAdcHz+|+Long+||+0+|+行波电流采样频率+
+|+gzdlUpTime+|+String+|||+故障电流波形数据召回时间+
+|+gzdlThreshold+|+Long+||+0+|+故障电流阈值+
+|+gzdlAdcDeep+|+Long+||+0+|+故障电流采集深度+
+|+gzdlAdcHz+|+Long+||+0+|+故障电流采集频率+
+|+workInfoUpTime+|+String+|||+工况数据上报时间+
+|+workInfoAcQGAP+|+Long+||+0+|+工况数据采集间隔+
+|+loraAddr+|+Long+||+0+|+lora地址+
+|+ip+|+String+|||
+|+port+|+Integer+||+0+|
+|+lteRssi+|+Long+||+0+|+4g信号强度+
+|+angleX+|+Float+||+0+|+设备倾角+
+|+angleY+|+Float+||+0+|
+|+angleZ+|+Float+||+0+|
+|+power+|+Float+||+0+|+设备功率+
+|+longitude+|+Double+||+0+|
+|+latitude+|+Double+||+0+|
+|+temp+|+Float+||+0+|+设备温度+
+|+src+|+Integer+||+0+|+供电方式+
+|+batVoltage+|+Float+||+0+|+电池电压+
+|+rmsI+|+Float+||+0+|+电流有效值+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+used+|+Boolean+|||+终端是否已被绑定+
+|+online+|+Boolean+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "sn" : "",
+  "organizationId" : 0,
+  "name" : "",
+  "model" : "",
+  "manufacturer" : "",
+  "versionHw" : 0,
+  "versionSw" : 0,
+  "productionDate" : "",
+  "xbdlUpTime" : "",
+  "xbdlThreshold" : 0,
+  "xbdlAdcDeep" : 0,
+  "xbdlAdcHz" : 0,
+  "gzdlUpTime" : "",
+  "gzdlThreshold" : 0,
+  "gzdlAdcDeep" : 0,
+  "gzdlAdcHz" : 0,
+  "workInfoUpTime" : "",
+  "workInfoAcQGAP" : 0,
+  "loraAddr" : 0,
+  "ip" : "",
+  "port" : 0,
+  "lteRssi" : 0,
+  "angleX" : 0,
+  "angleY" : 0,
+  "angleZ" : 0,
+  "power" : 0,
+  "longitude" : 0,
+  "latitude" : 0,
+  "temp" : 0,
+  "src" : 0,
+  "batVoltage" : 0,
+  "rmsI" : 0,
+  "createTime" : "",
+  "createUserId" : 0,
+  "createUserName" : "",
+  "updateTime" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||+终端编号+
+|+organizationId+|+Long+||+0+|
+|+name+|+String+|||+设备名称+
+|+model+|+String+|||+设备型号+
+|+manufacturer+|+String+|||+生产厂家+
+|+versionHw+|+Integer+||+0+|+硬件版本+
+|+versionSw+|+Integer+||+0+|+软件版本+
+|+productionDate+|+String+|||+生产日期+
+|+xbdlUpTime+|+String+|||+行波电流波形数据召回时间+
+|+xbdlThreshold+|+Long+||+0+|+行波电流阈值+
+|+xbdlAdcDeep+|+Long+||+0+|+行波电流采集深度+
+|+xbdlAdcHz+|+Long+||+0+|+行波电流采样频率+
+|+gzdlUpTime+|+String+|||+故障电流波形数据召回时间+
+|+gzdlThreshold+|+Long+||+0+|+故障电流阈值+
+|+gzdlAdcDeep+|+Long+||+0+|+故障电流采集深度+
+|+gzdlAdcHz+|+Long+||+0+|+故障电流采集频率+
+|+workInfoUpTime+|+String+|||+工况数据上报时间+
+|+workInfoAcQGAP+|+Long+||+0+|+工况数据采集间隔+
+|+loraAddr+|+Long+||+0+|+lora地址+
+|+ip+|+String+|||
+|+port+|+Integer+||+0+|
+|+lteRssi+|+Long+||+0+|+4g信号强度+
+|+angleX+|+Float+||+0+|+设备倾角+
+|+angleY+|+Float+||+0+|
+|+angleZ+|+Float+||+0+|
+|+power+|+Float+||+0+|+设备功率+
+|+longitude+|+Double+||+0+|
+|+latitude+|+Double+||+0+|
+|+temp+|+Float+||+0+|+设备温度+
+|+src+|+Integer+||+0+|+供电方式+
+|+batVoltage+|+Float+||+0+|+电池电压+
+|+rmsI+|+Float+||+0+|+电流有效值+
+|+createTime+|+Date+|||+设备创建时间+
+|+createUserId+|+Long+||+0+|+创建人id+
+|+createUserName+|+String+|||+创建人用户名+
+|+updateTime+|+Date+|||+设备修改时间+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+used+|+Boolean+|||+终端是否已被绑定+
+|+online+|+Boolean+|||
+|===
+
+
+== 告警管理
+
+=== 线路下的告警信息，设备组信息
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/lines/{lineId}/alarms? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "id" : 0,
+  "sn" : "",
+  "faultType" : "",
+  "faultName" : "",
+  "faultTime" : "",
+  "groupNumber1" : 0,
+  "groupNumber2" : 0,
+  "distance1" : 0,
+  "distance2" : 0,
+  "milepost" : 0,
+  "lineId" : 0,
+  "organizationId" : 0,
+  "createTime" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "groups" : [ 0 ]
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].id+|+Long+||+0+|
+|+[].sn+|+String+|||+故障编号+
+|+[].faultType+|+FaultType+|||+故障类型+
+|+[].faultName+|+String+|||+故障名称+
+|+[].faultTime+|+Date+|||+故障时间+
+|+[].groupNumber1+|+Integer+||+0+|+故障区间小端设备组号+
+|+[].groupNumber2+|+Integer+||+0+|+故障区间大端设备组号+
+|+[].inner+|+Boolean+|||+故障是否在区间内+
+|+[].distance1+|+Double+||+0+|+故障到小端距离 米+
+|+[].distance2+|+Double+||+0+|+故障到大端距离 米+
+|+[].milepost+|+Long+||+0+|+故障位置，里程碑，在线路多少米处+
+|+[].lineId+|+Long+||+0+|+线路+
+|+[].organizationId+|+Long+||+0+|+组织+
+|+[].createTime+|+Date+|||+创建时间+
+|+[].updateTime+|+Date+|||+修改时间+
+|+[].updateUserId+|+Long+||+0+|+更新人id+
+|+[].updateUserName+|+String+|||+操作人员+
+|+[].disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+[].cleared+|+Boolean+|||+报警是否已解除 1已解除，0未解除、报警中+
+|+[].groups+|+Set+|||+发送故障的设备组编号+
+|===
+
+
+=== 告警信息查询
+[%hardbreaks]
+lineId 不传时，查询该组织下的告警信息
+
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/alarms?lineId=0&cleared= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+lineId+|+Long+||+0+|+关联的线路id+
+|+cleared+|+Boolean+|||+告警是否已解除，不传查所有，未解除报警传false+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "page" : 0,
+  "size" : 0,
+  "totalPage" : 0,
+  "totalElement" : 0,
+  "data" : [ ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+page+|+int+||+0+|+页码+
+|+size+|+int+||+0+|+每页数据量+
+|+totalPage+|+int+||+0+|+总页数+
+|+totalElement+|+long+||+0+|+总记录数+
+|+data+|+Iterable+|||+数据+
+|===
+
+
+=== 告警详情查询
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/alarms/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+id+|+Long+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "sn" : "",
+  "faultType" : "",
+  "faultName" : "",
+  "faultTime" : "",
+  "groupNumber1" : 0,
+  "groupNumber2" : 0,
+  "distance1" : 0,
+  "distance2" : 0,
+  "milepost" : 0,
+  "lineId" : 0,
+  "organizationId" : 0,
+  "createTime" : "",
+  "updateTime" : "",
+  "updateUserId" : 0,
+  "updateUserName" : "",
+  "waves" : [ {
+    "id" : 0,
+    "groupNumber" : 0,
+    "phase" : "",
+    "waveDataId" : "",
+    "alarmId" : 0,
+    "lineId" : 0,
+    "createTime" : ""
+  } ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Long+||+0+|
+|+sn+|+String+|||+故障编号+
+|+faultType+|+FaultType+|||+故障类型+
+|+faultName+|+String+|||+故障名称+
+|+faultTime+|+Date+|||+故障时间+
+|+groupNumber1+|+Integer+||+0+|+故障区间小端设备组号+
+|+groupNumber2+|+Integer+||+0+|+故障区间大端设备组号+
+|+inner+|+Boolean+|||+故障是否在区间内+
+|+distance1+|+Double+||+0+|+故障到小端距离 米+
+|+distance2+|+Double+||+0+|+故障到大端距离 米+
+|+milepost+|+Long+||+0+|+故障位置，里程碑，在线路多少米处+
+|+lineId+|+Long+||+0+|+线路+
+|+organizationId+|+Long+||+0+|+组织+
+|+createTime+|+Date+|||+创建时间+
+|+updateTime+|+Date+|||+修改时间+
+|+updateUserId+|+Long+||+0+|+更新人id+
+|+updateUserName+|+String+|||+操作人员+
+|+disabled+|+Boolean+|||+使能状态：0正常（默认）, 1删除+
+|+cleared+|+Boolean+|||+报警是否已解除 1已解除，0未解除、报警中+
+|+waves+|+List+|||
+|+waves.[].id+|+Long+||+0+|
+|+waves.[].groupNumber+|+Integer+||+0+|+告警组编号+
+|+waves.[].phase+|+Phase+|||+告警相别+
+|+waves.[].waveDataId+|+String+|||+故障波id+
+|+waves.[].alarmId+|+Long+||+0+|+告警id+
+|+waves.[].lineId+|+Long+||+0+|+线路id+
+|+waves.[].createTime+|+Date+|||+设备创建时间+
+|===
+
+
+=== 查询波信息
+请求
+[source,HTTP ]
+----
+GET /organizations/{organizationId}/alarms/wave/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+id+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : "",
+  "sn" : "",
+  "lineId" : 0,
+  "groupNumber" : 0,
+  "phase" : "",
+  "terminalTime" : "",
+  "type" : 0,
+  "block" : [ 0 ],
+  "createTime" : "",
+  "analysed" : false
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+String+|||
+|+sn+|+String+|||+终端编号+
+|+lineId+|+Long+||+0+|+线路id+
+|+groupNumber+|+Integer+||+0+|+设备组编号+
+|+phase+|+Phase+|||+相别+
+|+terminalTime+|+String+|||+终端时间+
+|+type+|+Integer+||+0+|+波形类型（0故障，1行波）+
+|+block+|+float[]+|||+波形数据+
+|+createTime+|+Date+|||+记录时间+
+|+analysed+|+boolean+||+false+|+已分析过的+
+|===
+
+
+=== 告警解除
+请求
+[source,HTTP ]
+----
+PUT /organizations/{organizationId}/alarms/{id}/clear HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+id+|+Long+|||
+|===
+
+
+=== 创建告警信息（测试使用）
+[%hardbreaks]
+波形数据不校验，测试时请传入正确波形
+
+请求
+[source,HTTP ]
+----
+POST /organizations/{organizationId}/alarms HTTP/1.1
+Content-Type: application/json
+
+{
+  "faultType" : "",
+  "faultTime" : "",
+  "groupNumber1" : 0,
+  "groupNumber2" : 0,
+  "distance1" : 0,
+  "distance2" : 0,
+  "lineId" : 0,
+  "waves" : [ {
+    "groupNumber" : 0,
+    "phase" : "",
+    "waveDataId" : ""
+  } ]
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+organizationId+|+Long+|||
+|+faultType+|+FaultType+|||+故障类型
+BACK_FLASHOVER SHIELDING_FAILURE NOTLIGHTNING+
+|+faultTime+|+Date+|||+故障时间+
+|+groupNumber1+|+Integer+||+0+|+故障区间小端设备组号+
+|+groupNumber2+|+Integer+||+0+|+故障区间大端设备组号+
+|+inner+|+Boolean+|||+故障是否在区间内+
+|+distance1+|+Double+||+0+|+故障到小端距离 米+
+|+distance2+|+Double+||+0+|+故障到大端距离 米+
+|+lineId+|+Long+||+0+|+线路+
+|+waves+|+List+|||+电流波+
+|+waves.[].groupNumber+|+int+||+0+|+组编号+
+|+waves.[].phase+|+Phase+|||+相别+
+|+waves.[].waveDataId+|+String+|||+波的id+
+|===
+
+
+== 开放服务
+
+=== 开放的邮件服务
+请求
+[source,HTTP ]
+----
+POST /open/mail HTTP/1.1
+Content-Type: application/json
+
+{
+  "to" : "",
+  "subject" : "",
+  "text" : ""
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+to+|+String+|+NotBlank Email+||+邮件接收人+
+|+subject+|+String+|+NotBlank+||+邮件主题+
+|+text+|+String+|+NotBlank+||+邮件内容，文本格式+
+|===
+
+
+=== echo服务
+[%hardbreaks]
+用于测试
+
+请求
+[source,HTTP ]
+----
+GET /open/echo?msg= HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+msg+|+String+|||
+|===
+

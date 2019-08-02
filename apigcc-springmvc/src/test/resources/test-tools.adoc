@@ -1,0 +1,1377 @@
+= 硬件测试辅助工具TEST-TOOLS
+:doctype: book
+:toc: left
+:toclevels: 3
+:toc-title: 目录
+:source-highlighter: highlightjs
+
+[%hardbreaks]
+version:1.0-SNAPSHOT
+
+[%hardbreaks]
+web前后端交互接口文档
+
+
+== 终端服务
+
+=== 查询在线设备编号
+[%hardbreaks]
+返回sn数组
+
+请求
+[source,HTTP ]
+----
+GET /terminals HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ "" ]
+----
+
+
+=== 查询波形数据（分页）
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/waves?type=&page=1&size=10 HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|+type+|+String+|||+波类型，如：0101,0103+
+|+page+|+int+||+1+|
+|+size+|+int+||+10+|
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "sn" : "",
+  "terminalTime" : "",
+  "terminalClock" : "",
+  "length" : 0,
+  "type" : "",
+  "lightening" : 0,
+  "waveMax" : "",
+  "headTime" : "",
+  "headClock" : "",
+  "maxTime" : "",
+  "maxClock" : "",
+  "createTime" : "",
+  "maxAd" : 0,
+  "minAd" : 0,
+  "scopePoint" : "",
+  "dataMax" : 0,
+  "dataMaxIndex" : 0,
+  "data1" : 0,
+  "data1Index" : 0,
+  "data2" : 0,
+  "data2Index" : 0,
+  "data3" : 0,
+  "data3Index" : 0,
+  "highPassMax" : 0,
+  "rate" : 0,
+  "headIndex" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Integer+||+0+|
+|+sn+|+String+|||
+|+terminalTime+|+String+|||
+|+terminalClock+|+String+|||
+|+length+|+Integer+||+0+|
+|+type+|+String+|||
+|+lowScope+|+Boolean+|||
+|+lightening+|+Integer+||+0+|
+|+waveMax+|+String+|||
+|+headTime+|+String+|||
+|+headClock+|+String+|||
+|+maxTime+|+String+|||
+|+maxClock+|+String+|||
+|+createTime+|+Date+|||
+|+maxAd+|+Integer+||+0+|
+|+minAd+|+Integer+||+0+|
+|+scopePoint+|+String+|||
+|+dataMax+|+Float+||+0+|
+|+dataMaxIndex+|+Integer+||+0+|+最大值得索引+
+|+data1+|+Float+||+0+|+幅值往前150个点的值+
+|+data1Index+|+Integer+||+0+|
+|+data2+|+Float+||+0+|+幅值往前100个点的值+
+|+data2Index+|+Integer+||+0+|
+|+data3+|+Float+||+0+|+幅值往前50个点的值+
+|+data3Index+|+Integer+||+0+|
+|+highPassMax+|+Float+||+0+|
+|+rate+|+Integer+||+0+|
+|+flattop+|+Boolean+|||
+|+useful+|+Boolean+|||
+|+headIndex+|+Integer+||+0+|
+|===
+
+
+=== 查询所有波形
+请求
+[source,HTTP ]
+----
+GET /terminals/all/waves?type=&page=1&size=10 HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+type+|+String+|||
+|+page+|+int+||+1+|
+|+size+|+int+||+10+|
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "sn" : "",
+  "terminalTime" : "",
+  "terminalClock" : "",
+  "length" : 0,
+  "type" : "",
+  "lightening" : 0,
+  "waveMax" : "",
+  "headTime" : "",
+  "headClock" : "",
+  "maxTime" : "",
+  "maxClock" : "",
+  "createTime" : "",
+  "maxAd" : 0,
+  "minAd" : 0,
+  "scopePoint" : "",
+  "dataMax" : 0,
+  "dataMaxIndex" : 0,
+  "data1" : 0,
+  "data1Index" : 0,
+  "data2" : 0,
+  "data2Index" : 0,
+  "data3" : 0,
+  "data3Index" : 0,
+  "highPassMax" : 0,
+  "rate" : 0,
+  "headIndex" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Integer+||+0+|
+|+sn+|+String+|||
+|+terminalTime+|+String+|||
+|+terminalClock+|+String+|||
+|+length+|+Integer+||+0+|
+|+type+|+String+|||
+|+lowScope+|+Boolean+|||
+|+lightening+|+Integer+||+0+|
+|+waveMax+|+String+|||
+|+headTime+|+String+|||
+|+headClock+|+String+|||
+|+maxTime+|+String+|||
+|+maxClock+|+String+|||
+|+createTime+|+Date+|||
+|+maxAd+|+Integer+||+0+|
+|+minAd+|+Integer+||+0+|
+|+scopePoint+|+String+|||
+|+dataMax+|+Float+||+0+|
+|+dataMaxIndex+|+Integer+||+0+|+最大值得索引+
+|+data1+|+Float+||+0+|+幅值往前150个点的值+
+|+data1Index+|+Integer+||+0+|
+|+data2+|+Float+||+0+|+幅值往前100个点的值+
+|+data2Index+|+Integer+||+0+|
+|+data3+|+Float+||+0+|+幅值往前50个点的值+
+|+data3Index+|+Integer+||+0+|
+|+highPassMax+|+Float+||+0+|
+|+rate+|+Integer+||+0+|
+|+flattop+|+Boolean+|||
+|+useful+|+Boolean+|||
+|+headIndex+|+Integer+||+0+|
+|===
+
+
+=== 查询历史波形数据sn号
+请求
+[source,HTTP ]
+----
+GET /terminals/waves HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ "" ]
+----
+
+
+=== 查询历史波形数据详情
+请求
+[source,HTTP ]
+----
+GET /terminals/waves/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Integer+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "sn" : "",
+  "terminalTime" : "",
+  "terminalClock" : "",
+  "data" : [ 0 ],
+  "dataMax" : 0,
+  "dataMaxIndex" : 0,
+  "data1" : 0,
+  "data1Index" : 0,
+  "data2" : 0,
+  "data2Index" : 0,
+  "data3" : 0,
+  "data3Index" : 0,
+  "highPassBlock" : [ 0 ],
+  "highPassMax" : 0,
+  "rate" : 0,
+  "length" : 0,
+  "type" : "",
+  "lightening" : 0,
+  "waveMax" : "",
+  "headTime" : "",
+  "headClock" : "",
+  "maxTime" : "",
+  "maxClock" : "",
+  "createTime" : "",
+  "maxAd" : 0,
+  "minAd" : 0,
+  "scopePoint" : "",
+  "headIndex" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Integer+||+0+|
+|+sn+|+String+|||
+|+terminalTime+|+String+|||
+|+terminalClock+|+String+|||
+|+data+|+float[]+|||
+|+dataMax+|+Float+||+0+|
+|+dataMaxIndex+|+Integer+||+0+|+最大值得索引+
+|+data1+|+Float+||+0+|+幅值往前150个点的值+
+|+data1Index+|+Integer+||+0+|
+|+data2+|+Float+||+0+|+幅值往前100个点的值+
+|+data2Index+|+Integer+||+0+|
+|+data3+|+Float+||+0+|+幅值往前50个点的值+
+|+data3Index+|+Integer+||+0+|
+|+highPassBlock+|+float[]+|||
+|+highPassMax+|+Float+||+0+|
+|+rate+|+Integer+||+0+|
+|+flattop+|+Boolean+|||
+|+length+|+Integer+||+0+|
+|+type+|+String+|||
+|+lowScope+|+Boolean+|||
+|+lightening+|+Integer+||+0+|
+|+waveMax+|+String+|||
+|+headTime+|+String+|||
+|+headClock+|+String+|||
+|+maxTime+|+String+|||
+|+maxClock+|+String+|||
+|+createTime+|+Date+|||
+|+maxAd+|+Integer+||+0+|
+|+minAd+|+Integer+||+0+|
+|+scopePoint+|+String+|||
+|+useful+|+Boolean+|||
+|+headIndex+|+Integer+||+0+|
+|===
+
+
+=== 获取txt格式 波形数据
+请求
+[source,HTTP ]
+----
+GET /terminals/waves/{id}/txt? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Integer+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ 0 ]
+----
+
+
+=== 查询波形数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/wave? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "id" : "",
+    "terminalClock" : "",
+    "headClock" : "",
+    "maxClock" : "",
+    "block" : [ 0 ],
+    "highPassBlock" : [ 0 ],
+    "headIndex" : 0,
+    "algotithmResp" : {
+      "lightening" : 0,
+      "waveMax" : "",
+      "headTime" : "",
+      "headMaxTime" : ""
+    }
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+WaveDataDTO+|||
+|+[].data.id+|+String+|||
+|+[].data.terminalClock+|+LocalDateTime+|||
+|+[].data.headClock+|+LocalDateTime+|||
+|+[].data.maxClock+|+LocalDateTime+|||
+|+[].data.block+|+float[]+|||
+|+[].data.highPassBlock+|+float[]+|||
+|+[].data.headIndex+|+int+||+0+|
+|+[].data.algotithmResp+|+AlgotithmResp+|||
+|+[].data.algotithmResp.lightening+|+Integer+||+0+|+1：雷击，2：非雷击+
+|+[].data.algotithmResp.waveMax+|+String+|||+幅值+
+|+[].data.algotithmResp.headTime+|+String+|||+波头+
+|+[].data.algotithmResp.headMaxTime+|+String+|||+半峰+
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 查询故障数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/wave/gz? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "id" : "",
+    "terminalClock" : "",
+    "headClock" : "",
+    "maxClock" : "",
+    "block" : [ 0 ],
+    "highPassBlock" : [ 0 ],
+    "headIndex" : 0,
+    "algotithmResp" : {
+      "lightening" : 0,
+      "waveMax" : "",
+      "headTime" : "",
+      "headMaxTime" : ""
+    }
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+WaveDataDTO+|||
+|+[].data.id+|+String+|||
+|+[].data.terminalClock+|+LocalDateTime+|||
+|+[].data.headClock+|+LocalDateTime+|||
+|+[].data.maxClock+|+LocalDateTime+|||
+|+[].data.block+|+float[]+|||
+|+[].data.highPassBlock+|+float[]+|||
+|+[].data.headIndex+|+int+||+0+|
+|+[].data.algotithmResp+|+AlgotithmResp+|||
+|+[].data.algotithmResp.lightening+|+Integer+||+0+|+1：雷击，2：非雷击+
+|+[].data.algotithmResp.waveMax+|+String+|||+幅值+
+|+[].data.algotithmResp.headTime+|+String+|||+波头+
+|+[].data.algotithmResp.headMaxTime+|+String+|||+半峰+
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 清理半波
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/wave/clear? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+
+=== 查询行波电流数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/xb? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "h" : "0x5566",
+    "id" : "",
+    "type" : 0,
+    "length" : 0,
+    "sum" : 0,
+    "blockLen" : 0,
+    "block" : [ 0 ],
+    "clock" : {
+      "year" : 0,
+      "month" : 0,
+      "day" : 0,
+      "hour" : 0,
+      "minute" : 0,
+      "second" : 0,
+      "mill" : 0,
+      "micro" : 0,
+      "nano" : 0
+    },
+    "totalBytes" : 0,
+    "n" : 0,
+    "p" : 0,
+    "packages" : 0,
+    "num" : 0,
+    "scope" : 0
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+DataPktType+|||
+|+[].data.h+|+short+||+0x5566+|+帧头+
+|+[].data.id+|+String+|||+设备编号+
+|+[].data.type+|+short+||+0+|+帧类型+
+|+[].data.length+|+int+||+0+|
+|+[].data.sum+|+short+||+0+|+帧尾校验位+
+|+[].data.blockLen+|+int+||+0+|+波形数据字节数+
+|+[].data.block+|+byte[]+|||+波形数据+
+|+[].data.clock+|+Clock+|||+时间+
+|+[].data.clock.year+|+byte+||+0+|
+|+[].data.clock.month+|+byte+||+0+|
+|+[].data.clock.day+|+byte+||+0+|
+|+[].data.clock.hour+|+byte+||+0+|
+|+[].data.clock.minute+|+byte+||+0+|
+|+[].data.clock.second+|+byte+||+0+|
+|+[].data.clock.mill+|+int+||+0+|+毫秒+
+|+[].data.clock.micro+|+int+||+0+|+微秒+
+|+[].data.clock.nano+|+int+||+0+|+纳秒+
+|+[].data.totalBytes+|+int+||+0+|+本次波形字节总数+
+|+[].data.n+|+short+||+0+|+当前报文数据包序号+
+|+[].data.p+|+short+||+0+|+本次波形数据包数量+
+|+[].data.packages+|+long+||+0+|+扩展的
+本次波形数据包数量+
+|+[].data.num+|+long+||+0+|+扩展的
+当前报文数据包序号+
+|+[].data.scope+|+byte+||+0+|
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 查询故障电流数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/gz? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "h" : "0x5566",
+    "id" : "",
+    "type" : 0,
+    "length" : 0,
+    "sum" : 0,
+    "blockLen" : 0,
+    "block" : [ 0 ],
+    "clock" : {
+      "year" : 0,
+      "month" : 0,
+      "day" : 0,
+      "hour" : 0,
+      "minute" : 0,
+      "second" : 0,
+      "mill" : 0,
+      "micro" : 0,
+      "nano" : 0
+    },
+    "totalBytes" : 0,
+    "n" : 0,
+    "p" : 0,
+    "packages" : 0,
+    "num" : 0,
+    "scope" : 0
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+DataPktType+|||
+|+[].data.h+|+short+||+0x5566+|+帧头+
+|+[].data.id+|+String+|||+设备编号+
+|+[].data.type+|+short+||+0+|+帧类型+
+|+[].data.length+|+int+||+0+|
+|+[].data.sum+|+short+||+0+|+帧尾校验位+
+|+[].data.blockLen+|+int+||+0+|+波形数据字节数+
+|+[].data.block+|+byte[]+|||+波形数据+
+|+[].data.clock+|+Clock+|||+时间+
+|+[].data.clock.year+|+byte+||+0+|
+|+[].data.clock.month+|+byte+||+0+|
+|+[].data.clock.day+|+byte+||+0+|
+|+[].data.clock.hour+|+byte+||+0+|
+|+[].data.clock.minute+|+byte+||+0+|
+|+[].data.clock.second+|+byte+||+0+|
+|+[].data.clock.mill+|+int+||+0+|+毫秒+
+|+[].data.clock.micro+|+int+||+0+|+微秒+
+|+[].data.clock.nano+|+int+||+0+|+纳秒+
+|+[].data.totalBytes+|+int+||+0+|+本次波形字节总数+
+|+[].data.n+|+short+||+0+|+当前报文数据包序号+
+|+[].data.p+|+short+||+0+|+本次波形数据包数量+
+|+[].data.packages+|+long+||+0+|+扩展的
+本次波形数据包数量+
+|+[].data.num+|+long+||+0+|+扩展的
+当前报文数据包序号+
+|+[].data.scope+|+byte+||+0+|
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 查询设备故障数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/fault? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "h" : "0x5566",
+    "id" : "",
+    "type" : 0,
+    "length" : 0,
+    "sum" : 0,
+    "clock" : {
+      "year" : 0,
+      "month" : 0,
+      "day" : 0,
+      "hour" : 0,
+      "minute" : 0,
+      "second" : 0,
+      "mill" : 0,
+      "micro" : 0,
+      "nano" : 0
+    },
+    "info" : ""
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+FaultDTO+|||
+|+[].data.h+|+short+||+0x5566+|+帧头+
+|+[].data.id+|+String+|||+设备编号+
+|+[].data.type+|+short+||+0+|+帧类型+
+|+[].data.length+|+int+||+0+|
+|+[].data.sum+|+short+||+0+|+帧尾校验位+
+|+[].data.clock+|+Clock+|||
+|+[].data.clock.year+|+byte+||+0+|
+|+[].data.clock.month+|+byte+||+0+|
+|+[].data.clock.day+|+byte+||+0+|
+|+[].data.clock.hour+|+byte+||+0+|
+|+[].data.clock.minute+|+byte+||+0+|
+|+[].data.clock.second+|+byte+||+0+|
+|+[].data.clock.mill+|+int+||+0+|+毫秒+
+|+[].data.clock.micro+|+int+||+0+|+微秒+
+|+[].data.clock.nano+|+int+||+0+|+纳秒+
+|+[].data.info+|+String+|||+故障信息+
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 查询心跳数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/heart? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "h" : "0x5566",
+    "id" : "",
+    "type" : 0,
+    "length" : 0,
+    "sum" : 0
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+HeartPktType+|||
+|+[].data.h+|+short+||+0x5566+|+帧头+
+|+[].data.id+|+String+|||+设备编号+
+|+[].data.type+|+short+||+0+|+帧类型+
+|+[].data.length+|+int+||+0+|
+|+[].data.sum+|+short+||+0+|+帧尾校验位+
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 查询设备基本信息数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/info? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "h" : "0x5566",
+    "id" : "",
+    "type" : 0,
+    "length" : 0,
+    "sum" : 0,
+    "name" : "",
+    "model" : "",
+    "verion" : "",
+    "infoPara1" : {
+      "ad" : 0,
+      "phyInt" : 0
+    },
+    "infoPara2" : {
+      "ad" : 0,
+      "phyInt" : 0
+    },
+    "total" : 0,
+    "infoParas" : [ {
+      "ad" : 0,
+      "phyInt" : 0
+    } ]
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+InfoPktType+|||
+|+[].data.h+|+short+||+0x5566+|+帧头+
+|+[].data.id+|+String+|||+设备编号+
+|+[].data.type+|+short+||+0+|+帧类型+
+|+[].data.length+|+int+||+0+|
+|+[].data.sum+|+short+||+0+|+帧尾校验位+
+|+[].data.name+|+String+|||+监测终端名称+
+|+[].data.model+|+String+|||+监测终端型号+
+|+[].data.verion+|+String+|||+监测终端基本信息版本
+号+
+|+[].data.infoPara1+|+InfoPara+|||
+|+[].data.infoPara1.ad+|+int+||+0+|
+|+[].data.infoPara1.phyInt+|+int+||+0+|
+|+[].data.infoPara2+|+InfoPara+|||
+|+[].data.infoPara2.ad+|+int+||+0+|
+|+[].data.infoPara2.phyInt+|+int+||+0+|
+|+[].data.total+|+int+||+0+|
+|+[].data.infoParas+|+List+|||
+|+[].data.infoParas.[].ad+|+int+||+0+|
+|+[].data.infoParas.[].phyInt+|+int+||+0+|
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 查询工况数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/work? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+[ {
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "h" : "0x5566",
+    "id" : "",
+    "type" : 0,
+    "length" : 0,
+    "sum" : 0,
+    "clock" : "",
+    "src" : 0,
+    "voltage" : 0,
+    "temp" : 0,
+    "i" : 0,
+    "remark" : ""
+  },
+  "frame" : "",
+  "count" : 0
+} ]
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+[].createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+[].data+|+WorkPktType+|||
+|+[].data.h+|+short+||+0x5566+|+帧头+
+|+[].data.id+|+String+|||+设备编号+
+|+[].data.type+|+short+||+0+|+帧类型+
+|+[].data.length+|+int+||+0+|
+|+[].data.sum+|+short+||+0+|+帧尾校验位+
+|+[].data.clock+|+String+|||
+|+[].data.src+|+byte+||+0+|+电池供电状态：0 表示感应电源供电；1 表示
+电池供电；2.表示太阳能供电+
+|+[].data.voltage+|+int+||+0+|+电池电压 单位 mV+
+|+[].data.temp+|+int+||+0+|+设备温度 单位℃+
+|+[].data.i+|+int+||+0+|+电流有效值 单位 A+
+|+[].data.remark+|+String+|||+备用+
+|+[].frame+|+String+|||
+|+[].count+|+Integer+||+0+|
+|===
+
+
+=== 查询参数信息
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/param? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "xbUpTime" : 0,
+    "xbUpThreshold" : 0,
+    "xbUpAdcDeep" : 0,
+    "xbUpAdcHz" : 0,
+    "gzUpTime" : 0,
+    "gzUpThreshold" : 0,
+    "gzUpAdcDeep" : 0,
+    "gzUpAdcHz" : 0,
+    "workInfoUpTime" : 0,
+    "workInfoAcQGAP" : 0
+  },
+  "frame" : "",
+  "count" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+data+|+ParamDTO+|||
+|+data.xbUpTime+|+Integer+||+0+|+行波电流召回时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+data.xbUpThreshold+|+Integer+||+0+|+行波电流阈值 单位 安倍+
+|+data.xbUpAdcDeep+|+Integer+||+0+|+行波电流采集时长 单位微秒+
+|+data.xbUpAdcHz+|+Integer+||+0+|+行波电流采样频率 单位Hz+
+|+data.gzUpTime+|+Integer+||+0+|+工频电流召回时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+data.gzUpThreshold+|+Integer+||+0+|+工频电流阈值 单位 安倍+
+|+data.gzUpAdcDeep+|+Integer+||+0+|+工频电流采集时长 单位 毫秒+
+|+data.gzUpAdcHz+|+Integer+||+0+|+工频电流采样频率 单位 Hz+
+|+data.workInfoUpTime+|+Integer+||+0+|+工作状态上报时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+data.workInfoAcQGAP+|+Integer+||+0+|+工况数据采集间隔 单位分钟+
+|+frame+|+String+|||
+|+count+|+Integer+||+0+|
+|===
+
+
+=== 设置参数信息
+请求
+[source,HTTP ]
+----
+POST /terminals/{sn}/param HTTP/1.1
+Content-Type: application/json
+
+{
+  "xbUpTime" : 0,
+  "xbUpThreshold" : 0,
+  "xbUpAdcDeep" : 0,
+  "xbUpAdcHz" : 0,
+  "gzUpTime" : 0,
+  "gzUpThreshold" : 0,
+  "gzUpAdcDeep" : 0,
+  "gzUpAdcHz" : 0,
+  "workInfoUpTime" : 0,
+  "workInfoAcQGAP" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|+xbUpTime+|+Integer+||+0+|+行波电流召回时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+xbUpThreshold+|+Integer+||+0+|+行波电流阈值 单位 安倍+
+|+xbUpAdcDeep+|+Integer+||+0+|+行波电流采集时长 单位微秒+
+|+xbUpAdcHz+|+Integer+||+0+|+行波电流采样频率 单位Hz+
+|+gzUpTime+|+Integer+||+0+|+工频电流召回时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+gzUpThreshold+|+Integer+||+0+|+工频电流阈值 单位 安倍+
+|+gzUpAdcDeep+|+Integer+||+0+|+工频电流采集时长 单位 毫秒+
+|+gzUpAdcHz+|+Integer+||+0+|+工频电流采样频率 单位 Hz+
+|+workInfoUpTime+|+Integer+||+0+|+工作状态上报时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+workInfoAcQGAP+|+Integer+||+0+|+工况数据采集间隔 单位分钟+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "createTime" : "System.currentTimeMillis()",
+  "data" : {
+    "xbUpTime" : 0,
+    "xbUpThreshold" : 0,
+    "xbUpAdcDeep" : 0,
+    "xbUpAdcHz" : 0,
+    "gzUpTime" : 0,
+    "gzUpThreshold" : 0,
+    "gzUpAdcDeep" : 0,
+    "gzUpAdcHz" : 0,
+    "workInfoUpTime" : 0,
+    "workInfoAcQGAP" : 0
+  },
+  "frame" : "",
+  "count" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+createTime+|+long+||+System.currentTimeMillis()+|+接收时间+
+|+data+|+ParamDTO+|||
+|+data.xbUpTime+|+Integer+||+0+|+行波电流召回时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+data.xbUpThreshold+|+Integer+||+0+|+行波电流阈值 单位 安倍+
+|+data.xbUpAdcDeep+|+Integer+||+0+|+行波电流采集时长 单位微秒+
+|+data.xbUpAdcHz+|+Integer+||+0+|+行波电流采样频率 单位Hz+
+|+data.gzUpTime+|+Integer+||+0+|+工频电流召回时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+data.gzUpThreshold+|+Integer+||+0+|+工频电流阈值 单位 安倍+
+|+data.gzUpAdcDeep+|+Integer+||+0+|+工频电流采集时长 单位 毫秒+
+|+data.gzUpAdcHz+|+Integer+||+0+|+工频电流采样频率 单位 Hz+
+|+data.workInfoUpTime+|+Integer+||+0+|+工作状态上报时间
+至当天0点的秒数
+显示格式 HH:mm:ss+
+|+data.workInfoAcQGAP+|+Integer+||+0+|+工况数据采集间隔 单位分钟+
+|+frame+|+String+|||
+|+count+|+Integer+||+0+|
+|===
+
+
+=== 终端重置
+请求
+[source,HTTP ]
+----
+POST /terminals/{sn}/reset HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+
+----
+
+
+=== 获取最近重置成功的数据
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/reset? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+
+=== 终端升级
+请求
+[source,HTTP ]
+----
+POST /terminals/{sn}/upgrade HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+
+=== 当前终端的升级进度
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/upgrade/progress? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "total" : 0,
+  "index" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+total+|+int+||+0+|+升级包总数+
+|+index+|+int+||+0+|+当前进行中的包索引+
+|===
+
+
+=== 上传升级文件
+请求
+[source,HTTP ]
+----
+POST /terminals/upgrade/file HTTP/1.1
+
+version=0
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+version+|+short+||+0+|
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+
+----
+
+
+=== 获取升级文件信息
+请求
+[source,HTTP ]
+----
+GET /terminals/upgrade/file HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "fileName" : "",
+  "version" : 0,
+  "total" : 0,
+  "bytes" : 0,
+  "crc" : 0
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+fileName+|+String+|||+升级文件名+
+|+version+|+short+||+0+|+版本号+
+|+total+|+int+||+0+|+升级包总数+
+|+bytes+|+int+||+0+|+文件大小+
+|+crc+|+int+||+0+|+文件校验码+
+|===
+
+
+=== 清除升级文件
+请求
+[source,HTTP ]
+----
+DELETE /terminals/upgrade/file HTTP/1.1
+
+----
+
+
+=== 切换量程
+请求
+[source,HTTP ]
+----
+GET /terminals/{sn}/range?enable=0 HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+sn+|+String+|||
+|+enable+|+boolean+||+0+|+0禁用大量程 1使能大量程+
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+
+----
+
+
+== 终端时间标定
+
+=== 第一步，开始标定
+请求
+[source,HTTP ]
+----
+GET /terminals/calibration/start HTTP/1.1
+
+----
+
+
+=== 第二步，锁定标定终端
+请求
+[source,HTTP ]
+----
+GET /terminals/calibration/lock HTTP/1.1
+
+----
+
+
+=== 第三步，结束标定
+请求
+[source,HTTP ]
+----
+GET /terminals/calibration/finish HTTP/1.1
+
+----
+
+
+=== 设置标定偏差阈值
+请求
+[source,HTTP ]
+----
+PUT /terminals/calibration/limit HTTP/1.1
+
+limit=0
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+limit+|+long+||+0+|
+|===
+
+
+=== 当前标定状态
+[%hardbreaks]
+状态 0-初始化 1-开始标定，允许新增标定设备 2-锁定设备 3-结束标定，保存标定结果
+
+请求
+[source,HTTP ]
+----
+GET /terminals/calibration/state HTTP/1.1
+
+----
+
+
+=== 查询当前标定信息
+请求
+[source,HTTP ]
+----
+GET /terminals/calibration HTTP/1.1
+
+----
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "terminalCount" : 0,
+  "batchCount" : 0,
+  "createTime" : "",
+  "terminals" : "new LinkedHashMap<>()"
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Integer+||+0+|
+|+terminalCount+|+Integer+||+0+|+终端数量+
+|+batchCount+|+Integer+||+0+|
+|+createTime+|+Date+|||
+|+terminals+|+Map+|||
+|===
+
+
+=== 获取标定详情
+请求
+[source,HTTP ]
+----
+GET /terminals/calibration/{id}? HTTP/1.1
+
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+int+||+0+|
+|===
+
+响应
+[source,HTTP ]
+----
+HTTP/1.1 200 OK
+
+{
+  "id" : 0,
+  "terminalCount" : 0,
+  "batchCount" : 0,
+  "createTime" : "",
+  "terminals" : "new LinkedHashMap<>()"
+}
+----
+
+[options="header"]
+|===
+|+名称+|+类型+|+校验+|+默认+|+描述+
+|+id+|+Integer+||+0+|
+|+terminalCount+|+Integer+||+0+|+终端数量+
+|+batchCount+|+Integer+||+0+|
+|+createTime+|+Date+|||
+|+terminals+|+Map+|||
+|===
+

@@ -1,0 +1,5 @@
+dependencies {
+    compile 'com.github.javaparser:javaparser-symbol-solver-core:3.14.4'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.2'
+    compile 'org.asciidoctor:asciidoctorj:2.1.0'
+}

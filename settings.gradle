@@ -1,2 +1,4 @@
 rootProject.name = 'apigcc'
+include 'apigcc-core'
+include 'apigcc-springmvc'
 
