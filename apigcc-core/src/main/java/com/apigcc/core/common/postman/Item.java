@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 public class Item extends Folder {
 
-    String id;
+    String id = UUID.randomUUID().toString();
     Request request = new Request();
     List<Response> response = new ArrayList<>();
 

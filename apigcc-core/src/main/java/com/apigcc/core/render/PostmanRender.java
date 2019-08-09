@@ -45,6 +45,9 @@ public class PostmanRender implements ProjectRender {
                 chapterFolder.setName(chapter.getName());
                 chapterFolder.setDescription(chapter.getDescription());
                 for (Section section : chapter.getSections()) {
+                    if(section.isIgnore()){
+                        continue;
+                    }
                     chapterFolder.getItem().add(build(section));
                 }
                 folder.getItem().add(chapterFolder);
@@ -62,7 +65,6 @@ public class PostmanRender implements ProjectRender {
 
     private Item build(Section section) {
         Item item = new Item();
-        item.setId(section.getId());
         item.setName(section.getName());
         item.setDescription(section.getDescription());
 

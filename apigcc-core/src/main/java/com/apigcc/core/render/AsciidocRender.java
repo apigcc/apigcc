@@ -55,6 +55,9 @@ public class AsciidocRender implements ProjectRender {
                 builder.title(1, chapter.getName());
                 builder.paragraph(chapter.getDescription());
                 for (Section section : chapter.getSections()) {
+                    if(section.isIgnore()){
+                        continue;
+                    }
                     builder.title(2, section.getName());
                     builder.paragraph(section.getDescription());
 
