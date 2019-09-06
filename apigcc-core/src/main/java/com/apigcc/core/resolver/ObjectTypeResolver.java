@@ -46,6 +46,11 @@ public class ObjectTypeResolver implements TypeResolver {
             if(declaredField.isStatic()){
                 continue;
             }
+
+            if(CommentHelper.isIgnore(declaredField)){
+                continue;
+            }
+
             ResolvedType fieldType = declaredField.getType();
 
             if(fieldType.isReferenceType()){

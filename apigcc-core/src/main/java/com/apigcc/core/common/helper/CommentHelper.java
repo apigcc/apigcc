@@ -3,6 +3,7 @@ package com.apigcc.core.common.helper;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
@@ -12,6 +13,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParse
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -47,6 +49,7 @@ public class CommentHelper {
         }
         return null;
     }
+
     public static String getComment(ResolvedFieldDeclaration it){
         if(it instanceof JavaParserFieldDeclaration){
             FieldDeclaration wrappedNode = ((JavaParserFieldDeclaration) it).getWrappedNode();
@@ -59,5 +62,30 @@ public class CommentHelper {
 
         }
         return null;
+    }
+
+    public static boolean isIgnore(Comment comment){
+        if(!comment.isJavadocComment()){
+            return false;
+        }
+        return comment.asJavadocComment()
+                .parse()
+                .getBlockTags()
+                .stream()
+                .anyMatch(tag -> Objects.equals("ignore", tag.getTagName()));
+    }
+
+    public static boolean isIgnore(ResolvedFieldDeclaration it){
+        if(it instanceof JavaParserFieldDeclaration){
+            FieldDeclaration wrappedNode = ((JavaParserFieldDeclaration) it).getWrappedNode();
+            Optional<Comment> optional = wrappedNode.getComment();
+            if(optional.isPresent()){
+                return CommentHelper.isIgnore(optional.get());
+            }
+        }else if(it instanceof JavaParserClassDeclaration){
+            JavaParserClassDeclaration classDeclaration = (JavaParserClassDeclaration) it;
+
+        }
+        return false;
     }
 }
