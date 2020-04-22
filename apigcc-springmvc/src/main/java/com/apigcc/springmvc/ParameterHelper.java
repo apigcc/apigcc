@@ -23,6 +23,15 @@ public class ParameterHelper {
         return false;
     }
 
+    public static Parameter getRequestBody(NodeList<Parameter> parameters){
+        for (Parameter parameter : parameters) {
+            if (isRequestBody(parameter)) {
+                return parameter;
+            }
+        }
+        return null;
+    }
+
     public static boolean isRequestParam(Parameter parameter) {
         if (!parameter.isAnnotationPresent(ANNOTATION_PATH_VARIABLE) &&
                 !parameter.isAnnotationPresent(ANNOTATION_REQUEST_BODY) &&

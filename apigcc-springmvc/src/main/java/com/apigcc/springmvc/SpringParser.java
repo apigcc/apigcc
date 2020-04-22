@@ -8,10 +8,7 @@ import com.apigcc.core.common.helper.AnnotationHelper;
 import com.apigcc.core.common.helper.ExpressionHelper;
 import com.apigcc.core.common.helper.StringHelper;
 import com.apigcc.core.parser.ParserStrategy;
-import com.apigcc.core.schema.Chapter;
-import com.apigcc.core.schema.Header;
-import com.apigcc.core.schema.Row;
-import com.apigcc.core.schema.Section;
+import com.apigcc.core.schema.*;
 import com.apigcc.springmvc.resovler.SpringComponentTypeResolver;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -122,10 +119,10 @@ public class SpringParser implements ParserStrategy {
      * @param section
      */
     private void visitParameters(MethodDeclaration n, Chapter chapter, Section section) {
-        if (ParameterHelper.hasRequestBody(n.getParameters())) {
-            visitRequestBody(n, chapter, section);
-        }else{
+        if (Method.GET.equals(section.getMethod())) {
             visitParameter(n, chapter, section);
+        }else{
+            visitRequestBody(n, chapter, section);
         }
     }
 
@@ -205,19 +202,35 @@ public class SpringParser implements ParserStrategy {
     private void visitRequestBody(MethodDeclaration n, Chapter chapter, Section section) {
         section.setQueryParameter(false);
         section.addInHeader(Header.APPLICATION_JSON);
-        for (Parameter parameter : n.getParameters()) {
-            if (ParameterHelper.isRequestBody(parameter)) {
-                TypeDescription description = Apigcc.getInstance().getTypeResolvers().resolve(parameter.getType());
-                if (description.isAvailable()) {
-                    if (description.isArray()) {
-                        section.setParameter(description.asArray().getValue());
-                    } else if (description.isObject()) {
-                        section.setParameter(description.asObject().getValue());
-                    }
-                    section.addRequestRows(description.rows());
+
+        if (ParameterHelper.hasRequestBody(n.getParameters())) {
+            Parameter parameter = ParameterHelper.getRequestBody(n.getParameters());
+            TypeDescription description = Apigcc.getInstance().getTypeResolvers().resolve(parameter.getType());
+            if (description.isAvailable()) {
+                if (description.isArray()) {
+                    section.setParameter(description.asArray().getValue());
+                } else if (description.isObject()) {
+                    section.setParameter(description.asObject().getValue());
                 }
-                break;
+                section.addRequestRows(description.rows());
             }
+        }else{
+            ObjectTypeDescription objectTypeDescription = new ObjectTypeDescription();
+            for (Parameter parameter : n.getParameters()) {
+                TypeDescription description = Apigcc.getInstance().getTypeResolvers().resolve(parameter.getType());
+                if(description.isAvailable()){
+                    if(description.isObject()){
+                        objectTypeDescription.merge(description.asObject());
+                    }else{
+                        String key = parameter.getNameAsString();
+                        description.setKey(key);
+                        section.getParamTag(key).ifPresent(tag->description.addRemark(tag.getContent()));
+                        objectTypeDescription.add(description);
+                    }
+                }
+            }
+            section.setParameter(objectTypeDescription.getValue());
+            section.addRequestRows(objectTypeDescription.rows());
         }
 
     }

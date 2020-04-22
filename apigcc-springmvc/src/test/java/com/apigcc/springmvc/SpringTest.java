@@ -15,10 +15,13 @@ public class SpringTest {
     public void test() throws IOException {
 
         Context context = new Context();
-        context.setId("test");
-        context.setName("测试项目");
-        context.addSource(Paths.get("D:/apigcc/apigcc-demo-spring"));
+        context.setId("ava");
+        context.setName("AVA");
+        context.addSource(Paths.get("E:\\avalokitesvara/application/src/main/java/com/dingdingzn/avalokitesvara/api/dms/equipment/"));
+        context.addDependency(Paths.get("E:\\avalokitesvara"));
+        context.addDependency(Paths.get("E:\\apigcc-hub\\build\\dependency"));
 //        context.setCss("https://darshandsoni.com/asciidoctor-skins/css/monospace.css");
+//        context.addJar(Paths.get("E:\\apigcc-hub\\build\\dependency\\spring-data-commons-2.2.3.RELEASE-sources.jar"));
 
         Apigcc apigcc = new Apigcc(context);
         apigcc.parse();
