@@ -15,6 +15,7 @@ public class PrimitiveTypeResolver implements TypeResolver {
             Character.class.getName(),
             Double.class.getName(),
             Float.class.getName(),
+            Long.class.getName(),
             Integer.class.getName(),
             Short.class.getName(),
             Byte.class.getName()

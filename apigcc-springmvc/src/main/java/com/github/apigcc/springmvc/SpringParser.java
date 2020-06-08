@@ -219,15 +219,17 @@ public class SpringParser implements ParserStrategy {
         } else {
             ObjectTypeDescription objectTypeDescription = new ObjectTypeDescription();
             for (Parameter parameter : n.getParameters()) {
-                TypeDescription description = Apigcc.getInstance().getTypeResolvers().resolve(parameter.getType());
-                if (description.isAvailable()) {
-                    if (description.isObject()) {
-                        objectTypeDescription.merge(description.asObject());
-                    } else {
-                        String key = parameter.getNameAsString();
-                        description.setKey(key);
-                        section.param(key).ifPresent(tag -> description.addRemark(tag.getContent()));
-                        objectTypeDescription.add(description);
+                if (ParameterHelper.isRequestParam(parameter)) {
+                    TypeDescription description = Apigcc.getInstance().getTypeResolvers().resolve(parameter.getType());
+                    if (description.isAvailable()) {
+                        if (description.isObject()) {
+                            objectTypeDescription.merge(description.asObject());
+                        } else {
+                            String key = parameter.getNameAsString();
+                            description.setKey(key);
+                            section.param(key).ifPresent(tag -> description.addRemark(tag.getContent()));
+                            objectTypeDescription.add(description);
+                        }
                     }
                 }
             }
